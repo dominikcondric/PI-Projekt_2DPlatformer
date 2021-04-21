@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.5" tiledversion="1.5.0" orientation="orthogonal" renderorder="right-down" width="125" height="46" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="112">
- <tileset firstgid="1" name="363156_cutesbboy_beacon-cave-background_4000x1466" tilewidth="32" tileheight="32" tilecount="5625" columns="125">
-  <image source="../363156_cutesbboy_beacon-cave-background_4000x1466.png" width="4000" height="1466"/>
+ <tileset firstgid="1" name="cave" tilewidth="32" tileheight="32" tilecount="5625" columns="125">
+  <image source="../cave4000.png" width="4000" height="1466"/>
  </tileset>
  <layer id="1" name="Background" width="125" height="46">
   <data encoding="csv">
