@@ -15,8 +15,8 @@ public abstract class Entity {
 
 	public abstract void addToWorld(World world);
 	
-	public void update() {
-		sprite.setPosition(playerBody.getPosition().x, playerBody.getPosition().y);
+	public void update(float deltaTime) {
+		sprite.setPosition(playerBody.getPosition().x - sprite.getWidth() / 2.f, playerBody.getPosition().y - sprite.getHeight() / 2.f);
 	}
 		
 		

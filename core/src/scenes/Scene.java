@@ -2,13 +2,14 @@ package scenes;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import entities.Entity;
 
@@ -36,6 +37,10 @@ public abstract class Scene {
 		mapRenderer.setView(camera);
 	}
 	
+	public void renderPhysicsBodies(Box2DDebugRenderer physicsDebugRenderer) {
+		physicsDebugRenderer.render(box2DWorld, camera.combined);
+	}
+	
 	public void renderEntities(SpriteBatch batch) {
 		batch.begin();
 		for (final Entity entity : entities) {
@@ -48,7 +53,7 @@ public abstract class Scene {
 	public void update(OrthogonalTiledMapRenderer mapRenderer, SpriteBatch batch, float deltaTime) {
 		mapRenderer.setView(camera);
 		batch.setProjectionMatrix(camera.combined);
-		//box2DWorld.step(deltaTime, 10, 10);
+		box2DWorld.step(deltaTime, 10, 10);
 	}
 	
 	public void dispose() {
