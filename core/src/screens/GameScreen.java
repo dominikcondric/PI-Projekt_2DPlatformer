@@ -1,70 +1,43 @@
 package screens;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
 
+import scenes.TestScene;
+
 public class GameScreen implements Screen {
 	private final Platformer game;
-	private OrthographicCamera camera;
-	private TiledMap map;
-	private OrthogonalTiledMapRenderer mapRenderer;
+	private final TmxMapLoader tiledMapLoader;
+	private TestScene scene;
+	OrthogonalTiledMapRenderer mapRenderer;
 //	private Box2DDebugRenderer physicsDebugRenderer;
-//	private World world;
 
 	public GameScreen(final Platformer game) {
 		// Game handle
 		this.game = game;
-
-		// Camera
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false);
+		tiledMapLoader = new TmxMapLoader();
 		
-		// Map
-		TmxMapLoader mapLoader = new TmxMapLoader();
-		map = mapLoader.load("Cave/Maps/demo3.tmx");
-		mapRenderer = new OrthogonalTiledMapRenderer(map);
-		mapRenderer.setView(camera);
-		
-//		physicsDebugRenderer = new Box2DDebugRenderer();
+		mapRenderer = new OrthogonalTiledMapRenderer(null);
+		scene = new TestScene(tiledMapLoader.load("Cave/Maps/demo3.tmx"));
+		scene.setSceneForRendering(mapRenderer);
 	}
 
-	private void update() {
-		float deltaTime = Gdx.graphics.getDeltaTime();
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			camera.translate(-200.0f * deltaTime, 0.f);
-			camera.update();
-		}
-		
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			camera.translate(200.f * deltaTime, 0.f);
-			camera.update();
-		}
-		
-//		testWorld.step(deltaTime, 10, 10);
-	}
-	
 	@Override
 	public void render (float delta) {
 		ScreenUtils.clear(Color.SKY);
-		mapRenderer.getBatch().setProjectionMatrix(camera.combined);
+		scene.update(mapRenderer, game.batch, delta);
 		mapRenderer.render();
-//		physicsDebugRenderer.render(testWorld, camera.combined);
-		update();
+//		scene.renderEntities(game.batch);
 	}
 
 	@Override
 	public void dispose () {
 		mapRenderer.dispose();
-		map.dispose();
+		scene.dispose();
 	}
 
 	@Override
