@@ -10,11 +10,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-//import entities.Entity;
+import entities.Entity;
 
 public abstract class Scene {
 	protected TiledMap map;
-//	protected ArrayList<Entity> entities; 
+	protected ArrayList<Entity> entities; 
 	protected World box2DWorld;
 	protected OrthographicCamera camera;
 	
@@ -23,6 +23,7 @@ public abstract class Scene {
 		box2DWorld = new World(new Vector2(0.f, -9.81f), true);
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false);
+		entities = new ArrayList<Entity>();
 	}
 	
 	public void addEntity(Entity entity) {
@@ -47,7 +48,7 @@ public abstract class Scene {
 	public void update(OrthogonalTiledMapRenderer mapRenderer, SpriteBatch batch, float deltaTime) {
 		mapRenderer.setView(camera);
 		batch.setProjectionMatrix(camera.combined);
-		box2DWorld.step(Gdx.graphics.getDeltaTime(), 10, 10);
+		//box2DWorld.step(deltaTime, 10, 10);
 	}
 	
 	public void dispose() {

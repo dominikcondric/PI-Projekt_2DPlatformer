@@ -6,11 +6,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
+import entities.Player;
+
 public class TestScene extends Scene {
 	
 	public TestScene(TiledMap map) {
 		super(map);
 //		camera.zoom = 0.4f;
+		Player player = new Player(box2DWorld);
+		addEntity(player);
 		camera.update();
 	}
 	
