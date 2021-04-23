@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
+import entities.Player;
 
 import scenes.TestScene;
 
@@ -24,6 +25,8 @@ public class GameScreen implements Screen {
 		mapRenderer = new OrthogonalTiledMapRenderer(null);
 		scene = new TestScene(tiledMapLoader.load("Cave/Maps/demo3.tmx"));
 		scene.setSceneForRendering(mapRenderer);
+		
+		
 	}
 
 	@Override
@@ -31,7 +34,7 @@ public class GameScreen implements Screen {
 		ScreenUtils.clear(Color.SKY);
 		scene.update(mapRenderer, game.batch, delta);
 		mapRenderer.render();
-//		scene.renderEntities(game.batch);
+		scene.renderEntities(game.batch);
 	}
 
 	@Override
