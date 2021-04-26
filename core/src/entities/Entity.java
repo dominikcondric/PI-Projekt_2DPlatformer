@@ -8,7 +8,6 @@ public abstract class Entity {
 	protected Body playerBody;
 	protected Sprite sprite;
 
-
 	public Sprite getSprite() {
 		return sprite;
 	}
@@ -18,10 +17,4 @@ public abstract class Entity {
 	public void update(float deltaTime) {
 		sprite.setPosition(playerBody.getPosition().x - sprite.getWidth() / 2.f, playerBody.getPosition().y - sprite.getHeight() / 2.f);
 	}
-		
-		
-	
-	
-	
-
 }

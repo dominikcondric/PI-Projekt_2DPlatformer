@@ -12,7 +12,8 @@ public class Player extends Entity {
 	public Player(World world) {
 		Texture playerImg = new Texture("player.png");	
 		sprite = new Sprite(playerImg);
-		sprite.setPosition(50.f, 270.f);
+		sprite.setPosition(2.f, 8.f);
+		sprite.setSize(1.f, 1.5f);
 		addToWorld(world);
 	}
 	
@@ -30,6 +31,7 @@ public class Player extends Entity {
 		fdef.shape = polShape;
 
 		playerBody.createFixture(fdef);
+		polShape.dispose();
 	}
 	
 	@Override
