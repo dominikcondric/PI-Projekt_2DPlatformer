@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -18,40 +17,42 @@ public abstract class Scene {
 	protected ArrayList<Entity> entities; 
 	protected World box2DWorld;
 	protected OrthographicCamera camera;
+	protected OrthogonalTiledMapRenderer mapRenderer;
+	protected Entity playable;
+	boolean isPlayable;
 	
-	Scene(final TiledMap map) {
+	Scene(final TiledMap map, final SpriteBatch batch, float mapTileSize) {
 		this.map = map;
-		box2DWorld = new World(new Vector2(0.f, -9.81f), true);
+		mapRenderer = new OrthogonalTiledMapRenderer(this.map, 1 / mapTileSize, batch);
+		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false);
 		entities = new ArrayList<Entity>();
 	}
 	
-	public void addEntity(Entity entity) {
-		entity.addToWorld(box2DWorld);
+	public void addEntity(Entity entity, boolean isPlayable) {
+		//entity.addToWorld(box2DWorld);
+		if(isPlayable) {
+			playable = entity;
+		}
 		entities.add(entity);
-	}
-	
-	public void setSceneForRendering(OrthogonalTiledMapRenderer mapRenderer) {
-		mapRenderer.setMap(map);
-		mapRenderer.setView(camera);
 	}
 	
 	public void renderPhysicsBodies(Box2DDebugRenderer physicsDebugRenderer) {
 		physicsDebugRenderer.render(box2DWorld, camera.combined);
 	}
 	
-	public void renderEntities(SpriteBatch batch) {
+	public void render(SpriteBatch batch) {
+		mapRenderer.getBatch().setProjectionMatrix(camera.combined);
+		mapRenderer.render();
 		batch.begin();
 		for (final Entity entity : entities) {
 			final Sprite sprite = entity.getSprite();
-			batch.draw(sprite, sprite.getX(), sprite.getY());
+			batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
 		}
 		batch.end();
 	}
 	
-	public void update(OrthogonalTiledMapRenderer mapRenderer, SpriteBatch batch, float deltaTime) {
-		mapRenderer.setView(camera);
+	public void update(SpriteBatch batch, float deltaTime) {
 		batch.setProjectionMatrix(camera.combined);
 		box2DWorld.step(deltaTime, 10, 10);
 	}

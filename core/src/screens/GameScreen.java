@@ -5,11 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
-import entities.Player;
 
 import scenes.TestScene;
 
@@ -17,7 +15,6 @@ public class GameScreen implements Screen {
 	private final Platformer game;
 	private final TmxMapLoader tiledMapLoader;
 	private TestScene scene;
-	OrthogonalTiledMapRenderer mapRenderer;
 	private Box2DDebugRenderer physicsDebugRenderer;
 	private boolean debug = false;
 
@@ -25,11 +22,8 @@ public class GameScreen implements Screen {
 		// Game handle
 		this.game = game;
 		tiledMapLoader = new TmxMapLoader();
-		
+		scene = new TestScene(tiledMapLoader.load("Cave/Maps/demo3.tmx"), game.batch, 32.f);
 		physicsDebugRenderer = new Box2DDebugRenderer();
-		mapRenderer = new OrthogonalTiledMapRenderer(null);
-		scene = new TestScene(tiledMapLoader.load("Cave/Maps/demo3.tmx"));
-		scene.setSceneForRendering(mapRenderer);
 	}
 
 	private void update(float deltaTime) {
@@ -40,9 +34,8 @@ public class GameScreen implements Screen {
 	@Override
 	public void render (float delta) {
 		ScreenUtils.clear(Color.SKY);
-		scene.update(mapRenderer, game.batch, delta);
-		mapRenderer.render();
-		scene.renderEntities(game.batch);
+		scene.update(game.batch, delta);
+		scene.render(game.batch);
 		if (debug) {
 			scene.renderPhysicsBodies(physicsDebugRenderer);
 		}
@@ -51,7 +44,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose () {
-		mapRenderer.dispose();
 		scene.dispose();
 		physicsDebugRenderer.dispose();
 	}
