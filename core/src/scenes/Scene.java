@@ -30,7 +30,7 @@ public abstract class Scene {
 	}
 	
 	public void addEntity(Entity entity, boolean isPlayable) {
-		entity.addToWorld(box2DWorld);
+		//entity.addToWorld(box2DWorld);
 		if(isPlayable) {
 			playable = entity;
 		}
