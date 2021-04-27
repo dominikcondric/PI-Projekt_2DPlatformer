@@ -9,10 +9,12 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Entity;
 import entities.Player;
+import entities.Projectile;
 
 public class TestScene extends Scene {
 	
@@ -24,7 +26,7 @@ public class TestScene extends Scene {
 		mapRenderer.setView(camera);
 		
 		Player player = new Player(box2DWorld);
-		addEntity(player);
+		addEntity(player, true);
 		
 		BodyDef bodyDefinition = new BodyDef();
 		Body body = null;
@@ -36,7 +38,13 @@ public class TestScene extends Scene {
 			bodyDefinition.position.set((rectangle.getX() + rectangle.getWidth() / 2.f) * scalingFactor, (rectangle.getY() + rectangle.getHeight() / 2.f)  * scalingFactor);
 			body = box2DWorld.createBody(bodyDefinition);
 			polyShape.setAsBox(rectangle.getWidth() / 2.f  * scalingFactor, rectangle.getHeight() / 2.f * scalingFactor);
-			body.createFixture(polyShape, 0.f);
+			
+			FixtureDef fdef = new FixtureDef();
+			fdef.shape = polyShape;
+			fdef.friction = 0;
+			
+			body.createFixture(fdef);
+			
 		}
 		polyShape.dispose();
 	}
@@ -63,6 +71,10 @@ public class TestScene extends Scene {
 		
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			camera.position.add(0.f, -100.f * deltaTime, 0);
+		}
+		if(Gdx.input.isKeyJustPressed(Input.Keys.F)) {
+			Projectile projectile = new Projectile(box2DWorld, playable.getSprite().getX(), playable.getSprite().getY(), ((Player)playable).runningRight);
+			addEntity(projectile, false);
 		}
 		
 		camera.update();

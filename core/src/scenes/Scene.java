@@ -18,17 +18,22 @@ public abstract class Scene {
 	protected World box2DWorld;
 	protected OrthographicCamera camera;
 	protected OrthogonalTiledMapRenderer mapRenderer;
+	protected Entity playable;
+	boolean isPlayable;
 	
 	Scene(final TiledMap map, final SpriteBatch batch, float mapTileSize) {
 		this.map = map;
 		mapRenderer = new OrthogonalTiledMapRenderer(this.map, 1 / mapTileSize, batch);
-		box2DWorld = new World(new Vector2(0.f, -20.81f), true);
+		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
 		camera = new OrthographicCamera();
 		entities = new ArrayList<Entity>();
 	}
 	
-	public void addEntity(Entity entity) {
+	public void addEntity(Entity entity, boolean isPlayable) {
 		entity.addToWorld(box2DWorld);
+		if(isPlayable) {
+			playable = entity;
+		}
 		entities.add(entity);
 	}
 	
