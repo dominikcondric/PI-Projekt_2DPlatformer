@@ -1,31 +1,72 @@
 package entities;
 
 import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 public class Player extends Entity {
+	
+	private TextureAtlas atlas;
+	
+	@SuppressWarnings({ "unused", "rawtypes" })
+	private Animation playerStandAnim;
+	@SuppressWarnings("rawtypes")
+	private Animation playerRunAnim;
+	private TextureRegion playerStand;
+	private TextureRegion playerFall;
+	private TextureRegion playerJump;
 	
 	private final int MOVE_THRESHOLD_LEFT = -6;
 	private final int MOVE_THRESHOLD_RIGHT = 6;
 	private final int ON_GROUND = 0;
 	
-	public enum State { FALLING, JUMPING, STANDING, RUNNING, GROWING, DEAD };
+	public enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD };
+	public State currentState;
+    public State previousState;
+    
 	public boolean runningRight = true;
-	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>(); 
+	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+	private float stateTimer;
 	
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Player() {
-		Texture playerImg = new Texture("player.png");	
-		sprite = new Sprite(playerImg);
-		sprite.setSize(1.f, 1.5f);
+		
+		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\aero_v3.atlas"));
+		playerStand = new TextureRegion(atlas.findRegion("aero3"), 0, 0, 16, 20);
+		playerJump = new TextureRegion(atlas.findRegion("jumping"), 42, 0, 18, 20);
+		playerFall = new TextureRegion(atlas.findRegion("jumping"), 84, 0, 18, 20);
+		
+		Array<TextureRegion> framesStand = new Array<TextureRegion>();
+		Array<TextureRegion> framesRun = new Array<TextureRegion>();
+		
+		int xCoordinate = 0;
+		
+		for(int i = 0; i < 13; i++) {
+	        framesStand.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 21));
+	        xCoordinate += 21;
+		}
+	    playerStandAnim = new Animation(0.1f, framesStand);
+	    
+		for(int i = 0; i < 8; i++) {
+	        framesRun.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 21));
+	        xCoordinate += 21;
+		}
+	    playerRunAnim = new Animation(0.1f, framesRun);
+		
+		sprite = new Sprite(playerStand);
+		sprite.setBounds(2.f, 8.f, 1.6f, 2f);
+		sprite.setScale(1.6f, 2f);
 	}
 	
 	public void addToWorld(World world) {
@@ -33,7 +74,7 @@ public class Player extends Entity {
 		bodyDefinition.position.set(sprite.getX() + sprite.getWidth() / 2.f, sprite.getY() + sprite.getHeight() / 2.f);
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
-		this.body = world.createBody(bodyDefinition);
+		body = world.createBody(bodyDefinition);
 		
 		PolygonShape polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f, sprite.getHeight() / 2.f);
@@ -41,7 +82,7 @@ public class Player extends Entity {
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 
-		this.body.createFixture(fdef).setUserData(this);;
+		body.createFixture(fdef);
 		polShape.dispose();
 	}
 	
@@ -49,6 +90,11 @@ public class Player extends Entity {
 	public void update(float deltaTime) {
 		super.update(deltaTime);
 		Vector2 playerVelocity = body.getLinearVelocity();
+		
+		TextureRegion currentRegion = getFrame(deltaTime);
+		
+		sprite.setRegion(currentRegion);
+		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && playerVelocity.y == ON_GROUND) {
 			jump();
 		}	
@@ -66,10 +112,60 @@ public class Player extends Entity {
         }else {
         	body.setLinearDamping(12);
         }
-        
+
 	}
 	
+	public TextureRegion getFrame(float deltaTime){
+
+        currentState = getState();
+        TextureRegion region;
+
+        switch(currentState){
+        	case JUMPING:
+        		region = playerJump;
+        		break;
+        	case FALLING:
+        		region = playerFall;
+        		break;
+            case RUNNING:
+                region = (TextureRegion) playerRunAnim.getKeyFrame(stateTimer, true);
+                break;
+            case STANDING:
+            	region = (TextureRegion) playerStandAnim.getKeyFrame(stateTimer, true);
+            	break;
+            default:
+                region = playerStand;
+                break;
+        }
+        
+        if((body.getLinearVelocity().x < 0 || !runningRight) && !region.isFlipX()){
+            region.flip(true, false);
+            runningRight = false;
+        }
+
+        else if((body.getLinearVelocity().x > 0 || runningRight) && region.isFlipX()){
+            region.flip(true, false);
+            runningRight = true;
+        }
+
+        stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
+        previousState = currentState;
+        return region;
+
+    }
 	
+	public State getState(){
+		
+        if((body.getLinearVelocity().y > 0 && currentState == State.JUMPING) || (body.getLinearVelocity().y < 0 && previousState == State.JUMPING))
+            return State.JUMPING;
+        else if(body.getLinearVelocity().y < 0)
+            return State.FALLING;
+        else if(body.getLinearVelocity().x < -0.3f || body.getLinearVelocity().x > 0.3f)
+            return State.RUNNING;
+        else
+            return State.STANDING;
+    }
+
 	public void jump() {
 		body.applyLinearImpulse(new Vector2(0, 11f), body.getWorldCenter(), true);
 	}
@@ -85,8 +181,8 @@ public class Player extends Entity {
     	runningRight = false;
 	}
 	
-	public void basicattack() {
-		
-	}
+	public float getStateTimer(){
+        return stateTimer;
+    }
 
 }

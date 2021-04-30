@@ -20,7 +20,7 @@ public class Projectile extends Entity {
 		sprite = new Sprite(projectileImg);
 		
 		if (firedRight) {
-			sprite.setX(playerX + 1.3f);
+			sprite.setX(playerX + 1.8f);
 		} else {
 			sprite.setX(playerX - 0.3f);
 		}
