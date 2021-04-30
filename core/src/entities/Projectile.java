@@ -36,11 +36,12 @@ public class Projectile extends Entity {
 		
 		flying = new Animation(0.1f, frames);
 		
-		sprite = new Sprite(projectileImage);
 		
+		sprite = new Sprite(projectileImage);
 		if (firedRight) {
 			sprite.setX(playerX + 2.1f);
 		} else {
+			sprite.flip(true, false);
 			sprite.setX(playerX - 0.6f);
 		}
 		
