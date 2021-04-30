@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.Array;
 
 public class Player extends Entity {
 	
-	private TextureAtlas atlas;
 	
 	@SuppressWarnings({ "unused", "rawtypes" })
 	private Animation playerStandAnim;

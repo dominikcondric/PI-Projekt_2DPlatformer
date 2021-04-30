@@ -1,32 +1,51 @@
 package entities;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 public class Projectile extends Entity {
+	
 	private float stateTime = 0.f;
 	private boolean firedRight;
+	@SuppressWarnings("rawtypes")
+	private Animation flying;
+	private float stateTimer;
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Projectile(float playerX, float playerY, boolean firedRight) {
 		this.firedRight = firedRight;
-		Texture projectileImg = new Texture("projectile.png");	
-		sprite = new Sprite(projectileImg);
+		
+		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball.atlas"));
+		TextureRegion projectileImage = new TextureRegion(atlas.findRegion("FB001"),0 , 0, 35, 17);
+		
+		int xCoordinate = 0;
+		Array<TextureRegion> frames = new Array<TextureRegion>();
+		for(int i = 0; i < 5; i++) {
+			frames.add(new TextureRegion(atlas.findRegion("FB001"),xCoordinate , 0, 35, 17));
+			xCoordinate += 37;
+		}
+		
+		flying = new Animation(0.1f, frames);
+		
+		sprite = new Sprite(projectileImage);
 		
 		if (firedRight) {
-			sprite.setX(playerX + 1.8f);
+			sprite.setX(playerX + 2.1f);
 		} else {
-			sprite.setX(playerX - 0.3f);
+			sprite.setX(playerX - 0.6f);
 		}
 		
 		sprite.setY(playerY + 0.75f);
-		sprite.setSize(0.3f, 0.3f);
+		sprite.setSize(0.8f, 0.4f);
 	}
 
 	public void addToWorld(World world) {
@@ -61,6 +80,7 @@ public class Projectile extends Entity {
 	public void update(float deltaTime) {
 		super.update(deltaTime);
 		//stateTime += deltaTime;
+		sprite.setRegion(getFrame(deltaTime));
 		if(body.getLinearVelocity().y < 0) {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
@@ -73,5 +93,22 @@ public class Projectile extends Entity {
     public void onHit() {
     	System.out.println("onhitprojectile");
     	setToDestroy = true;
+    }
+    
+    public TextureRegion getFrame(float deltaTime){
+
+        TextureRegion region = (TextureRegion) flying.getKeyFrame(stateTimer, true);
+        if((body.getLinearVelocity().x < 0 || !firedRight) && !region.isFlipX()){
+            region.flip(true, false);
+            firedRight = false;
+        }
+
+        else if((body.getLinearVelocity().x > 0 || firedRight) && region.isFlipX()){
+            region.flip(true, false);
+            firedRight = true;
+        }
+        
+        stateTimer = stateTimer + deltaTime;
+        return region;
     }
 }

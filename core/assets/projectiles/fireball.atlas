@@ -1,0 +1,41 @@
+
+fireball.png
+size: 256, 32
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+FB001
+  rotate: false
+  xy: 2, 4
+  size: 32, 17
+  orig: 64, 32
+  offset: 21, 9
+  index: -1
+FB002
+  rotate: false
+  xy: 39, 4
+  size: 31, 17
+  orig: 64, 32
+  offset: 22, 9
+  index: -1
+FB003
+  rotate: false
+  xy: 76, 4
+  size: 35, 17
+  orig: 64, 32
+  offset: 18, 9
+  index: -1
+FB004
+  rotate: false
+  xy: 113, 4
+  size: 33, 17
+  orig: 64, 32
+  offset: 20, 9
+  index: -1
+FB005
+  rotate: false
+  xy: 150, 4
+  size: 29, 17
+  orig: 64, 32
+  offset: 24, 9
+  index: -1
