@@ -9,12 +9,15 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Entity;
 import entities.Player;
 import entities.Projectile;
+import entities.Enemys;
+
 
 public class TestScene extends Scene {
 	
@@ -27,6 +30,10 @@ public class TestScene extends Scene {
 		
 		Player player = new Player(box2DWorld);
 		addEntity(player, true);
+		
+		//
+		Enemys enemy= new Enemys(box2DWorld);
+		addEntity(enemy,false);
 		
 		BodyDef bodyDefinition = new BodyDef();
 		Body body = null;
@@ -44,8 +51,11 @@ public class TestScene extends Scene {
 			fdef.friction = 0;
 			
 			body.createFixture(fdef);
-			
+		
 		}
+		
+		
+		
 		polyShape.dispose();
 	}
 	
@@ -77,8 +87,19 @@ public class TestScene extends Scene {
 			addEntity(projectile, false);
 		}
 		
+		
 		camera.update();
-		for (Entity entity : entities) 
-			entity.update(deltaTime);
+		
+		for(int i = 0;i < entities.size();i++){ 
+			entities.get(i).update(deltaTime);
+		    if(!entities.get(i).exist){
+		    	entities.get(i).removeBody(box2DWorld);
+		    	entities.remove(i);
+		    }
+		}
+
+
 	}
+	
+
 }

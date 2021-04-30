@@ -7,6 +7,8 @@ import com.badlogic.gdx.physics.box2d.World;
 public abstract class Entity {
 	protected Body body;
 	protected Sprite sprite;
+	public boolean exist=true;
+
 
 	public Sprite getSprite() {
 		return sprite;
@@ -17,4 +19,14 @@ public abstract class Entity {
 	public void update(float deltaTime) {
 		sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2.f, body.getPosition().y - sprite.getHeight() / 2.f);
 	}
+	
+	public void remove() {
+		this.exist=false;
+	}
+	
+	public void removeBody(World world) {
+		world.destroyBody(this.body);
+	}
+	
+
 }

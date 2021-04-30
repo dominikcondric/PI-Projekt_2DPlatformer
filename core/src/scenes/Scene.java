@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import entities.Entity;
+import tools.Colisionlistener;
 
 public abstract class Scene {
 	protected TiledMap map;
@@ -27,6 +28,8 @@ public abstract class Scene {
 		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
 		camera = new OrthographicCamera();
 		entities = new ArrayList<Entity>();
+		
+		box2DWorld.setContactListener(new Colisionlistener());
 	}
 	
 	public void addEntity(Entity entity, boolean isPlayable) {
@@ -55,7 +58,10 @@ public abstract class Scene {
 	public void update(SpriteBatch batch, float deltaTime) {
 		batch.setProjectionMatrix(camera.combined);
 		box2DWorld.step(deltaTime, 10, 10);
+
 	}
+	
+	
 	
 	public void dispose() {
 		box2DWorld.dispose();

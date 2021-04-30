@@ -1,9 +1,11 @@
 package entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -12,10 +14,10 @@ import com.platformer.Platformer;
 
 public class Projectile extends Entity {
 	
-	boolean destroy;
-	boolean destroyed;
+	/*boolean destroy;
+	boolean destroyed;*/
 	boolean firedRight;
-	float stateTime;
+	//float stateTime;
 	World world;
 	
 	public Projectile(World world, float playerX, float playerY, boolean firedRight) {
@@ -37,7 +39,7 @@ public class Projectile extends Entity {
 		//bodyDefinition.position.set((float) (firedRight ? sprite.getX() : sprite.getX() ), (float) (sprite.getY()) );
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
-		body = world.createBody(bodyDefinition);
+		this.body = world.createBody(bodyDefinition);
 		
 		PolygonShape polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f , sprite.getHeight() / 2.f );
@@ -45,12 +47,15 @@ public class Projectile extends Entity {
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 
-		body.createFixture(fdef);
+				
+		this.body.createFixture(fdef).setUserData(this);
+		
 		fdef.friction = 0;
 		fdef.restitution = 1;
 		
 		body.setGravityScale(0);
-		body.setLinearVelocity(new Vector2(firedRight ? 10f : -10f,0));
+		body.setLinearVelocity(new Vector2(firedRight ? 20f : -20f,0));
+		
 		
 		polShape.dispose();
 		
@@ -58,27 +63,32 @@ public class Projectile extends Entity {
 	
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		stateTime += deltaTime;
+		//stateTime += deltaTime;
 		if(body.getLinearVelocity().y < 0) {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
 		
-		if((stateTime > 2 || destroy) && !destroyed ) {
+		/*if((stateTime > 2 || destroy) && !destroyed ) {
             world.destroyBody(body);
             destroyed = true;
-        }
+        }*/
 		
-		if((firedRight && body.getLinearVelocity().x < 0) || (!firedRight && body.getLinearVelocity().x > 1))
-            setToDestroy();
+		/*if((firedRight && body.getLinearVelocity().x < 0) || (!firedRight && body.getLinearVelocity().x > 1))
+            setToDestroy();*/
 		
 	}
 	
-	public void setToDestroy(){
+	/*public void setToDestroy(){
         destroy = true;
     }
 
     public boolean isDestroyed(){
         return destroyed;
+    }*/
+    
+    public void onHit() {
+    	System.out.println("onhitprojectile");
+    	this.remove();
     }
 
 }

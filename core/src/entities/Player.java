@@ -35,7 +35,7 @@ public class Player extends Entity {
 		bodyDefinition.position.set(sprite.getX() + sprite.getWidth() / 2.f, sprite.getY() + sprite.getHeight() / 2.f);
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
-		body = world.createBody(bodyDefinition);
+		this.body = world.createBody(bodyDefinition);
 		
 		PolygonShape polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f, sprite.getHeight() / 2.f);
@@ -43,7 +43,7 @@ public class Player extends Entity {
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 
-		body.createFixture(fdef);
+		this.body.createFixture(fdef).setUserData(this);;
 		polShape.dispose();
 	}
 	
@@ -88,5 +88,8 @@ public class Player extends Entity {
     	runningRight = false;
 	}
 	
+	public void basicattack() {
+		
+	}
 
 }
