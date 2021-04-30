@@ -7,34 +7,29 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Pools;
-import com.platformer.Platformer;
 
 public class Projectile extends Entity {
+	private float stateTime = 0.f;
+	private boolean firedRight;
 	
-	boolean destroy;
-	boolean destroyed;
-	boolean firedRight;
-	float stateTime;
-	World world;
-	
-	public Projectile(World world, float playerX, float playerY, boolean firedRight) {
-		this.world = world;
+	public Projectile(float playerX, float playerY, boolean firedRight) {
 		this.firedRight = firedRight;
-		
 		Texture projectileImg = new Texture("projectile.png");	
 		sprite = new Sprite(projectileImg);
-		sprite.setPosition(playerX, playerY);
-		sprite.setSize((float)0.4, (float)0.4);
 		
-		addToWorld(world);
+		if (firedRight) {
+			sprite.setX(playerX + 1.3f);
+		} else {
+			sprite.setX(playerX - 0.3f);
+		}
 		
+		sprite.setY(playerY + 0.75f);
+		sprite.setSize(0.3f, 0.3f);
 	}
 
 	public void addToWorld(World world) {
 		BodyDef bodyDefinition = new BodyDef();
-		bodyDefinition.position.set((float) ((float) (firedRight ? (float)(sprite.getX() + sprite.getWidth() / 2.f) + 1.6 :(float) (sprite.getX() + sprite.getWidth() / 2.f)) - 0.5), (float) (sprite.getY() + sprite.getHeight() + 0.5) );
-		//bodyDefinition.position.set((float) (firedRight ? sprite.getX() : sprite.getX() ), (float) (sprite.getY()) );
+		bodyDefinition.position.set(sprite.getX(), sprite.getY());
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
 		body = world.createBody(bodyDefinition);
@@ -50,10 +45,12 @@ public class Projectile extends Entity {
 		fdef.restitution = 1;
 		
 		body.setGravityScale(0);
-		body.setLinearVelocity(new Vector2(firedRight ? 10f : -10f,0));
+		if (firedRight)
+			body.setLinearVelocity(new Vector2(10f, 0f));
+		else
+			body.setLinearVelocity(new Vector2(-10f, 0f));
 		
 		polShape.dispose();
-		
 	}
 	
 	public void update(float deltaTime) {
@@ -63,22 +60,8 @@ public class Projectile extends Entity {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
 		
-		if((stateTime > 2 || destroy) && !destroyed ) {
-            world.destroyBody(body);
-            destroyed = true;
+		if(stateTime > 2.f || body.getLinearVelocity().x == 0.f) {
+            setToDestroy = true;
         }
-		
-		if((firedRight && body.getLinearVelocity().x < 0) || (!firedRight && body.getLinearVelocity().x > 1))
-            setToDestroy();
-		
 	}
-	
-	public void setToDestroy(){
-        destroy = true;
-    }
-
-    public boolean isDestroyed(){
-        return destroyed;
-    }
-
 }

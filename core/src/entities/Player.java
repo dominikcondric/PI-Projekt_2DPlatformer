@@ -22,12 +22,10 @@ public class Player extends Entity {
 	public boolean runningRight = true;
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>(); 
 	
-	public Player(World world) {
+	public Player() {
 		Texture playerImg = new Texture("player.png");	
 		sprite = new Sprite(playerImg);
-		sprite.setPosition(2.f, 8.f);
 		sprite.setSize(1.f, 1.5f);
-		addToWorld(world);
 	}
 	
 	public void addToWorld(World world) {
@@ -52,7 +50,6 @@ public class Player extends Entity {
 		super.update(deltaTime);
 		Vector2 playerVelocity = body.getLinearVelocity();
 		if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && playerVelocity.y == ON_GROUND) {
-			System.out.println(sprite.getX());
 			jump();
 		}	
 

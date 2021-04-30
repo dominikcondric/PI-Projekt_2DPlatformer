@@ -1,7 +1,11 @@
 package scenes;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -12,21 +16,15 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import entities.Entity;
-import entities.Player;
 import entities.Projectile;
 
 public class TestScene extends Scene {
+	private ArrayList<Projectile> projectiles;
 	
-	public TestScene(TiledMap map, final SpriteBatch batch, float mapTileSize) {
-		super(map, batch, mapTileSize);
+	public TestScene(TiledMap map, final SpriteBatch batch, float mapTileSize, final String sceneName) {
+		super(map, batch, mapTileSize, sceneName);
 		
-		camera.setToOrtho(false, Gdx.graphics.getWidth() / 20.f, Gdx.graphics.getHeight() / 20.f);
-		camera.update();
-		mapRenderer.setView(camera);
-		
-		Player player = new Player(box2DWorld);
-		addEntity(player, true);
+		projectiles = new ArrayList<Projectile>();
 		
 		BodyDef bodyDefinition = new BodyDef();
 		Body body = null;
@@ -50,35 +48,75 @@ public class TestScene extends Scene {
 	}
 	
 	@Override
-	public void render(SpriteBatch batch) {
-		super.render(batch);
+	public void render(SpriteBatch batch, OrthographicCamera camera) {
+		mapRenderer.setView(camera);
+		mapRenderer.render();
+		
+		batch.begin();
+		player.render(batch);
+		for (Projectile p : projectiles) {
+			p.render(batch);
+		}
+		batch.end();
 	}
+	
+	@Override
+	public boolean shouldTransit(String sceneName) {
+		switch (sceneName) {
+			case "Desert":
+				if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+					return true;
+				}
+				break;
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public void transitFromScene(Scene previousScene) {
+		// TODO Auto-generated method stub
+		switch (previousScene.getName()) {
+			case "Cave":
+				this.player = previousScene.player;
+				player.getSprite().setPosition(2.f, 30.f);
+				previousScene.box2DWorld.destroyBody(player.getBody());
+				player.addToWorld(box2DWorld);
+				previousScene.player = null;
+				break;
+		}
+	}
+		
 	
 	@Override
 	public void update(SpriteBatch batch, float deltaTime) {
 		super.update(batch, deltaTime);
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			camera.position.add(-100.f * deltaTime, 0, 0);
+		
+		if (player.isSetToDestroy()) {
+			player = null;
+		} else {
+			player.update(deltaTime);
 		}
 		
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			camera.position.add(100.f * deltaTime, 0, 0);
+		for (int i = projectiles.size() - 1; i >= 0; --i) {
+			if (projectiles.get(i).isSetToDestroy()) {
+				toDestroy.add(i);
+			} else { 
+				projectiles.get(i).update(deltaTime);
+			}
 		}
 		
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			camera.position.add(0.f, 100.f * deltaTime, 0.f);
+		for (Integer i : toDestroy) {
+			box2DWorld.destroyBody(projectiles.get(i.intValue()).getBody());
+			projectiles.remove(i.intValue());
 		}
 		
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			camera.position.add(0.f, -100.f * deltaTime, 0);
-		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-			Projectile projectile = new Projectile(box2DWorld, playable.getSprite().getX(), playable.getSprite().getY(), ((Player)playable).runningRight);
-			addEntity(projectile, false);
-		}
+		toDestroy.clear();
 		
-		camera.update();
-		for (Entity entity : entities) 
-			entity.update(deltaTime);
+		if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
+			Projectile p = new Projectile(player.getSprite().getX(), player.getSprite().getY(), player.runningRight);
+			p.addToWorld(box2DWorld);
+			projectiles.add(p);
+		}
 	}
 }
