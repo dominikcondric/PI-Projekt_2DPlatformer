@@ -79,6 +79,11 @@ public class GameScreen implements Screen {
 		if (debug) {
 			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
 		}
+		//placeholder da se moze izac i uc bez da ponovno launch
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+			game.setScreen(new MainMenuScreen(game));
+			dispose();
+		}
 		update(delta);
 	}
 

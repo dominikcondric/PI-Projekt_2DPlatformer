@@ -1,9 +1,11 @@
 package entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -32,7 +34,7 @@ public class Projectile extends Entity {
 		bodyDefinition.position.set(sprite.getX(), sprite.getY());
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
-		body = world.createBody(bodyDefinition);
+		this.body = world.createBody(bodyDefinition);
 		
 		PolygonShape polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f , sprite.getHeight() / 2.f );
@@ -40,11 +42,14 @@ public class Projectile extends Entity {
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 
-		body.createFixture(fdef);
+				
+		this.body.createFixture(fdef).setUserData(this);
+		
 		fdef.friction = 0;
 		fdef.restitution = 1;
 		
 		body.setGravityScale(0);
+		
 		if (firedRight)
 			body.setLinearVelocity(new Vector2(10f, 0f));
 		else
@@ -55,7 +60,7 @@ public class Projectile extends Entity {
 	
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		stateTime += deltaTime;
+		//stateTime += deltaTime;
 		if(body.getLinearVelocity().y < 0) {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
@@ -64,4 +69,9 @@ public class Projectile extends Entity {
             setToDestroy = true;
         }
 	}
+    
+    public void onHit() {
+    	System.out.println("onhitprojectile");
+    	setToDestroy = true;
+    }
 }

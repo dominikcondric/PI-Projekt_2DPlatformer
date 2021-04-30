@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import entities.Entity;
 import entities.Player;
+import tools.Colisionlistener;
 
 public abstract class Scene {
 	protected TiledMap map;
@@ -25,6 +26,7 @@ public abstract class Scene {
 		mapRenderer = new OrthogonalTiledMapRenderer(this.map, 1 / mapTileSize, batch);
 		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
 		toDestroy = new ArrayList<Integer>();
+		box2DWorld.setContactListener(new Colisionlistener());
 	}
 	
 	public void addEntity(Entity entity) {
@@ -52,6 +54,7 @@ public abstract class Scene {
 	
 	public void update(SpriteBatch batch, float deltaTime) {
 		box2DWorld.step(deltaTime, 10, 10);
+
 	}
 	
 	public abstract boolean shouldTransit(String nextSceneName);

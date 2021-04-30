@@ -13,18 +13,27 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Projectile;
+import entities.Enemys;
+import entities.Entity;
+
 
 public class TestScene extends Scene {
 	private ArrayList<Projectile> projectiles;
+	private ArrayList<Enemys> enemies;
 	
 	public TestScene(TiledMap map, final SpriteBatch batch, float mapTileSize, final String sceneName) {
 		super(map, batch, mapTileSize, sceneName);
 		
 		projectiles = new ArrayList<Projectile>();
+		enemies = new ArrayList<Enemys>(2);
+		
+		Enemys enemy= new Enemys();
+		addEntity(enemy);
 		
 		BodyDef bodyDefinition = new BodyDef();
 		Body body = null;
@@ -42,9 +51,17 @@ public class TestScene extends Scene {
 			fdef.friction = 0;
 			
 			body.createFixture(fdef);
-			
 		}
+		
 		polyShape.dispose();
+	}
+	
+	@Override 
+	public void addEntity(Entity entity) {
+		super.addEntity(entity);
+		if (entity instanceof Enemys) {
+			enemies.add((Enemys)entity);
+		}
 	}
 	
 	@Override
@@ -57,6 +74,11 @@ public class TestScene extends Scene {
 		for (Projectile p : projectiles) {
 			p.render(batch);
 		}
+		
+		for (Enemys enemy : enemies) {
+			enemy.render(batch);
+		}
+		
 		batch.end();
 	}
 	
@@ -109,6 +131,21 @@ public class TestScene extends Scene {
 		for (Integer i : toDestroy) {
 			box2DWorld.destroyBody(projectiles.get(i.intValue()).getBody());
 			projectiles.remove(i.intValue());
+		}
+		
+		toDestroy.clear();
+		
+		for (int i = enemies.size() - 1; i >= 0; --i) {
+			if (enemies.get(i).isSetToDestroy()) {
+				toDestroy.add(i);
+			} else { 
+				enemies.get(i).update(deltaTime);
+			}
+		}
+		
+		for (Integer i : toDestroy) {
+			box2DWorld.destroyBody(enemies.get(i.intValue()).getBody());
+			enemies.remove(i.intValue());
 		}
 		
 		toDestroy.clear();
