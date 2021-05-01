@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 
+import scenes.Scene;
+
 public abstract class Entity {
 	protected Body body;
 	protected Sprite sprite;
@@ -17,7 +19,7 @@ public abstract class Entity {
 	}
 
 	public abstract void addToWorld(World world);
-	
+
 	public Body getBody() {
 		return body;
 	}
@@ -26,7 +28,7 @@ public abstract class Entity {
 		batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
 	}
 	
-	public void update(float deltaTime) {
+	public void update(final Scene scene, float deltaTime) {
 		sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2.f, body.getPosition().y - sprite.getHeight() / 2.f);
 		setToDestroy = false;
 	}

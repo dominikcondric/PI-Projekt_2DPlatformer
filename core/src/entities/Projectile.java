@@ -12,6 +12,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import scenes.Scene;
+
 public class Projectile extends Entity {
 	
 	private float stateTime = 0.f;
@@ -78,8 +80,8 @@ public class Projectile extends Entity {
 		polShape.dispose();
 	}
 	
-	public void update(float deltaTime) {
-		super.update(deltaTime);
+	public void update(final Scene scene, float deltaTime) {
+		super.update(scene, deltaTime);
 		//stateTime += deltaTime;
 		sprite.setRegion(getFrame(deltaTime));
 		if(body.getLinearVelocity().y < 0) {
