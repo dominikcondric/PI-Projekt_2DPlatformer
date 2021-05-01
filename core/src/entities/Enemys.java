@@ -7,6 +7,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import scenes.Scene;
+
 public class Enemys extends Entity {
 	
 	protected int hp=5;
@@ -37,15 +39,11 @@ public class Enemys extends Entity {
 
 		this.body.createFixture(fdef).setUserData(this);
 		polShape.dispose();
-		
-		
-
-		
 	}
 	
 	@Override
-	public void update(float deltaTime) {
-		super.update(deltaTime);
+	public void update(final Scene scene, float deltaTime) {
+		super.update(scene, deltaTime);
 	}
 	
 	public void onHit() {

@@ -10,9 +10,11 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
 
+import entities.Enemys;
 import entities.Player;
+import scenes.EnemyTrigger;
+import scenes.PlayerLocationTrigger;
 import scenes.Scene;
-import scenes.TestScene;
 import utility.SceneManager;
 
 public class GameScreen implements Screen {
@@ -21,7 +23,6 @@ public class GameScreen implements Screen {
 	private Box2DDebugRenderer physicsDebugRenderer;
 	private OrthographicCamera camera;
 	private SceneManager sceneManager;
-	private Player player;
 	private boolean debug = false;
 
 	public GameScreen(final Platformer game) {
@@ -32,17 +33,22 @@ public class GameScreen implements Screen {
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
 		
-		TestScene caveScene = new TestScene(tiledMapLoader.load("Cave/Maps/demo3.tmx"), game.batch, 32.f, "Cave");
-		sceneManager.addScene(caveScene, true);
+		Scene caveScene = new Scene(tiledMapLoader.load("Cave/Maps/demo3.tmx"), game.batch, 32.f);
+		sceneManager.addScene(caveScene, "Cave", true);
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		
-		TestScene desertScene = new TestScene(tiledMapLoader.load("Desert/desert_map.tmx"), game.batch, 32.f, "Desert");
-		sceneManager.addScene(desertScene, false);
-		sceneManager.addSceneToFollow("Cave", "Desert");
+		Scene desertScene = new Scene(tiledMapLoader.load("Desert/desert_map.tmx"), game.batch, 32.f);
+		sceneManager.addScene(desertScene, "Desert", false);
 		
-		player = new Player();
+		Player player = new Player();
 		player.getSprite().setPosition(2.f, 8.f);
 		caveScene.addEntity(player);
+		caveScene.addTrigger(new PlayerLocationTrigger(desertScene, player));
+		
+		Enemys enemy = new Enemys();
+		enemy.getSprite().setPosition(5.f, 8.f);
+		caveScene.addEntity(enemy);
+		caveScene.addTrigger(new EnemyTrigger(desertScene, enemy));
 	}
 
 	private void update(float deltaTime) {
@@ -74,7 +80,7 @@ public class GameScreen implements Screen {
 		ScreenUtils.clear(Color.SKY);
 		game.batch.setProjectionMatrix(camera.combined);
 		Scene activeScene = sceneManager.getActiveScene();
-		activeScene.update(game.batch, delta);
+		activeScene.update(delta);
 		activeScene.render(game.batch, camera);
 		if (debug) {
 			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);

@@ -14,6 +14,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import scenes.Scene;
+
 public class Player extends Entity {
 	
 	
@@ -34,7 +36,6 @@ public class Player extends Entity {
     public State previousState;
     
 	public boolean runningRight = true;
-	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	private float stateTimer;
 	
 
@@ -86,8 +87,8 @@ public class Player extends Entity {
 	}
 	
 	@Override
-	public void update(float deltaTime) {
-		super.update(deltaTime);
+	public void update(final Scene scene, float deltaTime) {
+		super.update(scene, deltaTime);
 		Vector2 playerVelocity = body.getLinearVelocity();
 		
 		TextureRegion currentRegion = getFrame(deltaTime);
@@ -112,6 +113,10 @@ public class Player extends Entity {
         	body.setLinearDamping(12);
         }
 
+        
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
+        	scene.addEntity(new Projectile(sprite.getX(), sprite.getY(), runningRight));
+        }
 	}
 	
 	public TextureRegion getFrame(float deltaTime){
