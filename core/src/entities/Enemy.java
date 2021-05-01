@@ -9,11 +9,11 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import scenes.Scene;
 
-public class Enemys extends Entity {
+public class Enemy extends Entity {
 	
 	protected int hp=5;
 
-	public Enemys() {
+	public Enemy() {
 		Texture playerImg = new Texture("player.png");	
 		sprite = new Sprite(playerImg);
 		sprite.setPosition(5.f, 8.f);
