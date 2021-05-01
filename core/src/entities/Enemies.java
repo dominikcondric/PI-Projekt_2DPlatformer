@@ -7,11 +7,11 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-public class Enemys extends Entity {
+public class Enemies extends Entity {
 	
 	protected int hp=5;
 
-	public Enemys() {
+	public Enemies() {
 		Texture playerImg = new Texture("player.png");	
 		sprite = new Sprite(playerImg);
 		sprite.setPosition(5.f, 8.f);

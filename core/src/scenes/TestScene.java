@@ -18,21 +18,21 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Projectile;
-import entities.Enemys;
+import entities.Enemies;
 import entities.Entity;
 
 
 public class TestScene extends Scene {
 	private ArrayList<Projectile> projectiles;
-	private ArrayList<Enemys> enemies;
+	private ArrayList<Enemies> enemies;
 	
 	public TestScene(TiledMap map, final SpriteBatch batch, float mapTileSize, final String sceneName) {
 		super(map, batch, mapTileSize, sceneName);
 		
 		projectiles = new ArrayList<Projectile>();
-		enemies = new ArrayList<Enemys>(2);
+		enemies = new ArrayList<Enemies>(2);
 		
-		Enemys enemy= new Enemys();
+		Enemies enemy= new Enemies();
 		addEntity(enemy);
 		
 		BodyDef bodyDefinition = new BodyDef();
@@ -59,8 +59,8 @@ public class TestScene extends Scene {
 	@Override 
 	public void addEntity(Entity entity) {
 		super.addEntity(entity);
-		if (entity instanceof Enemys) {
-			enemies.add((Enemys)entity);
+		if (entity instanceof Enemies) {
+			enemies.add((Enemies)entity);
 		}
 	}
 	
@@ -75,7 +75,7 @@ public class TestScene extends Scene {
 			p.render(batch);
 		}
 		
-		for (Enemys enemy : enemies) {
+		for (Enemies enemy : enemies) {
 			enemy.render(batch);
 		}
 		

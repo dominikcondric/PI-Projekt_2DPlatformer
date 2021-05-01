@@ -50,22 +50,27 @@ public class Player extends Entity {
 		Array<TextureRegion> framesRun = new Array<TextureRegion>();
 		
 		int xCoordinate = 0;
-		
-		for(int i = 0; i < 13; i++) {
-	        framesStand.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 21));
+		framesStand.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 20 ));
+		xCoordinate += 21;
+		for(int i = 0; i < 3; i++) {
+	        framesStand.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 21 ));
 	        xCoordinate += 21;
 		}
+		for(int i = 0; i < 9; i++) {
+	        framesStand.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 20 ));
+	        xCoordinate += 21;
+		}
+
 	    playerStandAnim = new Animation(0.1f, framesStand);
 	    
 		for(int i = 0; i < 8; i++) {
-	        framesRun.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 21));
+	        framesRun.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 20));
 	        xCoordinate += 21;
 		}
 	    playerRunAnim = new Animation(0.1f, framesRun);
 		
 		sprite = new Sprite(playerStand);
 		sprite.setBounds(2.f, 8.f, 1.6f, 2f);
-		sprite.setScale(1.6f, 2f);
 	}
 	
 	public void addToWorld(World world) {

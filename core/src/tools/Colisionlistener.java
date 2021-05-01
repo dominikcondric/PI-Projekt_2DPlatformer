@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
-import entities.Enemys;
+import entities.Enemies;
 import entities.Player;
 import entities.Projectile;
 import scenes.TestScene;
@@ -23,9 +23,9 @@ public class Colisionlistener implements ContactListener{
 		if(A==null || B==null || A.getClass()==null || B.getClass()==null || A.getUserData() instanceof Player || B.getUserData() instanceof Player ) return;
 		
 		
-		if(A.getUserData() instanceof Enemys || B.getUserData() instanceof Enemys) {
+		if(A.getUserData() instanceof Enemies || B.getUserData() instanceof Enemies) {
 
-			if(A.getUserData() instanceof Enemys) {
+			if(A.getUserData() instanceof Enemies) {
 				enemy = A ;
 				object=B;
 			}
@@ -37,7 +37,7 @@ public class Colisionlistener implements ContactListener{
 			if(object.getUserData() instanceof Projectile){
 
 				((Projectile) object.getUserData()).onHit();
-				((Enemys) enemy.getUserData()).onHit();
+				((Enemies) enemy.getUserData()).onHit();
 			}	
 			return;
 		}
