@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
 
-import entities.Enemys;
+import entities.Enemy;
 import entities.Player;
 import scenes.EnemyTrigger;
 import scenes.PlayerLocationTrigger;
@@ -45,7 +45,7 @@ public class GameScreen implements Screen {
 		caveScene.addEntity(player);
 		caveScene.addTrigger(new PlayerLocationTrigger(desertScene, player));
 		
-		Enemys enemy = new Enemys();
+		Enemy enemy = new Enemy();
 		enemy.getSprite().setPosition(5.f, 8.f);
 		caveScene.addEntity(enemy);
 		caveScene.addTrigger(new EnemyTrigger(desertScene, enemy));

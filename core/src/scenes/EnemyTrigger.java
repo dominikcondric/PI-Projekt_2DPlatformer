@@ -1,11 +1,11 @@
 package scenes;
 
-import entities.Enemys;
+import entities.Enemy;
 
 public class EnemyTrigger extends SceneTrigger {
-	private Enemys enemy;	
+	private Enemy enemy;	
 	
-	public EnemyTrigger(final Scene sceneToFollow, Enemys enemy) {
+	public EnemyTrigger(final Scene sceneToFollow, Enemy enemy) {
 		super(sceneToFollow);
 		this.enemy = enemy;
 	}
