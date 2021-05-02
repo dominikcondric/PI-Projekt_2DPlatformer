@@ -30,12 +30,12 @@ public class GameScreen implements Screen {
 		this.game = game;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth() / 30.f, Gdx.graphics.getHeight() / 30.f);
+		physicsDebugRenderer = new Box2DDebugRenderer();
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
 		
 		Scene caveScene = new Scene(tiledMapLoader.load("Cave/Maps/demo3.tmx"), game.batch, 32.f);
 		sceneManager.addScene(caveScene, "Cave", true);
-		physicsDebugRenderer = new Box2DDebugRenderer();
 		
 		Scene desertScene = new Scene(tiledMapLoader.load("Desert/desert_map.tmx"), game.batch, 32.f);
 		sceneManager.addScene(desertScene, "Desert", false);
@@ -43,12 +43,10 @@ public class GameScreen implements Screen {
 		Player player = new Player();
 		player.getSprite().setPosition(2.f, 8.f);
 		caveScene.addEntity(player);
-		caveScene.addTrigger(new PlayerLocationTrigger(desertScene, player));
 		
 		Enemy enemy = new Enemy();
 		enemy.getSprite().setPosition(5.f, 8.f);
 		caveScene.addEntity(enemy);
-		caveScene.addTrigger(new EnemyTrigger(desertScene, enemy));
 	}
 
 	private void update(float deltaTime) {

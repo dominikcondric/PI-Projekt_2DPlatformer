@@ -15,8 +15,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import entities.Entity;
-import entities.Player;
-import tools.Colisionlistener;
+import tools.CollisionListener;
 
 public class Scene {
 	protected TiledMap map;
@@ -30,7 +29,7 @@ public class Scene {
 		this.map = map;
 		mapRenderer = new OrthogonalTiledMapRenderer(this.map, 1 / mapTileSize, batch);
 		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
-		box2DWorld.setContactListener(new Colisionlistener());
+		box2DWorld.setContactListener(new CollisionListener());
 		
 		BodyDef bodyDef = null;
 		PolygonShape shape = null;
