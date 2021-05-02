@@ -15,7 +15,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import entities.Entity;
-import entities.Player;
 import tools.CollisionListener;
 
 public class Scene {
