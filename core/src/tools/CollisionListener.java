@@ -29,7 +29,7 @@ public class CollisionListener implements ContactListener{
 			
 			if(!(A.getUserData() instanceof Player || B.getUserData() instanceof Player)) return;
 
-			if(A.getUserData()=="sensor") {
+			if(A.getUserData()instanceof Enemy) {
 				sensor = A ;
 				object=B;
 			}
