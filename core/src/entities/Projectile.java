@@ -2,7 +2,6 @@ package entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -24,6 +23,7 @@ public class Projectile extends Entity {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Projectile(float playerX, float playerY, boolean firedRight) {
+		super(new Vector2(playerX, playerY));
 		this.firedRight = firedRight;
 		
 		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball.atlas"));
@@ -38,8 +38,7 @@ public class Projectile extends Entity {
 		
 		flying = new Animation(0.1f, frames);
 		
-		
-		sprite = new Sprite(projectileImage);
+		sprite.setRegion(projectileImage);
 		if (firedRight) {
 			sprite.setX(playerX + 2.1f);
 		} else {
@@ -94,7 +93,6 @@ public class Projectile extends Entity {
 	}
     
     public void onHit() {
-    	System.out.println("onhitprojectile");
     	setToDestroy = true;
     }
     

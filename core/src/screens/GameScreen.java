@@ -5,16 +5,20 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
 
 import entities.Enemy;
 import entities.Player;
-import scenes.EnemyTrigger;
-import scenes.PlayerLocationTrigger;
+import scenes.CaveScene;
 import scenes.Scene;
+import screens.GameOverScreen.ScreenType;
 import utility.SceneManager;
 
 public class GameScreen implements Screen {
@@ -23,6 +27,7 @@ public class GameScreen implements Screen {
 	private Box2DDebugRenderer physicsDebugRenderer;
 	private OrthographicCamera camera;
 	private SceneManager sceneManager;
+	private Player player;
 	private boolean debug = false;
 
 	public GameScreen(final Platformer game) {
@@ -34,63 +39,65 @@ public class GameScreen implements Screen {
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
 		
-		Scene caveScene = new Scene(tiledMapLoader.load("Cave/Maps/demo3.tmx"), game.batch, 32.f);
+		Scene caveScene = new CaveScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(caveScene, "Cave", true);
 		
-		Scene desertScene = new Scene(tiledMapLoader.load("Desert/desert_map.tmx"), game.batch, 32.f);
-		sceneManager.addScene(desertScene, "Desert", false);
-		
-		Player player = new Player();
-		player.getSprite().setPosition(2.f, 8.f);
+		player = new Player(new Vector2(2.f, 8.f));
 		caveScene.addEntity(player);
-		
-		Enemy enemy = new Enemy();
-		enemy.getSprite().setPosition(5.f, 8.f);
-		caveScene.addEntity(enemy);
 	}
 
 	private void update(float deltaTime) {
-		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) 
+		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
 			debug = !debug;
-		
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			camera.position.add(-100.f * deltaTime, 0, 0);
 		}
 		
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			camera.position.add(100.f * deltaTime, 0, 0);
+		Vector2 playerPosition = player.getBody().getPosition();
+		Vector2 activeMapSize = sceneManager.getActiveScene().getTiledMapSize();
+		
+		if (playerPosition.x - camera.viewportWidth / 2f < 0f) {
+			camera.position.x = camera.viewportWidth / 2f;
+		} else if (playerPosition.x + camera.viewportWidth / 2.f > activeMapSize.x) {
+			camera.position.x = activeMapSize.x - camera.viewportWidth / 2f;
+		} else {
+			camera.position.x = playerPosition.x;
 		}
 		
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			camera.position.add(0.f, 100.f * deltaTime, 0.f);
-		}
-		
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			camera.position.add(0.f, -100.f * deltaTime, 0);
+		if (playerPosition.y - camera.viewportHeight / 2f < 0f) {
+			camera.position.y = camera.viewportHeight / 2f;
+		} else if (playerPosition.y + camera.viewportHeight / 2.f > activeMapSize.y) {
+			camera.position.y = activeMapSize.y - camera.viewportHeight / 2f;
+		} else {
+			camera.position.y = playerPosition.y;
 		}
 		
 		camera.update();
 		sceneManager.update();
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+			dispose();
+			game.setScreen(new MainMenuScreen(game));
+		} else if (player.isSetToDestroy()) {
+			player.setToDestroy(false);
+			sceneManager.getActiveScene().resetEntities();
+			player.setPosition(2.f, 8.f);
+			sceneManager.getActiveScene().addEntity(player);
+			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
+		}
 	}
 	
 	@Override
 	public void render (float delta) {
 		ScreenUtils.clear(Color.SKY);
-		game.batch.setProjectionMatrix(camera.combined);
 		Scene activeScene = sceneManager.getActiveScene();
+		game.batch.setProjectionMatrix(camera.combined);
 		activeScene.update(delta);
 		activeScene.render(game.batch, camera);
 		if (debug) {
 			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
 		}
-		//placeholder da se moze izac i uc bez da ponovno launch
-		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-			game.setScreen(new MainMenuScreen(game));
-			dispose();
-		}
 		update(delta);
 	}
-
+	
 	@Override
 	public void dispose () {
 		sceneManager.dispose();

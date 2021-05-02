@@ -1,11 +1,8 @@
 package utility;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.function.BiConsumer;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
 import scenes.Scene;
@@ -22,8 +19,7 @@ public class SceneManager implements Disposable {
 	
 	/**
 	 * Adds scene to scene map and sets it to active if setActive is true, or if it
-	 * is the first scene in the map.\n
-	 * WARNING!!! - If scene name already exist, new name to fetch scene is changed and shown in console!
+	 * is the first scene in the map.
 	 * @param scene
 	 * @param sceneName
 	 * @param setActive

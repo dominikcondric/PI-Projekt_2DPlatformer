@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import scenes.Scene;
 
 public class Player extends Entity {
-	
+	private int hp = 5; 
 	
 	@SuppressWarnings({ "unused", "rawtypes" })
 	private Animation playerStandAnim;
@@ -40,8 +40,8 @@ public class Player extends Entity {
 	
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Player() {
-		
+	public Player(Vector2 position) {
+		super(position);
 		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\aero_v3.atlas"));
 		playerStand = new TextureRegion(atlas.findRegion("aero3"), 0, 0, 16, 20);
 		playerJump = new TextureRegion(atlas.findRegion("jumping"), 42, 0, 18, 20);
@@ -70,8 +70,8 @@ public class Player extends Entity {
 		}
 	    playerRunAnim = new Animation(0.1f, framesRun);
 		
-		sprite = new Sprite(playerStand);
-		sprite.setBounds(2.f, 8.f, 1.6f, 2f);
+	    sprite.setRegion(playerStand);
+		sprite.setSize(1.6f, 2f);
 	}
 	
 	public void addToWorld(World world) {
@@ -121,6 +121,11 @@ public class Player extends Entity {
         
         if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
         	scene.addEntity(new Projectile(sprite.getX(), sprite.getY(), runningRight));
+        }
+        
+        if (body.getPosition().y < 0.f) {
+        	setToDestroy = true;
+        	body.setTransform(2.f, 8.f, 0.f);
         }
 	}
 	

@@ -20,22 +20,20 @@ import com.platformer.Platformer;
 
 public class MainMenuScreen implements Screen {
 	private final Platformer game;
-	private BitmapFont font;
 	private Stage userInterface;
-	TextButton newGameButton;
-	TextButton resumeGameButton;
-	TextButton optionsButton;
-	Table table;
+	private TextButton newGameButton;
+	private TextButton resumeGameButton;
+	private TextButton optionsButton;
+	private Table table;
 
 	public MainMenuScreen(final Platformer game) {
 		// Initialization
 		this.game = game;
-		font = new BitmapFont();
-		userInterface = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		userInterface = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), game.batch);
 		
 		// Setup input
 		Gdx.input.setInputProcessor(userInterface);
-		font.getData().setScale(20.f);
+		game.font.getData().setScale(20.f);
 
 		// Setup
 		table = new Table();
@@ -51,9 +49,9 @@ public class MainMenuScreen implements Screen {
 		TextureRegionDrawable texture = new TextureRegionDrawable(new Texture(pixmap));
 		
 		TextButtonStyle style = new TextButtonStyle();
-		style.font = font;
+		style.font = game.font;
 		style.fontColor = Color.WHITE;
-		style.overFontColor = Color.SKY;
+		style.overFontColor = Color.FIREBRICK;
 		style.up = texture;
 		
 		newGameButton = new TextButton("NEW GAME", style);
@@ -93,7 +91,7 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		ScreenUtils.clear(Color.SKY);
+		ScreenUtils.clear(Color.BLACK);
 		userInterface.act();
 		userInterface.draw();
 		
@@ -129,7 +127,6 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		font.dispose();
 		userInterface.dispose();
 	}
 

@@ -3,6 +3,7 @@ package entities;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 
@@ -14,12 +15,17 @@ public abstract class Entity {
 	protected boolean setToDestroy = false;
 	protected TextureAtlas atlas;
 	
-	public Sprite getSprite() {
-		return sprite;
+	protected Entity(Vector2 position) {
+		sprite = new Sprite();
+		sprite.setPosition(position.x, position.y);
 	}
-
+	
 	public abstract void addToWorld(World world);
 
+	public void setPosition(float x, float y) {
+		sprite.setPosition(x, y);
+	}
+	
 	public Body getBody() {
 		return body;
 	}
@@ -35,5 +41,9 @@ public abstract class Entity {
 	
 	public boolean isSetToDestroy() {
 		return setToDestroy;
+	}
+	
+	public void setToDestroy(boolean destroy) {
+		setToDestroy = destroy;
 	}
 }
