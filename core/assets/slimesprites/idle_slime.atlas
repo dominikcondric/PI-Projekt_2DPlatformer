@@ -1,0 +1,48 @@
+
+idle_slime.png
+size: 256, 32
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+idle_slime01
+  rotate: false
+  xy: 2, 4
+  size: 21, 18
+  orig: 64, 64
+  offset: 18, 16
+  index: -1
+idle_slime02
+  rotate: false
+  xy: 25, 4
+  size: 21, 18
+  orig: 64, 64
+  offset: 18, 16
+  index: -1
+idle_slime03
+  rotate: false
+  xy: 48, 4
+  size: 21, 18
+  orig: 64, 64
+  offset: 18, 16
+  index: -1
+idle_slime04
+  rotate: false
+  xy: 71, 4
+  size: 21, 18
+  orig: 64, 64
+  offset: 18, 16
+  index: -1
+idle_slime05
+  rotate: false
+  xy: 94, 4
+  size: 21, 18
+  orig: 64, 64
+  offset: 18, 16
+  index: -1
+idle_slime06
+  rotate: false
+  xy: 117, 4
+  size: 21, 18
+  orig: 64, 64
+  offset: 18, 16
+  index: -1
