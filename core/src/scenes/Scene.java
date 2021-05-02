@@ -4,20 +4,15 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+
 import entities.Entity;
+import entities.Player;
 import tools.CollisionListener;
 
 public abstract class Scene {
@@ -105,8 +100,20 @@ public abstract class Scene {
 		toDestroy.clear();
 	}
 	
+
+	public Player getPlayer() {
+		for(Entity entity : entities) {
+			if(entity instanceof Player) return (Player) entity;
+		}
+		return null;
+	}
+	
 	public void dispose() {
 		box2DWorld.dispose();
 		map.dispose();
 	}
+
+
+
+
 }

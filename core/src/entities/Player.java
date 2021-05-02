@@ -1,10 +1,8 @@
 package entities;
 
-import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -17,7 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import scenes.Scene;
 
 public class Player extends Entity {
-	private int hp = 5; 
+	private int hp = 1; 
 	
 	@SuppressWarnings({ "unused", "rawtypes" })
 	private Animation playerStandAnim;
@@ -79,7 +77,7 @@ public class Player extends Entity {
 		bodyDefinition.position.set(sprite.getX() + sprite.getWidth() / 2.f, sprite.getY() + sprite.getHeight() / 2.f);
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
-		body = world.createBody(bodyDefinition);
+		this.body = world.createBody(bodyDefinition);
 		
 		PolygonShape polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f, sprite.getHeight() / 2.f);
@@ -87,7 +85,7 @@ public class Player extends Entity {
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 
-		body.createFixture(fdef);
+		this.body.createFixture(fdef).setUserData(this);
 		polShape.dispose();
 	}
 	
@@ -198,5 +196,19 @@ public class Player extends Entity {
 	public float getStateTimer(){
         return stateTimer;
     }
+
+	
+	public void onHit() {
+		this.hp=0;
+		if(this.hp<=0)
+			setToDestroy = true;
+	}
+	
+
+	
+	
+	
+	
+
 
 }

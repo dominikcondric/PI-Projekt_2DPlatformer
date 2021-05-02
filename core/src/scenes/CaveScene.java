@@ -48,6 +48,6 @@ public class CaveScene extends Scene {
 
 	@Override
 	public void constructEntities() {
-		addEntity(new Enemy(new Vector2(5.f, 8.f)));
+		addEntity(new Enemy(new Vector2(82.f, 20.f)));
 	}
 }

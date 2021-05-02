@@ -112,4 +112,6 @@ public class Projectile extends Entity {
         stateTimer = stateTimer + deltaTime;
         return region;
     }
+
+
 }
