@@ -14,7 +14,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+
+import entities.Enemy;
 import entities.Entity;
+import entities.Player;
 import tools.CollisionListener;
 
 public class Scene {
@@ -98,8 +101,49 @@ public class Scene {
 		toDestroy.clear();
 	}
 	
+	//dodano
+	
+	public void ClosestEnemy(Player player) {
+		Enemy closestEnemy=null;
+		float closestdist=10000000f;
+		
+		for(Entity enemy:entities) {
+			if(!(enemy instanceof Enemy)) continue;
+			/*float disttoplayer=(float) Math.sqrt(
+				Math.pow(enemy.getSprite().getX()-player.getSprite().getX(),2) 
+				+ Math.pow(enemy.getSprite().getY()-player.getSprite().getY(),2)
+				);
+			*/
+			float disttoplayer=getDistance(enemy.getSprite().getX(), player.getSprite().getX(), enemy.getSprite().getY(), player.getSprite().getY());
+			if(disttoplayer<closestdist) {
+				closestdist=disttoplayer;
+				closestEnemy=(Enemy) enemy;
+			}
+		}
+		closestEnemy.activate();
+	}
+	
+	public float getDistance(float x1, float y1, float x2, float y2) {
+		float distance=(float) Math.sqrt(
+				Math.pow(x1-x2,2) + Math.pow(y1-y2,2)
+				);
+		return distance;
+	}
+	
+	public Player getPlayer() {
+		Player player;
+		for(Entity entity : entities) {
+			if(entity instanceof Player) return (Player) entity;
+		}
+		return null;
+	}
+	
 	public void dispose() {
 		box2DWorld.dispose();
 		map.dispose();
 	}
+
+
+
+
 }

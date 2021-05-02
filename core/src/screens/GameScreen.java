@@ -45,7 +45,8 @@ public class GameScreen implements Screen {
 		caveScene.addEntity(player);
 		
 		Enemy enemy = new Enemy();
-		enemy.getSprite().setPosition(5.f, 8.f);
+		//enemy.getSprite().setPosition(82.f, 20.f);
+		
 		caveScene.addEntity(enemy);
 	}
 
