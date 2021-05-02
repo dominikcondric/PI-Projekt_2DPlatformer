@@ -23,7 +23,7 @@ public class Enemy extends Entity {
 		sprite = new Sprite(playerImg);
 		/*sprite.setPosition(5.f, 8.f);
 		sprite.setSize(1.f, 1.5f);*/
-		sprite.setBounds(5.f, 8.f, 1f, 1.5f);
+		sprite.setBounds(10.f, 8.f, 1f, 1.5f);
 
 	}
 	
@@ -54,7 +54,7 @@ public class Enemy extends Entity {
 		
 		fdef.shape = vision;
 		fdef.isSensor=true;
-		this.body.createFixture(fdef).setUserData("sensor");
+		this.body.createFixture(fdef).setUserData(this);
 		
 		
 		polShape.dispose();
@@ -70,20 +70,32 @@ public class Enemy extends Entity {
 	
 
 
-	public boolean getDirection(Player player) {
+	public int getDirection(Player player) {
 		//enemy manji x dakle true onda se mice enemy u desno
 		//inace se mice u ljevo
-		if(this.getSprite().getX()<player.getSprite().getX()) return true;
-		return false;
+		int dir=0;
+		if(this.getSprite().getX()<player.getSprite().getX()) dir++;
+		if(this.getSprite().getY()<player.getSprite().getY()) dir+=2;
+		return dir;
+
 	}
 
-	public void move(boolean direction) {
-		if(direction) {
-			moveRight();
-		}
-		else {
+	public void move(int direction) {
+		if(direction==0 || direction==2) {
 			moveLeft();
 		}
+		else {
+			moveRight();
+
+		}
+		if(direction>=2 && this.getBody().getLinearVelocity().y==0) {
+			jump();
+		}
+		
+	}
+
+	public void jump() {
+		body.applyLinearImpulse(new Vector2(0, 11f), body.getWorldCenter(), true);
 		
 	}
 

@@ -38,7 +38,6 @@ public class Player extends Entity {
 	public boolean runningRight = true;
 	private float stateTimer;
 	
-	protected boolean contactWithEnemy=false;
 	public int hp=1;
 	
 
@@ -127,11 +126,6 @@ public class Player extends Entity {
         }
         
         
-        //dodano
-        if(this.contactWithEnemy) {
-        	this.contactWithEnemy=false;
-        	scene.ClosestEnemy(this);
-        }
 	}
 	
 	public TextureRegion getFrame(float deltaTime){
@@ -204,9 +198,6 @@ public class Player extends Entity {
         return stateTimer;
     }
 
-	public void ContactWithEnemy() {
-		this.contactWithEnemy=true;
-	}
 	
 	public void onHit() {
 		this.hp=0;
@@ -214,6 +205,7 @@ public class Player extends Entity {
 			setToDestroy = true;
 	}
 	
+
 	
 	
 	

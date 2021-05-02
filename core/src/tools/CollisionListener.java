@@ -20,35 +20,12 @@ public class CollisionListener implements ContactListener{
 		
 		if(A==null || B==null || A.getClass()==null || B.getClass()==null) return;
 		
-		if(A.getUserData() instanceof Enemy || B.getUserData() instanceof Enemy) {
-			Fixture enemy;
-			Fixture object;
-
-			if(A.getUserData() instanceof Enemy) {
-				enemy = A ;
-				object=B;
-			}
-			else {
-				enemy = B ;
-				object=A;
-			}
-			
-			if(object.getUserData() instanceof Projectile){
-
-				((Projectile) object.getUserData()).onHit();
-				((Enemy) enemy.getUserData()).onHit();
-			}	
-			if(object.getUserData() instanceof Player) {
-				((Player) object.getUserData()).onHit();
-				((Enemy) enemy.getUserData()).stop();
-
-			}
-			return;
-		}
 		
-		if(A.getUserData()=="sensor" || B.getUserData()=="sensor") {
+		
+		if((A.getUserData() instanceof Enemy || B.getUserData() instanceof Enemy) && (A.isSensor() || B.isSensor())) {
 			Fixture sensor;
 			Fixture object;
+			
 			
 			if(!(A.getUserData() instanceof Player || B.getUserData() instanceof Player)) return;
 
@@ -61,13 +38,38 @@ public class CollisionListener implements ContactListener{
 				object=A;
 			}
 			
+			
 			if(object.getUserData() instanceof Player) {
-				((Player) object.getUserData()).ContactWithEnemy();
+				((Enemy) sensor.getUserData()).activate();
 			}
 			return;
 		}
 		
 		
+		if(A.getUserData() instanceof Enemy || B.getUserData() instanceof Enemy) {
+			Fixture enemy;
+			Fixture object;
+
+			if(A.getUserData() instanceof Enemy) {
+				enemy = A ;
+				object=B;
+			}
+			else {
+				enemy = B ;
+				object=A;
+			}
+			if(object.getUserData() instanceof Projectile){
+
+				((Projectile) object.getUserData()).onHit();
+				((Enemy) enemy.getUserData()).onHit();
+			}	
+			if(object.getUserData() instanceof Player) {
+				((Player) object.getUserData()).onHit();
+				((Enemy) enemy.getUserData()).stop();
+
+			}
+			return;
+		}
 		
 		if(A.getUserData() instanceof Projectile) {
 			((Projectile) A.getUserData()).onHit();
