@@ -75,16 +75,17 @@ public class Enemy extends Entity {
 		//inace se mice u ljevo
 		int dir=0;
 		if(this.getSprite().getX()<player.getSprite().getX()) dir++;
-		if(this.getSprite().getY()<player.getSprite().getY()) dir+=2;
+		else dir--;
+		if(this.getSprite().getY()<player.getSprite().getY()) dir+=3;
 		return dir;
 
 	}
 
 	public void move(int direction) {
-		if(direction==0 || direction==2) {
+		if(direction==-1 || direction==2) {
 			moveLeft();
 		}
-		else {
+		else if (direction==1 || direction == 4 ){
 			moveRight();
 
 		}
