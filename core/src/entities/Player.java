@@ -2,11 +2,13 @@ package entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -18,58 +20,124 @@ public class Player extends Entity {
 	public int hp = 4; 
 	
 	@SuppressWarnings({ "unused", "rawtypes" })
-	private Animation playerStandAnim;
+	private Animation playerIdleAnim;
 	@SuppressWarnings("rawtypes")
 	private Animation playerRunAnim;
-	private TextureRegion playerStand;
+	private Animation playerFallAnim;
+	private Animation playerJumpAnim;
+	private Animation playerCastAnim;
+	private TextureRegion playerIdle;
 	private TextureRegion playerFall;
 	private TextureRegion playerJump;
+	
+	PolygonShape polShape;
+	FixtureDef fdef;
+	Fixture fix;
 	
 	private final int MOVE_THRESHOLD_LEFT = -6;
 	private final int MOVE_THRESHOLD_RIGHT = 6;
 	private final int ON_GROUND = 0;
 	
-	public enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD };
+	public enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD, CASTING };
 	public State currentState;
     public State previousState;
     
 	public boolean runningRight = true;
+	boolean lastAnim = false;
 	private float stateTimer;
 	
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Player(Vector2 position) {
 		super(position);
-		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\aero_v3.atlas"));
-		playerStand = new TextureRegion(atlas.findRegion("aero3"), 0, 0, 16, 20);
-		playerJump = new TextureRegion(atlas.findRegion("jumping"), 42, 0, 18, 20);
-		playerFall = new TextureRegion(atlas.findRegion("jumping"), 84, 0, 18, 20);
+		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\movement_casting_aero.atlas"));
 		
-		Array<TextureRegion> framesStand = new Array<TextureRegion>();
+		Array<TextureRegion> framesFall = new Array<TextureRegion>();
+		Array<TextureRegion> framesIdle = new Array<TextureRegion>();
 		Array<TextureRegion> framesRun = new Array<TextureRegion>();
+		Array<TextureRegion> framesCast = new Array<TextureRegion>();
 		
 		int xCoordinate = 0;
-		framesStand.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 20 ));
-		xCoordinate += 21;
-		for(int i = 0; i < 3; i++) {
-	        framesStand.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 21 ));
-	        xCoordinate += 21;
+		playerJump = new TextureRegion(atlas.findRegion("jump"), xCoordinate, 0, 20, 24);
+		for(int i = 0; i < 2; i++) {
+			framesFall.add(new TextureRegion(atlas.findRegion("fall"), xCoordinate, 0, 17, 31 ));
+			xCoordinate += 19;
 		}
-		for(int i = 0; i < 9; i++) {
-	        framesStand.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 20 ));
-	        xCoordinate += 21;
+		playerFallAnim = new Animation(0.1f, framesFall);
+		xCoordinate = 0;
+		for(int i = 0; i < 4; i++) {
+			switch(i) {
+				case 0:
+					framesIdle.add(new TextureRegion(atlas.findRegion("idle"), xCoordinate, 0, 19, 29 ));
+					break;
+				case 1:
+					framesIdle.add(new TextureRegion(atlas.findRegion("idle"), xCoordinate, 0, 17, 30 ));
+					break;
+				case 2:
+					framesIdle.add(new TextureRegion(atlas.findRegion("idle"), xCoordinate, 0, 19, 30 ));
+					playerIdle = new TextureRegion(atlas.findRegion("idle"), xCoordinate, 0, 23, 31);
+					break;
+				case 3:
+					framesIdle.add(new TextureRegion(atlas.findRegion("idle"), xCoordinate, 0, 20, 29 ));
+					break;
+			}
+			
+	        xCoordinate += 22;
 		}
-
-	    playerStandAnim = new Animation(0.1f, framesStand);
-	    
-		for(int i = 0; i < 8; i++) {
-	        framesRun.add(new TextureRegion(atlas.findRegion("aero3"), xCoordinate, 0, 19, 20));
-	        xCoordinate += 21;
+		playerIdleAnim = new Animation(0.1f, framesIdle);
+		xCoordinate = 0;
+		for(int i = 0; i < 6; i++) {
+			switch(i) {
+			case 0:
+				framesRun.add(new TextureRegion(atlas.findRegion("run"), xCoordinate, 0, 20, 28 ));
+				break;
+			case 1:
+				framesRun.add(new TextureRegion(atlas.findRegion("run"), xCoordinate, 0, 20, 27 ));
+				break;
+			case 2:
+				framesRun.add(new TextureRegion(atlas.findRegion("run"), xCoordinate, 0, 20, 25 ));
+				break;
+			case 3:
+				framesRun.add(new TextureRegion(atlas.findRegion("run"), xCoordinate, 0, 23, 28 ));
+				break;
+			case 4:
+				framesRun.add(new TextureRegion(atlas.findRegion("run"), xCoordinate, 0, 20, 27 ));
+				break;
+			case 5:
+				framesRun.add(new TextureRegion(atlas.findRegion("run"), xCoordinate, 0, 20, 25 ));
+				break;
 		}
-	    playerRunAnim = new Animation(0.1f, framesRun);
 		
-	    sprite.setRegion(playerStand);
-		sprite.setSize(0.9f, 1.125f);
+        xCoordinate += 25;
+		}
+		playerRunAnim = new Animation(0.1f, framesRun);
+		
+		xCoordinate = 0;
+		for(int i = 0; i < 5; i++) {
+			switch(i) {
+				case 0:
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), xCoordinate, 0, 21, 26 ));
+					break;
+				case 1:
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), xCoordinate, 0, 18, 25 ));
+					break;
+				case 2:
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), xCoordinate, 0, 17, 25 ));
+					break;
+				case 3:
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), xCoordinate, 0, 27, 24 ));
+					break;
+				case 4:
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), xCoordinate - 29, 0, 27, 24 ));
+					break;
+			}
+			
+	        xCoordinate += 29;
+		}
+		playerCastAnim = new Animation(0.1f, framesCast);
+		
+	    sprite.setRegion(playerJump);
+		sprite.setSize(0.78f, 1.25f);
 	}
 	
 	public void addToWorld(World world) {
@@ -79,13 +147,14 @@ public class Player extends Entity {
 		
 		this.body = world.createBody(bodyDefinition);
 		
-		PolygonShape polShape = new PolygonShape();
+		polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f, sprite.getHeight() / 2.f);
 		
-		FixtureDef fdef = new FixtureDef();
+		fdef = new FixtureDef();
 		fdef.shape = polShape;
-
-		this.body.createFixture(fdef).setUserData(this);
+		
+		fix = this.body.createFixture(fdef);
+		fix.setUserData(this);
 		polShape.dispose();
 	}
 	
@@ -110,6 +179,10 @@ public class Player extends Entity {
         	moveLeft();
         }
         
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        	crouch();
+        }
+        
         if(playerVelocity.y != ON_GROUND) {
         	body.setLinearDamping(0);
         }else {
@@ -126,39 +199,47 @@ public class Player extends Entity {
         	body.setTransform(2.f, 8.f, 0.f);
         }
 	}
-	
-	public TextureRegion getFrame(float deltaTime){
 
+	private void crouch() {
+
+	}
+
+	public TextureRegion getFrame(float deltaTime){
+		
+		TextureRegion region;
+		if(currentState == State.CASTING && playerCastAnim.getKeyFrameIndex(stateTimer) != 4) {
+			region = (TextureRegion) playerCastAnim.getKeyFrame(stateTimer, true);
+			needsFlip(region);
+			stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
+			
+			return region;
+		}
         currentState = getState();
-        TextureRegion region;
+        
 
         switch(currentState){
-        	case JUMPING:
+        	case CASTING:
+        		region = (TextureRegion) playerCastAnim.getKeyFrame(stateTimer, true);
+        		break;
+         	case JUMPING:
         		region = playerJump;
         		break;
         	case FALLING:
-        		region = playerFall;
+        		region = (TextureRegion) playerFallAnim.getKeyFrame(stateTimer, true);
         		break;
             case RUNNING:
                 region = (TextureRegion) playerRunAnim.getKeyFrame(stateTimer, true);
                 break;
             case STANDING:
-            	region = (TextureRegion) playerStandAnim.getKeyFrame(stateTimer, true);
+            	region = (TextureRegion) playerIdleAnim.getKeyFrame(stateTimer, true);
             	break;
             default:
-                region = playerStand;
+                region = playerIdle;
                 break;
         }
+        	
         
-        if((body.getLinearVelocity().x < 0 || !runningRight) && !region.isFlipX()){
-            region.flip(true, false);
-            runningRight = false;
-        }
-
-        else if((body.getLinearVelocity().x > 0 || runningRight) && region.isFlipX()){
-            region.flip(true, false);
-            runningRight = true;
-        }
+        needsFlip(region);
 
         stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
         previousState = currentState;
@@ -168,8 +249,11 @@ public class Player extends Entity {
 	
 	public State getState(){
 		
-        if((body.getLinearVelocity().y > 0 && currentState == State.JUMPING) || (body.getLinearVelocity().y < 0 && previousState == State.JUMPING))
-            return State.JUMPING;
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.F))
+			return State.CASTING;
+		else if((body.getLinearVelocity().y > 0 ))//&& currentState == State.JUMPING) || (body.getLinearVelocity().y < 0 && previousState == State.JUMPING)) {
+        	return State.JUMPING;   
         else if(body.getLinearVelocity().y < 0)
             return State.FALLING;
         else if(body.getLinearVelocity().x < -0.3f || body.getLinearVelocity().x > 0.3f)
@@ -215,10 +299,18 @@ public class Player extends Entity {
 	public int getHp() {
 		return this.hp;
 	}
+	
+	public void needsFlip(TextureRegion region) {
+		 if((body.getLinearVelocity().x < 0 || !runningRight) && !region.isFlipX()){
+	            region.flip(true, false);
+	            runningRight = false;
+	        }
 
-	
-	
-	
+	        else if((body.getLinearVelocity().x > 0 || runningRight) && region.isFlipX()){
+	            region.flip(true, false);
+	            runningRight = true;
+	        }	
+	}
 	
 
 
