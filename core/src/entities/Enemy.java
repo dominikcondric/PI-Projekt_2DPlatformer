@@ -1,26 +1,46 @@
 package entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
 
+
+
 public class Enemy extends Entity {
 	
+	float stateTimer;
+	int direction;
+	private TextureRegion slimeIdle;
+	@SuppressWarnings("rawtypes")
+	private Animation slimeIdleAnim;
 	protected int hp=5;
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
 	protected boolean active=false;
+	private Array<TextureRegion> idleFrames = new Array<TextureRegion>();
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Enemy(Vector2 position) {
 		super(position);
-		Texture playerImg = new Texture("player.png");	
-		sprite.setRegion(playerImg);
-		sprite.setSize(1.f, 1.5f);
+		atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\idle_slime.atlas"));
+		slimeIdle = new TextureRegion(atlas.findRegion("idle_slime01"), 0, 0, 19, 18);
+		for(int i = 0; i < 6; i++) {
+			idleFrames.add(new TextureRegion(atlas.findRegion("idle_slime01"), i * 23+5 , 0, 19, 18 ));
+		}
+		slimeIdleAnim = new Animation(0.1f, idleFrames);
+		sprite.setRegion(slimeIdle);
+		sprite.setSize(1f, 1f);
+		sprite.setScale(2f, 2f);
 	}
 	
 	@Override
@@ -59,6 +79,8 @@ public class Enemy extends Entity {
 	@Override
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
+		TextureRegion currentRegion = getFrame(deltaTime);
+		sprite.setRegion(currentRegion);
 		if (body.getPosition().y < 0.f) {
 			setToDestroy = true;
 		}
@@ -82,6 +104,7 @@ public class Enemy extends Entity {
 	}
 
 	public void move(int direction) {
+		this.direction = direction;
 		if(direction==-1 || direction==2) {
 			moveLeft();
 		}
@@ -125,4 +148,20 @@ public class Enemy extends Entity {
 		this.active=false;
 		
 	}
+	
+	public TextureRegion getFrame(float deltaTime){
+
+		TextureRegion region = (TextureRegion) slimeIdleAnim.getKeyFrame(stateTimer, true);
+        
+        if(body.getLinearVelocity().x < 0 && region.isFlipX()){
+            region.flip(true, false);
+        }
+        else if(body.getLinearVelocity().x > 0 && !region.isFlipX()){
+            region.flip(true, false);
+        }
+
+        stateTimer = stateTimer + deltaTime;
+        return region;
+
+    }
 }
