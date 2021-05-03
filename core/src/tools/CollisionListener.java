@@ -64,8 +64,9 @@ public class CollisionListener implements ContactListener{
 				((Enemy) enemy.getUserData()).onHit();
 			}	
 			if(object.getUserData() instanceof Player) {
-				((Player) object.getUserData()).onHit();
-				((Enemy) enemy.getUserData()).stop();
+				((Player) object.getUserData()).onHit(((Enemy) enemy.getUserData()).getBody().getPosition().x);
+				if( ((Player) object.getUserData()).getHp() <= 0) ((Enemy) enemy.getUserData()).stop();
+				//((Enemy) enemy.getUserData()).stop();
 
 			}
 			return;
