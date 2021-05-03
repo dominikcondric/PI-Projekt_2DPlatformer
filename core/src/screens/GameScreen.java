@@ -76,6 +76,7 @@ public class GameScreen implements Screen {
 			player.setToDestroy(false);
 			sceneManager.getActiveScene().resetEntities();
 			player.setPosition(2.f, 8.f);
+			player.hp=4;
 			sceneManager.getActiveScene().addEntity(player);
 			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
 		}

@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import scenes.Scene;
 
 public class Player extends Entity {
-	private int hp = 4; 
+	public int hp = 4; 
 	
 	@SuppressWarnings({ "unused", "rawtypes" })
 	private Animation playerStandAnim;
@@ -70,6 +70,7 @@ public class Player extends Entity {
 		
 	    sprite.setRegion(playerStand);
 		sprite.setSize(1.6f, 2f);
+		
 	}
 	
 	public void addToWorld(World world) {
