@@ -13,6 +13,7 @@ import com.platformer.Platformer;
 
 import entities.Player;
 import scenes.CaveScene;
+import scenes.ForestScene;
 import scenes.Scene;
 import screens.GameOverScreen.ScreenType;
 import utility.SceneManager;
@@ -30,7 +31,7 @@ public class GameScreen implements Screen {
 		// Game handle
 		this.game = game;
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth() / 30.f, Gdx.graphics.getHeight() / 30.f);
+		camera.setToOrtho(false, Gdx.graphics.getWidth() / 40.f, Gdx.graphics.getHeight() / 40.f);
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
@@ -38,8 +39,11 @@ public class GameScreen implements Screen {
 		Scene caveScene = new CaveScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(caveScene, "Cave", true);
 		
-		player = new Player(new Vector2(2.f, 8.f));
-		caveScene.addEntity(player);
+		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
+		sceneManager.addScene(forestScene, "Forest", true);
+		
+		player = new Player(new Vector2(2.f, 39.f));
+		forestScene.addEntity(player);
 	}
 
 	private void update(float deltaTime) {
@@ -75,8 +79,8 @@ public class GameScreen implements Screen {
 		} else if (player.isSetToDestroy()) {
 			player.setToDestroy(false);
 			sceneManager.getActiveScene().resetEntities();
-			player.setPosition(2.f, 8.f);
 			player.hp=4;
+			player.setPosition(2.f, 39.f);
 			sceneManager.getActiveScene().addEntity(player);
 			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
 		}
