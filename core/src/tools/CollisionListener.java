@@ -41,8 +41,6 @@ public class CollisionListener implements ContactListener{
 			
 			if(object.getUserData() instanceof Player) {
 				((Enemy) sensor.getUserData()).activate();
-				((Player) object.getUserData()).onHit(0);
-
 			}
 			return;
 		}

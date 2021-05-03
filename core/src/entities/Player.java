@@ -210,6 +210,7 @@ public class Player extends Entity {
 		else {
 			body.applyLinearImpulse(new Vector2(12f, 2f), body.getWorldCenter(), true);
 		}		
+		System.out.print(this.hp);
 	}
 	
 	public int getHp() {
