@@ -85,6 +85,14 @@ public class Enemy extends Entity {
 			setToDestroy = true;
 		}
 		
+
+        if(body.getLinearVelocity().y != 0)  {
+			body.setLinearDamping(0);
+        }else {
+            body.setLinearDamping(12);
+        }
+		
+		
 		if(this.active) {
 			this.move(this.getDirection(scene.getPlayer()));
 		}

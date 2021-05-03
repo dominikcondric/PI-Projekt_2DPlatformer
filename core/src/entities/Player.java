@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import scenes.Scene;
 
 public class Player extends Entity {
-	private int hp = 1; 
+	private int hp = 4; 
 	
 	@SuppressWarnings({ "unused", "rawtypes" })
 	private Animation playerStandAnim;
@@ -198,12 +198,22 @@ public class Player extends Entity {
     }
 
 	
-	public void onHit() {
-		this.hp=0;
+	public void onHit(float x) {
+		this.hp--;
 		if(this.hp<=0)
 			setToDestroy = true;
+		if(x==0) return;
+		if(this.getBody().getPosition().x < x) {
+	    	body.applyLinearImpulse(new Vector2(-12f, 2f), body.getWorldCenter(), true);
+		}
+		else {
+			body.applyLinearImpulse(new Vector2(12f, 2f), body.getWorldCenter(), true);
+		}		
 	}
 	
+	public int getHp() {
+		return this.hp;
+	}
 
 	
 	
