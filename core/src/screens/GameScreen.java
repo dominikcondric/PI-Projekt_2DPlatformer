@@ -13,6 +13,7 @@ import com.platformer.Platformer;
 
 import entities.Player;
 import scenes.CaveScene;
+import scenes.ForestScene;
 import scenes.Scene;
 import screens.GameOverScreen.ScreenType;
 import utility.SceneManager;
@@ -38,8 +39,11 @@ public class GameScreen implements Screen {
 		Scene caveScene = new CaveScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(caveScene, "Cave", true);
 		
-		player = new Player(new Vector2(2.f, 8.f));
-		caveScene.addEntity(player);
+		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
+		sceneManager.addScene(forestScene, "Forest", true);
+		
+		player = new Player(new Vector2(2.f, 39.f));
+		forestScene.addEntity(player);
 	}
 
 	private void update(float deltaTime) {

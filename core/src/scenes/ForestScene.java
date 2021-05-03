@@ -5,22 +5,19 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import entities.Enemy;
+public class ForestScene extends Scene {
 
-public class CaveScene extends Scene {
-
-	public CaveScene(TmxMapLoader mapLoader, SpriteBatch batch) {
-		super(mapLoader, "Cave/Maps/demo3.tmx", batch);
+	public ForestScene(TmxMapLoader mapLoader, SpriteBatch batch) {
+		super(mapLoader, "Forest/forest.tmx", batch);
 	}
 
 	@Override
-	public void constructTileMap() {
+	protected void constructTileMap() {
 		BodyDef bodyDef = null;
 		PolygonShape shape = null;
 		FixtureDef fixtureDef = null;
@@ -45,9 +42,10 @@ public class CaveScene extends Scene {
 		}
 	}
 
-
 	@Override
 	public void constructEntities() {
-		addEntity(new Enemy(new Vector2(97.f, 57.f)));
+		// TODO Auto-generated method stub
+
 	}
+
 }
