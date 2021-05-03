@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.5.0" orientation="orthogonal" renderorder="right-down" width="220" height="45" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="35">
+<map version="1.5" tiledversion="1.5.0" orientation="orthogonal" renderorder="right-down" width="220" height="45" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="37">
  <tileset firstgid="1" name="DesertAssets" tilewidth="32" tileheight="32" tilecount="4050" columns="50">
   <image source="desert_scenario_assets.jpg" width="1600" height="2592"/>
  </tileset>
@@ -71,6 +71,8 @@
   <object id="34" x="6752" y="576">
    <polygon points="0,0 32,-32 160,-32 192,0"/>
   </object>
+  <object id="35" x="0" y="192" width="32" height="672"/>
+  <object id="36" x="7008" y="196" width="32" height="668"/>
  </objectgroup>
  <layer id="1" name="Background" width="220" height="45">
   <data encoding="csv">
