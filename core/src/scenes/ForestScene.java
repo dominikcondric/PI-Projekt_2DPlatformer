@@ -5,10 +5,13 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+
+import entities.Enemy;
 
 public class ForestScene extends Scene {
 
@@ -44,8 +47,8 @@ public class ForestScene extends Scene {
 
 	@Override
 	public void constructEntities() {
-		// TODO Auto-generated method stub
-
+		addEntity(new Enemy(new Vector2(97.f, 57.f)));
+		addEntity(new Enemy(new Vector2(39.f, 50.f)));
 	}
 
 }

@@ -31,7 +31,7 @@ public class GameScreen implements Screen {
 		// Game handle
 		this.game = game;
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth() / 30.f, Gdx.graphics.getHeight() / 30.f);
+		camera.setToOrtho(false, Gdx.graphics.getWidth() / 40.f, Gdx.graphics.getHeight() / 40.f);
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
@@ -79,7 +79,7 @@ public class GameScreen implements Screen {
 		} else if (player.isSetToDestroy()) {
 			player.setToDestroy(false);
 			sceneManager.getActiveScene().resetEntities();
-			player.setPosition(2.f, 8.f);
+			player.setPosition(2.f, 39.f);
 			sceneManager.getActiveScene().addEntity(player);
 			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
 		}

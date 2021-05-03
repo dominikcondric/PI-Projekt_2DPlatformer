@@ -39,7 +39,7 @@ public class Enemy extends Entity {
 		}
 		slimeIdleAnim = new Animation(0.1f, idleFrames);
 		sprite.setRegion(slimeIdle);
-		sprite.setSize(1f, 1f);
+		sprite.setSize(0.9f, 0.9f);
 		sprite.setScale(2f, 2f);
 	}
 	

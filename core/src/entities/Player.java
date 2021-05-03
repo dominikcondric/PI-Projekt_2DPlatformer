@@ -69,7 +69,7 @@ public class Player extends Entity {
 	    playerRunAnim = new Animation(0.1f, framesRun);
 		
 	    sprite.setRegion(playerStand);
-		sprite.setSize(1.6f, 2f);
+		sprite.setSize(0.9f, 1.125f);
 	}
 	
 	public void addToWorld(World world) {
