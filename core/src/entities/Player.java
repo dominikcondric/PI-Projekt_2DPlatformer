@@ -35,7 +35,6 @@ public class Player extends Entity {
     
 	public boolean runningRight = true;
 	private float stateTimer;
-	
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Player(Vector2 position) {

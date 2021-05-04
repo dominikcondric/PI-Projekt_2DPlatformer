@@ -16,6 +16,7 @@ import scenes.CaveScene;
 import scenes.ForestScene;
 import scenes.Scene;
 import screens.GameOverScreen.ScreenType;
+import utility.Hud;
 import utility.SceneManager;
 
 public class GameScreen implements Screen {
@@ -25,6 +26,7 @@ public class GameScreen implements Screen {
 	private OrthographicCamera camera;
 	private SceneManager sceneManager;
 	private Player player;
+	private Hud inGameHud;
 	private boolean debug = false;
 
 	public GameScreen(final Platformer game) {
@@ -35,6 +37,8 @@ public class GameScreen implements Screen {
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
+		player = new Player(new Vector2(2.f, 39.f));
+		inGameHud = new Hud(player, game.batch, game.font);
 		
 		Scene caveScene = new CaveScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(caveScene, "Cave", true);
@@ -42,7 +46,6 @@ public class GameScreen implements Screen {
 		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(forestScene, "Forest", true);
 		
-		player = new Player(new Vector2(2.f, 39.f));
 		forestScene.addEntity(player);
 	}
 
@@ -96,6 +99,7 @@ public class GameScreen implements Screen {
 		if (debug) {
 			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
 		}
+		inGameHud.render(player);
 		update(delta);
 	}
 	
@@ -112,7 +116,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
+		camera.setToOrtho(debug, width / 40.f, height / 40.f);
 	}
 
 	@Override
