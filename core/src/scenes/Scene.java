@@ -83,7 +83,6 @@ public abstract class Scene {
 	}
 	
 	public void update(float deltaTime) {
-		box2DWorld.step(deltaTime, 10, 10);
 		for (int i = entities.size() - 1; i >= 0; --i) {
 			if (entities.get(i).isSetToDestroy()) {
 				toDestroy.add(i);
@@ -98,6 +97,7 @@ public abstract class Scene {
 		}
 		
 		toDestroy.clear();
+		box2DWorld.step(deltaTime, 10, 10);
 	}
 	
 
@@ -108,11 +108,15 @@ public abstract class Scene {
 		return null;
 	}
 	
+	public ArrayList<Entity> getEntities(){
+		return entities;
+	}
+	
 	public void dispose() {
 		box2DWorld.dispose();
 		map.dispose();
 	}
-
+	
 
 
 

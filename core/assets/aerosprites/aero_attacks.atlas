@@ -1,0 +1,55 @@
+
+aero_attacks.png
+size: 2048, 64
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+airattack1
+  rotate: false
+  xy: 2, 4
+  size: 171, 31
+  orig: 256, 64
+  offset: 2, 29
+  index: -1
+airattack2
+  rotate: false
+  xy: 288, 4
+  size: 88, 31
+  orig: 128, 64
+  offset: 2, 29
+  index: -1
+airattack3
+  rotate: false
+  xy: 574, 4
+  size: 146, 36
+  orig: 256, 64
+  offset: 2, 24
+  index: -1
+airattackloop
+  rotate: false
+  xy: 860, 4
+  size: 88, 31
+  orig: 128, 64
+  offset: 2, 29
+  index: -1
+groundattack1
+  rotate: false
+  xy: 1146, 4
+  size: 163, 36
+  orig: 256, 64
+  offset: 2, 24
+  index: -1
+groundattack2
+  rotate: false
+  xy: 1432, 4
+  size: 226, 29
+  orig: 256, 64
+  offset: 2, 31
+  index: -1
+groundattack3
+  rotate: false
+  xy: 1718, 4
+  size: 284, 26
+  orig: 512, 32
+  offset: 2, 2
+  index: -1

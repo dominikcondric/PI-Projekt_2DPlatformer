@@ -29,24 +29,23 @@ public class Projectile extends Entity {
 		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball.atlas"));
 		TextureRegion projectileImage = new TextureRegion(atlas.findRegion("FB001"),0 , 0, 35, 17);
 		
-		int xCoordinate = 0;
 		Array<TextureRegion> frames = new Array<TextureRegion>();
 		for(int i = 0; i < 5; i++) {
-			frames.add(new TextureRegion(atlas.findRegion("FB001"),xCoordinate , 0, 35, 17));
-			xCoordinate += 37;
+			frames.add(new TextureRegion(atlas.findRegion("FB001"),i * 37 , 0, 35, 17));
 		}
 		
 		flying = new Animation(0.1f, frames);
 		
 		sprite.setRegion(projectileImage);
+		
 		if (firedRight) {
-			sprite.setX(playerX + 2.1f);
+			sprite.setX(playerX + 1f);
 		} else {
 			sprite.flip(true, false);
-			sprite.setX(playerX - 0.6f);
+			sprite.setX(playerX - 1f);
 		}
 		
-		sprite.setY(playerY + 0.75f);
+		sprite.setY(playerY + 0.07f);
 		sprite.setSize(0.8f, 0.4f);
 	}
 
