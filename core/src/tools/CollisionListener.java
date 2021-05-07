@@ -27,29 +27,34 @@ public class CollisionListener implements ContactListener{
 		
 		if(A == null || B == null || A.getClass() == null || B.getClass() == null) return;
 		
-		
 
 		if((A.getUserData() instanceof Enemy || B.getUserData() instanceof Enemy) && (A.isSensor() || B.isSensor())) {
-			Fixture sensor;
+			Fixture enemyorsensor;
 			Fixture object;
 			
-			
-			
-			if(!(A.getUserData() instanceof Player || B.getUserData() instanceof Player)) return;
-
-			if(A.getUserData()instanceof Enemy) {
-				sensor = A;
+			if(A.getUserData() instanceof Enemy) {
+				enemyorsensor = A;
 				object = B;
 			}
 			else {
-				sensor = B;
+				enemyorsensor = B;
 				object = A;
 			}			
 			
+			//kontakt playera i enemy visiona
+			//posto ne postoji senzor s player objektom u userdata to znaci da enemy u ovom slucaju mora biti senzor a player mora biti sam hitbox playera
 			if(object.getUserData() instanceof Player) {
-				((Enemy) sensor.getUserData()).activate();
+				((Enemy) enemyorsensor.getUserData()).activate();
+				return;
 			}
-			
+
+			//kontakt meleenapada i enemya
+			if(object.getUserData()=="meleehitbox")	{
+				if(enemyorsensor.getUserData() instanceof Enemy && !enemyorsensor.isSensor()) {
+					((Enemy) enemyorsensor.getUserData()).onHit();
+				}
+			}
+			return;
 		}
 		
 		
@@ -65,60 +70,30 @@ public class CollisionListener implements ContactListener{
 				object = A;
 			}
 			
-			if(object.getFilterData().categoryBits == 2) {
-				return;
-			}
-			
+			//kontakt enemy i projectile
 			if(object.getUserData() instanceof Projectile){
-
 				((Projectile) object.getUserData()).onHit();
 				((Enemy) enemy.getUserData()).onHit();
+				return;
 			}
-			else if(object.getUserData() instanceof Player && !enemy.isSensor() && !object.isSensor()) {
+			//kontakt player i tijelo enemya, damage playera
+			//nema potrebe provjeravati je li enemy senzor jer ako je onda nikada nece doci do ovog if
+			if(object.getUserData() instanceof Player) {
 				((Player) object.getUserData()).onHit(((Enemy) enemy.getUserData()).getBody().getPosition().x);
 				if( ((Player) object.getUserData()).getHp() <= 0) ((Enemy) enemy.getUserData()).stop();
-				((Enemy) enemy.getUserData()).stop();
-
 			}
-			
+			return;
 		}
 		
 		if(A.getUserData() instanceof Projectile && !B.isSensor()) {
 			((Projectile) A.getUserData()).onHit();
-		
+			return;
 		}
 		if(B.getUserData() instanceof Projectile && !A.isSensor()) {
 			((Projectile) B.getUserData()).onHit();
-			
+			return;
 		}
-		
-		if((A.getUserData() instanceof Player || B.getUserData() instanceof Player) && (A.isSensor()) || B.isSensor()) {
-			//System.out.println(A.getUserData().toString() + " , " + B.getUserData().toString());
-			Fixture sensor;
-			Fixture object;
-			if(A.getUserData()instanceof Player) {
-				sensor = A;
-				object = B;
-			}
-			else {
-				sensor = B;
-				object = A;
-			}
-			/*if(sensor.getFilterData().categoryBits == 2 && ((Player)sensor.getUserData()).hasAttacked == false) {
-				contact.setEnabled(false);
-			}else if(sensor.getFilterData().categoryBits == 2 && ((Player)sensor.getUserData()).hasAttacked == true) {
-				contact.setEnabled(true);
-			}
-			*/
-			if(object.getUserData() instanceof Enemy && !object.isSensor()) {
-				((Enemy) object.getUserData()).onHit();
-			}
-			
-		}
-		
-		
-		return;
-		
+				
 	}
 
 	@Override

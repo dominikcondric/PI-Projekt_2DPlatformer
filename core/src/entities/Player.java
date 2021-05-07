@@ -344,7 +344,7 @@ public class Player extends Entity {
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
 		melee = this.body.createFixture(fdef);
-		melee.setUserData(this);
+		melee.setUserData("meleehitbox");
 		hasAttacked = true;
 		
 	}
