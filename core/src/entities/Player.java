@@ -54,7 +54,7 @@ public class Player extends Entity {
 	private float stateTimer;
 	private TextureRegion currentRegion;
 	private boolean hasAttacked = false;
-	private float attackCooldown = 0.5f;
+	private float attackCooldown = 0.25f;
 	
 	FixtureDef fdef;
 	Fixture melee;
@@ -313,7 +313,7 @@ public class Player extends Entity {
         if(attackCooldown == 0) {
         	if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
         		meleeAttack();
-        		attackCooldown = 0.5f;
+        		attackCooldown = 0.25f;
         	}
         }
         attackCooldown -= deltaTime;
@@ -499,37 +499,25 @@ public class Player extends Entity {
 	@Override
 	public void render(SpriteBatch batch) {
 		AtlasRegion atlasRegion = new AtlasRegion(currentRegion);
-		float width = 34; // pick your size here
+		float width = 34; 
 		float height = 36;
-
-		float offsetPctX = atlasRegion.offsetX / atlasRegion.originalWidth;
-		float offsetPctY = atlasRegion.offsetY / atlasRegion.originalHeight;
 
 		float scaleWidth = (float) atlasRegion.packedWidth / atlasRegion.originalWidth;
 		float scaleHeight = (float) atlasRegion.packedHeight / atlasRegion.originalHeight;
 
-		float drawWidth = width * scaleWidth;
-		float drawHeight = height * scaleHeight;
+		float drawWidth = width * scaleWidth /16;
+		float drawHeight = height * scaleHeight /16;
 
-		float regionOffsetX = offsetPctX * width;
-		float regionOffsetY = offsetPctY * height;
-
-		float drawScaleX = 0.5f; // adjust to your needs
+		float drawScaleX = 0.5f;
 		float drawScaleY = 0.5f;
 
 
-		float drawOriginX = 0; // adjust to tour needs
+		float drawOriginX = 0;
 		float drawOriginY = 0;
 
-
-		//float x = 100 + offsetX + regionOffsetX; // adjust to your needs
-		//float y = 100 + offsetY + regionOffsetY;
-
-		batch.draw(atlasRegion, sprite.getX()-0.5f, sprite.getY()-0.65f, drawOriginX, drawOriginY, drawWidth/16, drawHeight/16, drawScaleX, drawScaleY, 0);
-		//batch.draw(sprite, sprite.getX()-0.5f, sprite.getY()-0.65f, currentRegion.getRegionWidth() / 16, currentRegion.getRegionHeight() / 16);
-		//batch.draw(sprite, sprite.getX()-0.5f, sprite.getY()-0.65f, currentRegion.getRegionWidth() / 16, currentRegion.getRegionHeight() / 16, playerIdle.getRegionWidth()/16, currentRegion.getRegionHeight()/16, 1f, 1f, 0);
+		batch.draw(atlasRegion, sprite.getX()-0.5f, sprite.getY()-0.65f, drawOriginX, drawOriginY, drawWidth, drawHeight, drawScaleX, drawScaleY, 0);
+		
 	}
-
 	
 
 
