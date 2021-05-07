@@ -202,7 +202,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim1 = new Animation(0.1f,framesAttack1);
+		playerAttackAnim1 = new Animation(0.05f,framesAttack1);
 		currentAttackAnim = playerAttackAnim1;
 		
 		for(int i = 0; i < 6; i++) {
@@ -226,7 +226,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim2 = new Animation(0.1f,framesAttack2);
+		playerAttackAnim2 = new Animation(0.05f,framesAttack2);
 		
 		for(int i = 0; i < 6; i++) {
 			switch(i) {
@@ -248,7 +248,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim3 = new Animation(0.1f,framesAttack3);
+		playerAttackAnim3 = new Animation(0.05f,framesAttack3);
 		
 	}
 	
