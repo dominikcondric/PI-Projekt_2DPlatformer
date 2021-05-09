@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
@@ -28,12 +29,14 @@ public class GameScreen implements Screen {
 	private Player player;
 	private Hud inGameHud;
 	private boolean debug = false;
+	private boolean paused = false;
 
 	public GameScreen(final Platformer game) {
 		// Game handle
 		this.game = game;
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth() / 40.f, Gdx.graphics.getHeight() / 40.f);
+		float aspectRatio = (float)Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+		camera.setToOrtho(false, 20.f * aspectRatio, 20.f);
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
@@ -76,9 +79,19 @@ public class GameScreen implements Screen {
 		camera.update();
 		sceneManager.update();
 		
-		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-			dispose();
-			game.setScreen(new MainMenuScreen(game));
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			paused = !paused;
+		} 
+		
+		if (paused == true) {
+			if (inGameHud.resumeButton.getClickListener().isPressed()) {
+				paused = false;
+			}
+			
+			if (inGameHud.quitButton.getClickListener().isPressed()) {
+				dispose();
+				game.setScreen(new MainMenuScreen(game));
+			}
 		} else if (player.isSetToDestroy()) {
 			player.setToDestroy(false);
 			sceneManager.getActiveScene().resetEntities();
@@ -94,12 +107,16 @@ public class GameScreen implements Screen {
 		ScreenUtils.clear(Color.SKY);
 		Scene activeScene = sceneManager.getActiveScene();
 		game.batch.setProjectionMatrix(camera.combined);
-		activeScene.update(delta);
 		activeScene.render(game.batch, camera);
-		if (debug) {
-			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
-		}
-		inGameHud.render(player);
+		inGameHud.render(player, paused);
+		
+		if (!paused) {
+			activeScene.update(delta);
+			if (debug) {
+				physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
+			}
+		} 
+		
 		update(delta);
 	}
 	
@@ -116,7 +133,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		camera.setToOrtho(debug, width / 40.f, height / 40.f);
+		inGameHud.onResize(width, height);
 	}
 
 	@Override

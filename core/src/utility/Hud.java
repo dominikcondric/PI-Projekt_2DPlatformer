@@ -2,50 +2,66 @@ package utility;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 
 import entities.Player;
+import screens.GameScreen;
 
 public class Hud implements Disposable {
 	private Stage hud;
 	private Label cooldownTimer;
 	private int maxHp;
 	private ProgressBar progressBar;
+	private ShapeRenderer shapeRenderer;
+	private Table pauseTable;
+	public TextButton quitButton;
+	public TextButton resumeButton;
+	public TextButton optionsButton;
 	
 	public Hud(Player player, SpriteBatch batch, BitmapFont font) {
+		shapeRenderer = new ShapeRenderer();
+		shapeRenderer.setColor(0.f, 0.f, 0.f, 0.9f);
 		hud = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), batch);
-		Table table = new Table();
-		table.setFillParent(true);
-		table.top().left();
-		table.pad(20.f);
+		Gdx.input.setInputProcessor(hud);
 		
 		maxHp = player.getHp();
-		table.row().height(50f).center().width(50f);
 		
-		table.add(new Label("HP:", new LabelStyle(font, Color.BLACK))).width(30f).height(20.f);
+		Group hp = new Group();
+		Label hpLabel = new Label("HP:", new LabelStyle(font, Color.BLACK));
+		hpLabel.setSize(30.f, 20.f);
+		hpLabel.setPosition(20.f, hud.getHeight() - 40f);
+		hp.addActor(hpLabel);
 		
-		Pixmap p = new Pixmap(1, 1, Format.RGB888);
-		p.setColor(Color.RED);
-		p.fill();
+		Pixmap progressBarColor = new Pixmap(1, 1, Format.RGB888);
+		progressBarColor.setColor(Color.RED);
+		progressBarColor.fill();
 		
-		TextureRegion barRegion = new TextureRegion(new Texture(p));
+		TextureRegion barRegion = new TextureRegion(new Texture(progressBarColor));
 		barRegion.setRegionHeight(20);
 		ProgressBarStyle barStyle = new ProgressBarStyle(null, new TextureRegionDrawable(barRegion));
 		barStyle.knobBefore = barStyle.knob;
@@ -53,12 +69,14 @@ public class Hud implements Disposable {
 		progressBar.setHeight(20.f);
 		progressBar.setWidth(200.f);
 		progressBar.setAnimateDuration(0.4f);
-		table.add(progressBar).width(200f).height(40f);
+		progressBar.setPosition(50f, hud.getHeight() - 40f);
 		
-		p.dispose();
+		hp.addActor(progressBar);
+		hud.addActor(hp);
 		
-		LabelStyle style = new LabelStyle(font, Color.BLACK);
-		cooldownTimer = new Label("10", style);
+		progressBarColor.dispose();
+		
+		cooldownTimer = new Label("10", new LabelStyle(font, Color.BLACK));
 		cooldownTimer.setFontScale(2f);
 		cooldownTimer.setAlignment(Align.center);
 		
@@ -67,28 +85,86 @@ public class Hud implements Disposable {
 		fireballRegion.setRegionWidth(35);
 		
 		Image fireballImage = new Image(new TextureRegion(fireballRegion));
+		fireballImage.setSize(50f, 50f);
 		Stack abilityFireball = new Stack();
 		abilityFireball.addActor(fireballImage);
 		abilityFireball.addActor(cooldownTimer);
+		abilityFireball.setPosition(hud.getWidth() - 60.f, hud.getHeight() - 60f);
+		abilityFireball.setSize(40.f, 40.f);
 		
-		table.add(abilityFireball).width(50f).spaceLeft(960f);
+		hud.addActor(abilityFireball);
 		
-		hud.addActor(table);
+		// Pause game gui
+		pauseTable = new Table();
+		
+		pauseTable.center();
+		pauseTable.setPosition(hud.getWidth() / 4f, hud.getHeight() / 4);
+		pauseTable.setSize(hud.getWidth() / 2f, hud.getHeight() / 2f);
+		float buttonHeight = hud.getHeight() / 8f;
+		
+		Pixmap buttonColor = new Pixmap(1, 1, Format.RGB888);
+		buttonColor.setColor(Color.BROWN);
+		buttonColor.fill();
+		TextureRegionDrawable texture = new TextureRegionDrawable(new Texture(buttonColor));
+		buttonColor.dispose();
+		
+		TextButtonStyle style = new TextButtonStyle();
+		style.font = font;
+		style.fontColor = Color.WHITE;
+		style.overFontColor = new Color(0.415f, 0.14f, 0.087f, 1f);
+		style.up = texture;
+		
+		resumeButton = new TextButton("Resume game", style);
+		optionsButton = new TextButton("Options", style);
+		quitButton = new TextButton("Quit", style);
+		
+		pauseTable.row().center().expandX();
+		pauseTable.add(resumeButton).spaceBottom(buttonHeight / 3.f).height(buttonHeight).width(pauseTable.getWidth());
+
+		pauseTable.row().expandX().center();
+		pauseTable.add(optionsButton).spaceBottom(buttonHeight / 3.f).height(buttonHeight).width(pauseTable.getWidth());
+		
+		pauseTable.row().expandX().center();
+		pauseTable.add(quitButton).spaceBottom(buttonHeight / 3.f).height(buttonHeight).width(pauseTable.getWidth());
+
+		resumeButton.getLabel().setFontScale(buttonHeight / 25.f);
+		optionsButton.getLabel().setFontScale(buttonHeight / 25.f);
+		quitButton.getLabel().setFontScale(buttonHeight / 25.f);
+		
+		hud.addActor(pauseTable);
 	}
 	
-	private void update(final Player player) {
+	public void onResize(int width, int height) {
+		hud.getViewport().setScreenSize(width, height);
+	}
+	
+	private void update(final Player player, boolean gamePaused) {
 		progressBar.setValue(player.hp);
 		
-		if (player.currentProjectileCooldown < player.projectileCooldown) {
-			cooldownTimer.setVisible(true);
-			cooldownTimer.setText(Integer.toString((int)player.currentProjectileCooldown + 1));
-		} else {
-			cooldownTimer.setVisible(false);
-		}
+//		if (player.currentProjectileCooldown < player.projectileCooldown) {
+//			cooldownTimer.setVisible(true);
+//			cooldownTimer.setText(Integer.toString((int)player.currentProjectileCooldown + 1));
+//		} else {
+//			cooldownTimer.setVisible(false);
+//		}
+		
+		pauseTable.setVisible(gamePaused);
 	}
 	
-	public void render(final Player player) {
-		update(player);
+	private void dimBackground() {
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		shapeRenderer.begin(ShapeType.Filled);
+		shapeRenderer.rect(0.f, 0.f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		shapeRenderer.end();
+	}
+	
+	public void render(final Player player, boolean gamePaused) {
+		update(player, gamePaused);
+		
+		if (gamePaused)
+			dimBackground();
+		
 		hud.act();
 		hud.draw();
 	}
@@ -96,5 +172,6 @@ public class Hud implements Disposable {
 	@Override
 	public void dispose() {
 		hud.dispose();
+		shapeRenderer.dispose();
 	}
 }
