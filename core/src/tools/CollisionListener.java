@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.MassData;
 
 import entities.Enemy;
 import entities.Player;
-import entities.Projectile;
+import entities.Fireball;
 
 
 
@@ -71,8 +71,8 @@ public class CollisionListener implements ContactListener{
 			}
 			
 			//kontakt enemy i projectile
-			if(object.getUserData() instanceof Projectile){
-				((Projectile) object.getUserData()).onHit();
+			if(object.getUserData() instanceof Fireball){
+				((Fireball) object.getUserData()).onHit();
 				((Enemy) enemy.getUserData()).onHit();
 				return;
 			}
@@ -85,12 +85,12 @@ public class CollisionListener implements ContactListener{
 			return;
 		}
 		
-		if(A.getUserData() instanceof Projectile && !B.isSensor()) {
-			((Projectile) A.getUserData()).onHit();
+		if(A.getUserData() instanceof Fireball && !B.isSensor()) {
+			((Fireball) A.getUserData()).onHit();
 			return;
 		}
-		if(B.getUserData() instanceof Projectile && !A.isSensor()) {
-			((Projectile) B.getUserData()).onHit();
+		if(B.getUserData() instanceof Fireball && !A.isSensor()) {
+			((Fireball) B.getUserData()).onHit();
 			return;
 		}
 				

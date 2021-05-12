@@ -1,5 +1,6 @@
 package entities;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
@@ -17,11 +18,15 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import abilities.Ability;
+import abilities.FireballAbility;
 import scenes.Scene;
 
 public class Player extends Entity {
 	private int hp = 50; 
 	private int maxHp = 50;
+	
+	private ArrayList<Ability> abilities;
 	
 	private Animation<TextureRegion> playerIdleAnim;
 	private Animation<TextureRegion> playerRunAnim;
@@ -35,10 +40,10 @@ public class Player extends Entity {
 	private TextureRegion playerFall;
 	private TextureRegion playerJump;
 	
-	Array<TextureRegion> framesAttack1 = new Array<TextureRegion>();
-	Array<TextureRegion> framesAttack2 = new Array<TextureRegion>();
-	Array<TextureRegion> framesAttack3 = new Array<TextureRegion>();
-	Array<TextureRegion> framesAttackCurrent = new Array<TextureRegion>();
+	private Array<TextureRegion> framesAttack1 = new Array<TextureRegion>();
+	private Array<TextureRegion> framesAttack2 = new Array<TextureRegion>();
+	private Array<TextureRegion> framesAttack3 = new Array<TextureRegion>();
+	private Array<TextureRegion> framesAttackCurrent = new Array<TextureRegion>();
 	
 	private final int MOVE_THRESHOLD_LEFT = -6;
 	private final int MOVE_THRESHOLD_RIGHT = 6;
@@ -48,7 +53,6 @@ public class Player extends Entity {
 	private State currentState;
 	private State previousState;
     
-	public boolean runningRight = true;
 	public boolean inRange;
 	//private boolean isCrouching = false;
 	private float stateTimer;
@@ -63,7 +67,8 @@ public class Player extends Entity {
 	public Player(Vector2 position) {
 		super(position);
 		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\movement_casting_v2.atlas"));
-		
+		abilities = new ArrayList<Ability>(2);
+		abilities.add(new FireballAbility());
 		
 		Array<TextureRegion> framesIdle = new Array<TextureRegion>();
 		Array<TextureRegion> framesRun = new Array<TextureRegion>();
@@ -280,14 +285,22 @@ public class Player extends Entity {
 	@Override
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
+		if (hp == 0) {
+			hp = maxHp;
+			return;
+		}
+		
 		Vector2 playerVelocity = body.getLinearVelocity();
+		
+		if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
+			abilities.get(0).cast(scene, this);
+		}
 		
 		currentRegion = getFrame(deltaTime);
 		sprite.setRegion(currentRegion);
 		
-		
-		if(hp == 0)
-			hp = maxHp;
+		for (Ability ability : abilities)
+			ability.update(deltaTime);
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && playerVelocity.y == ON_GROUND) {
 			jump();
@@ -299,10 +312,6 @@ public class Player extends Entity {
         
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && playerVelocity.x >= MOVE_THRESHOLD_LEFT) {
         	moveLeft();
-        }
-        
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-        	scene.addEntity(new Projectile(sprite.getX(), sprite.getY(), runningRight));
         }
         
         if(hasAttacked) {
@@ -339,7 +348,7 @@ public class Player extends Entity {
 
 	private void meleeAttack() {
 		PolygonShape attackRange = new PolygonShape();
-		attackRange.setAsBox(0.78f * 0.7f , 1.25f / 2.f, new Vector2(runningRight ? 1f : -1f,0), 0 );
+		attackRange.setAsBox(0.78f * 0.7f , 1.25f / 2.f, new Vector2(facingRight ? 1f : -1f,0), 0 );
 		fdef.shape = attackRange;
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
@@ -428,10 +437,8 @@ public class Player extends Entity {
 
     }
 	
-	public State getState(){
-		
-		
-		if(Gdx.input.isKeyJustPressed(Input.Keys.F))
+	public State getState() {
+		if(abilities.get(0).isTriggered())
 			return State.CASTING;
 		else if(hasAttacked)
 			return State.ATTACKING;
@@ -451,11 +458,11 @@ public class Player extends Entity {
 	
 	private void moveRight() {
 		body.applyLinearImpulse(new Vector2(3.5f, 0), body.getWorldCenter(), true);
-    	runningRight = true;
+    	facingRight = true;
 	}
 	private void moveLeft() {
     	body.applyLinearImpulse(new Vector2(-3.5f, 0), body.getWorldCenter(), true);
-    	runningRight = false;
+    	facingRight = false;
 	}
 	
 	public float getStateTimer(){
@@ -486,16 +493,17 @@ public class Player extends Entity {
 	}
 	
 	private void needsFlip(TextureRegion region) {
-		 if((!runningRight) && !region.isFlipX()){
+		 if((!facingRight) && !region.isFlipX()){
 	            region.flip(true, false);
-	            runningRight = false;
+	            facingRight = false;
 	        }
 
-	        else if((runningRight) && region.isFlipX()){
+	        else if((facingRight) && region.isFlipX()){
 	            region.flip(true, false);
-	            runningRight = true;
+	            facingRight = true;
 	        }	
 	}
+	
 	@Override
 	public void render(SpriteBatch batch) {
 		AtlasRegion atlasRegion = new AtlasRegion(currentRegion);
@@ -518,7 +526,4 @@ public class Player extends Entity {
 		batch.draw(atlasRegion, sprite.getX()-0.5f, sprite.getY()-0.65f, drawOriginX, drawOriginY, drawWidth, drawHeight, drawScaleX, drawScaleY, 0);
 		
 	}
-	
-
-
 }

@@ -13,17 +13,13 @@ import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
 
-public class Projectile extends Entity {
-	
-	private float stateTime = 0.f;
+public class Fireball extends Entity {
 	private boolean firedRight;
-	@SuppressWarnings("rawtypes")
-	private Animation flying;
+	private Animation<TextureRegion> flying;
 	private float stateTimer;
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Projectile(float playerX, float playerY, boolean firedRight) {
-		super(new Vector2(playerX, playerY));
+	public Fireball(Vector2 entityPosition, boolean firedRight) {
+		super(entityPosition);
 		this.firedRight = firedRight;
 		
 		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball.atlas"));
@@ -34,18 +30,18 @@ public class Projectile extends Entity {
 			frames.add(new TextureRegion(atlas.findRegion("FB001"),i * 37 , 0, 35, 17));
 		}
 		
-		flying = new Animation(0.1f, frames);
+		flying = new Animation<TextureRegion>(0.1f, frames);
 		
 		sprite.setRegion(projectileImage);
 		
 		if (firedRight) {
-			sprite.setX(playerX + 1f);
+			sprite.setX(entityPosition.x + 1f);
 		} else {
 			sprite.flip(true, false);
-			sprite.setX(playerX - 1f);
+			sprite.setX(entityPosition.x - 1f);
 		}
 		
-		sprite.setY(playerY + 0.07f);
+		sprite.setY(entityPosition.y + 0.07f);
 		sprite.setSize(0.8f, 0.4f);
 	}
 
@@ -80,13 +76,12 @@ public class Projectile extends Entity {
 	
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
-		//stateTime += deltaTime;
 		sprite.setRegion(getFrame(deltaTime));
 		if(body.getLinearVelocity().y < 0) {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
 		
-		if(stateTime > 2.f || body.getLinearVelocity().x == 0.f) {
+		if(body.getLinearVelocity().x == 0.f) {
             setToDestroy = true;
         }
 	}

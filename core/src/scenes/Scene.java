@@ -70,6 +70,19 @@ public abstract class Scene {
 	public void addEntity(Entity entity) {
 		entities.add(entity);
 		entity.addToWorld(box2DWorld);
+		if (entity instanceof Player) {
+			placePlayerOnScene(entity);
+		}
+	}
+	
+	public Player getPlayer() {
+		for (Entity e : entities) {
+			if (e instanceof Player) {
+				return (Player)e;
+			}
+		}
+		
+		return null;
 	}
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera) {
@@ -83,6 +96,7 @@ public abstract class Scene {
 	}
 	
 	public void update(float deltaTime) {
+		box2DWorld.step(deltaTime, 10, 10);
 		for (int i = entities.size() - 1; i >= 0; --i) {
 			if (entities.get(i).isSetToDestroy()) {
 				toDestroy.add(i);
@@ -97,27 +111,12 @@ public abstract class Scene {
 		}
 		
 		toDestroy.clear();
-		box2DWorld.step(deltaTime, 10, 10);
-	}
-	
-
-	public Player getPlayer() {
-		for(Entity entity : entities) {
-			if(entity instanceof Player) return (Player) entity;
-		}
-		return null;
-	}
-	
-	public ArrayList<Entity> getEntities(){
-		return entities;
 	}
 	
 	public void dispose() {
 		box2DWorld.dispose();
 		map.dispose();
 	}
-	
 
-
-
+	protected abstract void placePlayerOnScene(Entity player);
 }
