@@ -154,6 +154,7 @@ public class Hud implements Disposable {
 	private void dimBackground() {
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		shapeRenderer.updateMatrices();
 		shapeRenderer.begin(ShapeType.Filled);
 		shapeRenderer.rect(0.f, 0.f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		shapeRenderer.end();
