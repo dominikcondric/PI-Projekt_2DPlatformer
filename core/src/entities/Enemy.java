@@ -1,7 +1,6 @@
 package entities;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,8 +13,6 @@ import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
 
-
-
 public class Enemy extends Entity {
 	
 	float stateTimer;
@@ -23,7 +20,7 @@ public class Enemy extends Entity {
 	private TextureRegion slimeIdle;
 	@SuppressWarnings("rawtypes")
 	private Animation slimeIdleAnim;
-	protected int hp=5;
+	protected int hp=3;
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
 	protected boolean active=false;
@@ -141,13 +138,13 @@ public class Enemy extends Entity {
 
 	public void onHit() {
 		this.hp --;
+		System.out.println(this.hp);
 		if(this.hp<=0)
 			setToDestroy = true;
 	}
 
 	public void activate() {
 		this.active=true;
-		System.out.println("RADI");
 	}
 
 	public void stop() {

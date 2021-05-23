@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
@@ -93,10 +92,8 @@ public class GameScreen implements Screen {
 				game.setScreen(new MainMenuScreen(game));
 			}
 		} else if (player.isSetToDestroy()) {
-			player.setToDestroy(false);
+			player.update(sceneManager.getActiveScene(), deltaTime);
 			sceneManager.getActiveScene().resetEntities();
-			player.hp=4;
-			player.setPosition(2.f, 39.f);
 			sceneManager.getActiveScene().addEntity(player);
 			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
 		}
@@ -107,8 +104,6 @@ public class GameScreen implements Screen {
 		ScreenUtils.clear(Color.SKY);
 		Scene activeScene = sceneManager.getActiveScene();
 		game.batch.setProjectionMatrix(camera.combined);
-		activeScene.render(game.batch, camera);
-		inGameHud.render(player, paused);
 		
 		if (!paused) {
 			activeScene.update(delta);
@@ -117,6 +112,8 @@ public class GameScreen implements Screen {
 			}
 		} 
 		
+		activeScene.render(game.batch, camera);
+		inGameHud.render(player, paused);
 		update(delta);
 	}
 	

@@ -1,9 +1,10 @@
 package utility;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -14,12 +15,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+
+import abilities.Ability;
+
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -30,11 +33,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 
 import entities.Player;
-import screens.GameScreen;
 
 public class Hud implements Disposable {
 	private Stage hud;
-	private Label cooldownTimer;
+	private ArrayList<Label> cooldownTimers;
 	private int maxHp;
 	private ProgressBar progressBar;
 	private ShapeRenderer shapeRenderer;
@@ -76,23 +78,21 @@ public class Hud implements Disposable {
 		
 		progressBarColor.dispose();
 		
-		cooldownTimer = new Label("10", new LabelStyle(font, Color.BLACK));
-		cooldownTimer.setFontScale(2f);
-		cooldownTimer.setAlignment(Align.center);
-		
-		TextureRegion fireballRegion = new TextureRegion(new Texture(Gdx.files.internal("projectiles/fireball.png")));
-		fireballRegion.setRegionHeight(28);
-		fireballRegion.setRegionWidth(35);
-		
-		Image fireballImage = new Image(new TextureRegion(fireballRegion));
-		fireballImage.setSize(50f, 50f);
-		Stack abilityFireball = new Stack();
-		abilityFireball.addActor(fireballImage);
-		abilityFireball.addActor(cooldownTimer);
-		abilityFireball.setPosition(hud.getWidth() - 60.f, hud.getHeight() - 60f);
-		abilityFireball.setSize(40.f, 40.f);
-		
-		hud.addActor(abilityFireball);
+		cooldownTimers = new ArrayList<Label>(4);
+		for (Ability ability : player.getAbilityList()) {
+			Image fireballImage = new Image(new TextureRegion(ability.getHudTextureRegion()));
+			Label cooldownTimer = new Label(Integer.toString((int)ability.getCooldownTime()), new LabelStyle(font, Color.BLACK));
+			cooldownTimer.setAlignment(Align.center);
+			cooldownTimer.setFontScale(2f);
+			fireballImage.setSize(40f, 40f);
+			Stack abilityFireball = new Stack();
+			abilityFireball.addActor(fireballImage);
+			abilityFireball.addActor(cooldownTimer);
+			abilityFireball.setPosition(hud.getWidth() - 60.f, hud.getHeight() - 60f);
+			abilityFireball.setSize(40.f, 40.f);
+			cooldownTimers.add(cooldownTimer);
+			hud.addActor(abilityFireball);
+		}
 		
 		// Pause game gui
 		pauseTable = new Table();
@@ -139,14 +139,18 @@ public class Hud implements Disposable {
 	}
 	
 	private void update(final Player player, boolean gamePaused) {
-		progressBar.setValue(player.hp);
+		progressBar.setValue(player.getHp());
 		
-//		if (player.currentProjectileCooldown < player.projectileCooldown) {
-//			cooldownTimer.setVisible(true);
-//			cooldownTimer.setText(Integer.toString((int)player.currentProjectileCooldown + 1));
-//		} else {
-//			cooldownTimer.setVisible(false);
-//		}
+		ArrayList<Ability> abilities = player.getAbilityList();
+		for (int i = 0; i < abilities.size(); ++i) {
+			Ability ability = abilities.get(i);
+			cooldownTimers.get(i).setText(Integer.toString((int)ability.getCurrentCooldownTime() + 1));
+			if (ability.getCurrentCooldownTime() < ability.getCooldownTime()) {
+				cooldownTimers.get(i).setVisible(true);
+			} else {
+				cooldownTimers.get(i).setVisible(false);
+			}
+		}
 		
 		pauseTable.setVisible(gamePaused);
 	}
