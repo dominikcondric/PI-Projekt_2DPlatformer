@@ -14,6 +14,7 @@ public abstract class Entity {
 	protected Sprite sprite;
 	protected boolean setToDestroy = false;
 	protected TextureAtlas atlas;
+	protected boolean facingRight = true;
 	
 	protected Entity(Vector2 position) {
 		sprite = new Sprite();
@@ -22,16 +23,20 @@ public abstract class Entity {
 	
 	public abstract void addToWorld(World world);
 
-	public void setPosition(float x, float y) {
-		sprite.setPosition(x, y);
-	}
-	
 	public Body getBody() {
 		return body;
 	}
 	
+	public boolean getFacingDirection() {
+		return facingRight;
+	}
+	
 	public void render(SpriteBatch batch) {
 		batch.draw(sprite, sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+	}
+	
+	public void setPosition(Vector2 position) {
+		body.setTransform(position, 0);
 	}
 	
 	public void update(final Scene scene, float deltaTime) {

@@ -52,7 +52,7 @@ public class GameOverScreen implements Screen {
 		TextButtonStyle style = new TextButtonStyle();
 		style.font = game.font;
 		style.fontColor = Color.WHITE;
-		style.overFontColor = Color.SKY;
+		style.overFontColor = new Color(0.415f, 0.14f, 0.087f, 1f);
 		style.up = texture;
 		
 		String s = new String();
@@ -60,8 +60,8 @@ public class GameOverScreen implements Screen {
 			s = "Game over";
 		}
 		
-		game.font.getData().setScale(4.f);
 		Label gameStateLabel = new Label(s, new Label.LabelStyle(game.font, Color.BROWN));
+		gameStateLabel.setFontScale(4.f);
 		Cell<Label> labelCell = table.add(gameStateLabel);
 		labelCell.align(Align.center);
 		gameStateLabel.setAlignment(Align.center);
@@ -85,8 +85,8 @@ public class GameOverScreen implements Screen {
 		cell.height(buttonHeight);
 		cell.fill();
 		
-		continueGame.getLabel().setFontScale(buttonHeight / 20.f);
-		exitGame.getLabel().setFontScale(buttonHeight / 20.f);
+		continueGame.getLabel().setFontScale(buttonHeight / 25.f);
+		exitGame.getLabel().setFontScale(buttonHeight / 25.f);
 	}
 	
 	@Override

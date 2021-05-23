@@ -16,6 +16,7 @@ import scenes.CaveScene;
 import scenes.ForestScene;
 import scenes.Scene;
 import screens.GameOverScreen.ScreenType;
+import utility.Hud;
 import utility.SceneManager;
 
 public class GameScreen implements Screen {
@@ -25,16 +26,21 @@ public class GameScreen implements Screen {
 	private OrthographicCamera camera;
 	private SceneManager sceneManager;
 	private Player player;
+	private Hud inGameHud;
 	private boolean debug = false;
+	private boolean paused = false;
 
 	public GameScreen(final Platformer game) {
 		// Game handle
 		this.game = game;
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth() / 40.f, Gdx.graphics.getHeight() / 40.f);
+		float aspectRatio = (float)Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+		camera.setToOrtho(false, 20.f * aspectRatio, 20.f);
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
+		player = new Player(new Vector2(2.f, 39.f));
+		inGameHud = new Hud(player, game.batch, game.font);
 		
 		Scene caveScene = new CaveScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(caveScene, "Cave", true);
@@ -42,7 +48,6 @@ public class GameScreen implements Screen {
 		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(forestScene, "Forest", true);
 		
-		player = new Player(new Vector2(2.f, 39.f));
 		forestScene.addEntity(player);
 	}
 
@@ -73,14 +78,22 @@ public class GameScreen implements Screen {
 		camera.update();
 		sceneManager.update();
 		
-		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-			dispose();
-			game.setScreen(new MainMenuScreen(game));
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			paused = !paused;
+		} 
+		
+		if (paused == true) {
+			if (inGameHud.resumeButton.getClickListener().isPressed()) {
+				paused = false;
+			}
+			
+			if (inGameHud.quitButton.getClickListener().isPressed()) {
+				dispose();
+				game.setScreen(new MainMenuScreen(game));
+			}
 		} else if (player.isSetToDestroy()) {
-			player.setToDestroy(false);
+			player.update(sceneManager.getActiveScene(), deltaTime);
 			sceneManager.getActiveScene().resetEntities();
-			player.hp=4;
-			player.setPosition(2.f, 39.f);
 			sceneManager.getActiveScene().addEntity(player);
 			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
 		}
@@ -91,11 +104,16 @@ public class GameScreen implements Screen {
 		ScreenUtils.clear(Color.SKY);
 		Scene activeScene = sceneManager.getActiveScene();
 		game.batch.setProjectionMatrix(camera.combined);
-		activeScene.update(delta);
+		
+		if (!paused) {
+			activeScene.update(delta);
+			if (debug) {
+				physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
+			}
+		} 
+		
 		activeScene.render(game.batch, camera);
-		if (debug) {
-			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
-		}
+		inGameHud.render(player, paused);
 		update(delta);
 	}
 	
@@ -112,7 +130,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
+		inGameHud.onResize(width, height);
 	}
 
 	@Override

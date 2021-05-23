@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
@@ -32,10 +34,10 @@ public class MainMenuScreen implements Screen {
 		
 		// Setup input
 		Gdx.input.setInputProcessor(userInterface);
-		game.font.getData().setScale(20.f);
 
 		// Setup
 		table = new Table();
+		table.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Forest/forest24000.jpeg")))));
 		userInterface.addActor(table);
 		table.setFillParent(true);
 
@@ -46,16 +48,25 @@ public class MainMenuScreen implements Screen {
 		pixmap.setColor(Color.BROWN);
 		pixmap.fill();
 		TextureRegionDrawable texture = new TextureRegionDrawable(new Texture(pixmap));
+		pixmap.dispose();
 		
 		TextButtonStyle style = new TextButtonStyle();
 		style.font = game.font;
 		style.fontColor = Color.WHITE;
-		style.overFontColor = Color.FIREBRICK;
+		style.overFontColor = new Color(0.415f, 0.14f, 0.087f, 1f);
 		style.up = texture;
 		
-		newGameButton = new TextButton("NEW GAME", style);
-		resumeGameButton = new TextButton("RESUME GAME", style);
-		optionsButton = new TextButton("OPTIONS", style);
+		newGameButton = new TextButton("New game", style);
+		resumeGameButton = new TextButton("Resume game", style);
+		optionsButton = new TextButton("Options", style);
+		
+		Image title = new Image(new TextureRegion(new Texture(Gdx.files.internal("AerosAdventureLogo.png"))));
+		
+		table.row();
+		Cell<Image> imageCell = table.add(title);
+		imageCell.spaceBottom(buttonHeight / 3.f);
+		imageCell.width(userInterface.getWidth() / 2);
+		imageCell.height(buttonHeight * 2f);
 		
 		Cell<TextButton> cell;
 		table.row();
@@ -77,9 +88,9 @@ public class MainMenuScreen implements Screen {
 		cell.width(userInterface.getWidth() / 2);
 		cell.height(buttonHeight);
 
-		newGameButton.getLabel().setFontScale(buttonHeight / 20.f);
-		resumeGameButton.getLabel().setFontScale(buttonHeight / 20.f);
-		optionsButton.getLabel().setFontScale(buttonHeight / 20.f);
+		newGameButton.getLabel().setFontScale(buttonHeight / 25.f);
+		resumeGameButton.getLabel().setFontScale(buttonHeight / 25.f);
+		optionsButton.getLabel().setFontScale(buttonHeight / 25.f);
 	}
 	
 	@Override
@@ -103,7 +114,7 @@ public class MainMenuScreen implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
-		userInterface.getViewport().update(width, height, false);
+		userInterface.getViewport().setScreenSize(width, height);
 	}
 
 	@Override
@@ -128,5 +139,4 @@ public class MainMenuScreen implements Screen {
 	public void dispose() {
 		userInterface.dispose();
 	}
-
 }
