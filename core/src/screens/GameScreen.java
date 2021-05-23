@@ -52,7 +52,7 @@ public class GameScreen implements Screen {
 	}
 
 	private void update(float deltaTime) {
-		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.P) && !paused) {
 			debug = !debug;
 		}
 		
@@ -107,12 +107,12 @@ public class GameScreen implements Screen {
 		
 		if (!paused) {
 			activeScene.update(delta);
-			if (debug) {
-				physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
-			}
 		} 
 		
 		activeScene.render(game.batch, camera);
+		if (debug) {
+			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
+		}
 		inGameHud.render(player, paused);
 		update(delta);
 	}

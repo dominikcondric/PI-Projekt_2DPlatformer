@@ -529,4 +529,11 @@ public class Player extends Entity {
 		batch.draw(atlasRegion, sprite.getX()-0.5f, sprite.getY()-0.65f, drawOriginX, drawOriginY, drawWidth, drawHeight, drawScaleX, drawScaleY, 0);
 		
 	}
+
+	@Override
+	public void resolveCollision(Fixture self, Fixture other) {
+		if(other.getUserData() instanceof Enemy && !other.isSensor()) {
+			onHit(((Enemy) other.getUserData()).getBody().getPosition().x);
+		}
+	}
 }

@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Enemy;
 import entities.Entity;
-import entities.Player;
 
 public class CaveScene extends Scene {
 

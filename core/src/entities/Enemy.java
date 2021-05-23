@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -14,19 +15,16 @@ import com.badlogic.gdx.utils.Array;
 import scenes.Scene;
 
 public class Enemy extends Entity {
-	
 	float stateTimer;
 	int direction;
 	private TextureRegion slimeIdle;
-	@SuppressWarnings("rawtypes")
-	private Animation slimeIdleAnim;
+	private Animation<TextureRegion> slimeIdleAnim;
 	protected int hp=3;
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
 	protected boolean active=false;
 	private Array<TextureRegion> idleFrames = new Array<TextureRegion>();
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Enemy(Vector2 position) {
 		super(position);
 		atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\idle_slime.atlas"));
@@ -34,7 +32,7 @@ public class Enemy extends Entity {
 		for(int i = 0; i < 6; i++) {
 			idleFrames.add(new TextureRegion(atlas.findRegion("idle_slime01"), i * 23+5 , 0, 19, 18 ));
 		}
-		slimeIdleAnim = new Animation(0.1f, idleFrames);
+		slimeIdleAnim = new Animation<TextureRegion>(0.1f, idleFrames);
 		sprite.setRegion(slimeIdle);
 		sprite.setSize(0.9f, 0.9f);
 		sprite.setScale(2f, 2f);
@@ -82,13 +80,13 @@ public class Enemy extends Entity {
 			setToDestroy = true;
 		}
 		
-		if(this.active) {
+		if (this.active) {
 			this.move(this.getDirection(scene.getPlayer()));
 		}
 		
-        if(body.getLinearVelocity().y < 0)  {
+        if (body.getLinearVelocity().y < 0)  {
 			body.setLinearDamping(0);
-        }else {
+        } else {
             body.setLinearDamping(12);
         }
 	}
@@ -98,27 +96,31 @@ public class Enemy extends Entity {
 	public int getDirection(Player player) {
 		//enemy manji x dakle true onda se mice enemy u desno
 		//inace se mice u ljevo
-		int dir=0;
-		if(this.sprite.getX()<player.sprite.getX()) dir++;
-		else dir--;
-		if(this.sprite.getY()<player.sprite.getY()) dir+=3;
+		int dir = 0;
+		if (this.sprite.getX()<player.sprite.getX()) {
+			dir++;
+		} else {
+			dir--;
+		}
+		
+		if (this.sprite.getY()<player.sprite.getY())
+			dir	+= 3;
+		
 		return dir;
-
 	}
 
 	public void move(int direction) {
 		this.direction = direction;
-		if(direction==-1 || direction==2) {
+		
+		if (direction == -1 || direction == 2) {
 			moveLeft();
-		}
-		else if (direction==1 || direction == 4 ){
+		} else if (direction == 1 || direction == 4 ){
 			moveRight();
-
-		}
-		if(direction>=2 && this.getBody().getLinearVelocity().y==0) {
-			jump();
 		}
 		
+		if(direction >= 2 && this.getBody().getLinearVelocity().y == 0) {
+			jump();
+		}
 	}
 
 	public void jump() {
@@ -137,34 +139,44 @@ public class Enemy extends Entity {
 	}
 
 	public void onHit() {
-		this.hp --;
+		this.hp--;
 		System.out.println(this.hp);
-		if(this.hp<=0)
+		if (this.hp <= 0)
 			setToDestroy = true;
 	}
 
-	public void activate() {
-		this.active=true;
+	private void activate() {
+		this.active = true;
 	}
 
-	public void stop() {
-		this.active=false;
+	private void stop() {
+		this.active = false;
 		
 	}
 	
-	public TextureRegion getFrame(float deltaTime){
-
+	public TextureRegion getFrame(float deltaTime) {
 		TextureRegion region = (TextureRegion) slimeIdleAnim.getKeyFrame(stateTimer, true);
         
-        if(body.getLinearVelocity().x < 0 && region.isFlipX()){
+        if (body.getLinearVelocity().x < 0 && region.isFlipX()) {
             region.flip(true, false);
-        }
-        else if(body.getLinearVelocity().x > 0 && !region.isFlipX()){
+        } else if (body.getLinearVelocity().x > 0 && !region.isFlipX()) {
             region.flip(true, false);
         }
 
         stateTimer = stateTimer + deltaTime;
         return region;
-
     }
+
+	@Override
+	public void resolveCollision(Fixture self, Fixture other) {
+		//kontakt playera i enemy visiona
+		//posto ne postoji senzor s player objektom u userdata to znaci da enemy u ovom slucaju mora biti senzor a player mora biti sam hitbox playera
+		if (other.getUserData() instanceof Player && self.isSensor()) {
+			activate();
+			if (((Player)other.getUserData()).getHp() <= 0)
+				stop();
+		} else if (other.getUserData() == "meleehitbox" || other.getUserData() instanceof Fireball)	{
+			onHit();
+		}
+	}
 }
