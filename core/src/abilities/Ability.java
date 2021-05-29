@@ -1,11 +1,13 @@
 package abilities;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import entities.Entity;
 import scenes.Scene;
 
 public abstract class Ability {
+	protected Sound sound;
 	protected float cooldownTime;
 	protected float currentCooldownTime;
 	protected boolean triggered = false;

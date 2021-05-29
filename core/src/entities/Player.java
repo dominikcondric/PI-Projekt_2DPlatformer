@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -29,6 +30,10 @@ public class Player extends Entity {
 	private int jumpCount = 0;
 	private TextureAtlas atlas;
 	
+	private Sound swordSlash = Gdx.audio.newSound(Gdx.files.internal("sounds/sword.wav"));
+	private Sound footstep = Gdx.audio.newSound(Gdx.files.internal("sounds/footstep.wav"));
+	private Sound jump = Gdx.audio.newSound(Gdx.files.internal("sounds/jump.wav"));
+	private Sound land = Gdx.audio.newSound(Gdx.files.internal("sounds/landing.wav"));
 	private ArrayList<Ability> abilities;
 	private ArrayList<Item> items;
 	
@@ -63,6 +68,7 @@ public class Player extends Entity {
 	private TextureRegion currentRegion;
 	private boolean hasAttacked = false;
 	private float attackCooldown = 0.25f;
+	private boolean isPlaying = false;
 	
 	FixtureDef fdef;
 	Fixture melee;
@@ -332,6 +338,13 @@ public class Player extends Entity {
 		currentRegion = getFrame(deltaTime);
 		sprite.setRegion(currentRegion);
 		
+	     if(previousState == State.FALLING && currentState == State.STANDING) 
+				land.play();
+			
+		if(currentState == State.RUNNING && !isPlaying) {
+			footstep.loop(0.4f);
+			isPlaying = true;
+		}
 		for (Ability ability : abilities)
 			ability.update(deltaTime);
 		
@@ -341,16 +354,22 @@ public class Player extends Entity {
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && (playerVelocity.y == ON_GROUND || jumpCount < 2)) {
 			jumpCount++;
+			jump.play();
 			jump();
 		}	
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && playerVelocity.x <= MOVE_THRESHOLD_RIGHT) {
-        	moveRight();
+        	moveRight();	
         }	
         
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && playerVelocity.x >= MOVE_THRESHOLD_LEFT) {
         	moveLeft();
         }
+        
+        if(playerVelocity.x == 0 || playerVelocity.y != ON_GROUND) {
+			isPlaying = false;
+			footstep.stop();
+		}
         
         if(hasAttacked) {
         	body.destroyFixture(melee);
@@ -359,6 +378,7 @@ public class Player extends Entity {
         
         if(attackCooldown == 0) {
         	if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+        		swordSlash.play();
         		meleeAttack();
         		attackCooldown = 0.25f;
         	}
@@ -388,9 +408,6 @@ public class Player extends Entity {
 		melee.setUserData(this);
 		hasAttacked = true;
 	}
-
-
-
 	/*private void crouch() {
 		((PolygonShape)(body.getFixtureList().get(0).getShape())).setAsBox(0.78f / 2.f, isCrouching ? 1.25f / 2.f : 1.25f / 2.f / 2f);
     	body.setTransform(sprite.getX() + sprite.getWidth() / 2.f, isCrouching ? sprite.getY() + sprite.getHeight() / 2.f + 0.3f : sprite.getY() + sprite.getHeight() / 2.f - 0.3f, 0);
@@ -398,7 +415,7 @@ public class Player extends Entity {
 	} */
 
 	public TextureRegion getFrame(float deltaTime){
-		
+		previousState = currentState;
 		TextureRegion region;
 		Random randomAnimation = new Random();
 		
@@ -415,6 +432,8 @@ public class Player extends Entity {
 			
 			return region;
 		}
+		
+		
         currentState = getState();
         
         
@@ -461,9 +480,10 @@ public class Player extends Entity {
         }
         	
         needsFlip(region);
+        
 
         stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
-        previousState = currentState;
+        
         return region;
 
     }

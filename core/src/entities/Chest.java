@@ -2,6 +2,7 @@ package entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -15,6 +16,8 @@ import scenes.Scene;
 
 public class Chest extends Entity {
 	private Item item;
+	private Sound sound = Gdx.audio.newSound(Gdx.files.internal("sounds/chest.wav"));
+	
 	private boolean openable = false;
 	private boolean opened = false;
 
@@ -48,6 +51,7 @@ public class Chest extends Entity {
 	public void update(Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && openable && !opened) {
+			sound.play();
 			sprite.setRegion(20, 0, 20, 20);
 			opened = true;
 			item.appear();
