@@ -39,7 +39,7 @@ public class CaveScene extends Scene {
 			shape.setAsBox(rect.getWidth() / 2f, rect.getHeight() / 2f);
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
-			fixtureDef.friction = 0.f;
+			fixtureDef.friction = 1f;
 			
 			body.createFixture(fixtureDef);
 			shape.dispose();

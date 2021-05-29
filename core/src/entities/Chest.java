@@ -56,8 +56,9 @@ public class Chest extends Entity {
 
 	@Override
 	public void resolveCollision(Fixture self, Fixture other) {
+		openable = false;
 		if (!opened && other.getUserData() instanceof Player) {
-			openable = !openable;
+			openable = true;
 		}
 	}
 }

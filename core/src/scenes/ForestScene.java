@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Chest;
 import entities.Enemy;
+import entities.FireballItem;
 import entities.Key;
 import entities.Player;
 
@@ -41,7 +42,7 @@ public class ForestScene extends Scene {
 			shape.setAsBox(rect.getWidth() / 2f, rect.getHeight() / 2f);
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
-			fixtureDef.friction = 0.f;
+			fixtureDef.friction = 1f;
 			
 			body.createFixture(fixtureDef);
 			shape.dispose();
@@ -53,8 +54,11 @@ public class ForestScene extends Scene {
 		addEntity(new Enemy(new Vector2(15.f, 37.f)));
 		addEntity(new Enemy(new Vector2(39.f, 50.f)));
 		Key key = new Key(new Vector2(85.1f, 32.f), "first");
+		FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 39.1f));
+		addEntity(fireballItem);
 		addEntity(key);
 		addEntity(new Chest(new Vector2(85.f, 32.f), key));
+		addEntity(new Chest(new Vector2(5f, 39f), fireballItem));
 	}
 
 	@Override

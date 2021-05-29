@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -25,6 +26,7 @@ import scenes.Scene;
 public class Player extends Entity {
 	private int hp = 50; 
 	private int maxHp = 50;
+	private int jumpCount = 0;
 	private TextureAtlas atlas;
 	
 	private ArrayList<Ability> abilities;
@@ -265,14 +267,38 @@ public class Player extends Entity {
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
 		this.body = world.createBody(bodyDefinition);
-		
-		PolygonShape polShape = new PolygonShape();
-		polShape.setAsBox(0.78f / 2.f, 1.25f / 2.f);
-
 		fdef = new FixtureDef();
-		fdef.shape = polShape;
-		//fdef.filter.categoryBits = 1;
+		
+		EdgeShape bottomShape = new EdgeShape();
+		bottomShape.set(body.getLocalCenter().x - 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f, body.getLocalCenter().x + 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f);
+		fdef.shape = bottomShape;
+		fdef.friction = 2f;
 		this.body.createFixture(fdef).setUserData(this);
+		
+		EdgeShape leftShape = new EdgeShape();
+		leftShape.set(body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y - 1.23f / 2.f, body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
+		fdef.shape = leftShape;
+		fdef.friction = 0;
+		this.body.createFixture(fdef).setUserData(this);
+		
+		EdgeShape rightShape = new EdgeShape();
+		rightShape.set(body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y - 1.23f / 2.f, body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
+		fdef.shape = rightShape;
+		fdef.friction = 0;
+		this.body.createFixture(fdef).setUserData(this);
+		
+		EdgeShape topShape = new EdgeShape();
+		topShape.set(body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f, body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
+		fdef.shape = topShape;
+		fdef.friction = 0;
+		this.body.createFixture(fdef).setUserData(this);
+		//PolygonShape polShape = new PolygonShape();
+		//polShape.setAsBox(0.78f / 2.f, 1.25f / 2.f);
+
+		
+		//fdef.shape = polShape;
+		//fdef.filter.categoryBits = 1;
+		//this.body.createFixture(fdef).setUserData(this);
 		
 		/*PolygonShape meleeRange = new PolygonShape();
 		meleeRange.setAsBox(0.78f * 2, 1.25f / 2.f);
@@ -280,7 +306,12 @@ public class Player extends Entity {
 		fdef.filter.categoryBits = 2;
 		this.body.createFixture(fdef).setUserData(this);
 		*/
-		polShape.dispose();
+		//polShape.dispose();
+		
+		bottomShape.dispose();
+		topShape.dispose();
+		leftShape.dispose();
+		rightShape.dispose();
 		
 	}
 	
@@ -304,7 +335,12 @@ public class Player extends Entity {
 		for (Ability ability : abilities)
 			ability.update(deltaTime);
 		
-		if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && playerVelocity.y == ON_GROUND) {
+		if(playerVelocity.y == ON_GROUND){
+        	jumpCount = 0;
+        }
+		
+		if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && (playerVelocity.y == ON_GROUND || jumpCount < 2)) {
+			jumpCount++;
 			jump();
 		}	
 
@@ -334,12 +370,6 @@ public class Player extends Entity {
         /*if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
         	crouch();
         }*/
-        
-        if(playerVelocity.y < ON_GROUND - 0.1 || playerVelocity.y > ON_GROUND + 0.1) {
-        	body.setLinearDamping(0);
-        }else {
-        	body.setLinearDamping(12);
-        }
 
 
         if (body.getPosition().y < 0.f) {
@@ -454,15 +484,15 @@ public class Player extends Entity {
     }
 
 	private void jump() {
-		body.applyLinearImpulse(new Vector2(0, 11f), body.getWorldCenter(), true);
+		body.applyLinearImpulse(new Vector2(0, 9.5f), body.getWorldCenter(), true);
 	}
 	
 	private void moveRight() {
-		body.applyLinearImpulse(new Vector2(3.5f, 0), body.getWorldCenter(), true);
+		body.applyLinearImpulse(new Vector2(3f, 0), body.getWorldCenter(), true);
     	facingRight = true;
 	}
 	private void moveLeft() {
-    	body.applyLinearImpulse(new Vector2(-3.5f, 0), body.getWorldCenter(), true);
+    	body.applyLinearImpulse(new Vector2(-3f, 0), body.getWorldCenter(), true);
     	facingRight = false;
 	}
 	

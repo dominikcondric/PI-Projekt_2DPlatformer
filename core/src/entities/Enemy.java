@@ -18,7 +18,7 @@ public class Enemy extends Entity {
 	private float stateTimer;
 	private TextureRegion slimeIdle;
 	private Animation<TextureRegion> slimeIdleAnim;
-	protected int hp = 3;
+	protected int hp = 5;
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
 	protected boolean active = false;
@@ -136,7 +136,7 @@ public class Enemy extends Entity {
 	}
 
 	private void onHit(boolean pushRight) {
-		float xPush = 10f;
+		float xPush = 15f;
 		if (!pushRight) 
 			xPush *= -1.f;
 		

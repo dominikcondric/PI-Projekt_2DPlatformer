@@ -10,6 +10,7 @@ public abstract class Ability {
 	protected float currentCooldownTime;
 	protected boolean triggered = false;
 	protected TextureRegion hudTexture;
+	public boolean active = false;
 	
 	protected Ability(float cooldownTime) {
 		this.cooldownTime = cooldownTime;
@@ -41,6 +42,6 @@ public abstract class Ability {
 	}
 	
 	public boolean isTriggered() {
-		return triggered;
+		return triggered && active;
 	}
 }
