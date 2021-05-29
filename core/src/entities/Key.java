@@ -34,7 +34,8 @@ public class Key extends Item {
 	public void update(Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		if (triggerPickup) {
-			scene.beginAnimation(new PickupAnimation(this, scene.getPlayer()));
+			String message = "You just found a key. Wondering what it unlocks...";
+			scene.beginAnimation(new PickupAnimation(this, scene.getPlayer(), message));
 		}
 		
 		triggerPickup = false;

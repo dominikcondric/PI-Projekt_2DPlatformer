@@ -50,6 +50,10 @@ public abstract class Scene {
 		return box2DWorld;
 	}
 	
+	public SceneAnimation getSceneAnimation() {
+		return runningAnimation;
+	}
+	
 	public ArrayList<SceneTrigger> getTriggers() {
 		return triggers;
 	}

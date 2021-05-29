@@ -116,7 +116,7 @@ public class GameScreen implements Screen {
 		if (debug) {
 			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
 		}
-		inGameHud.render(player, paused);
+		inGameHud.render(activeScene, paused);
 		update(delta);
 	}
 	

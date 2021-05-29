@@ -34,7 +34,7 @@ public class Chest extends Entity {
 		this.body = world.createBody(bodyDefinition);
 		
 		PolygonShape polShape = new PolygonShape();
-		polShape.setAsBox(sprite.getWidth(), sprite.getHeight());
+		polShape.setAsBox(sprite.getWidth() * 2.f, sprite.getHeight() / 2.f);
 
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;

@@ -33,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 
 import entities.Player;
+import scenes.Scene;
 
 public class Hud implements Disposable {
 	private Stage hud;
@@ -44,6 +45,7 @@ public class Hud implements Disposable {
 	public TextButton quitButton;
 	public TextButton resumeButton;
 	public TextButton optionsButton;
+	private Label dialogueBox;
 	
 	public Hud(Player player, SpriteBatch batch, BitmapFont font) {
 		shapeRenderer = new ShapeRenderer();
@@ -132,13 +134,30 @@ public class Hud implements Disposable {
 		quitButton.getLabel().setFontScale(buttonHeight / 25.f);
 		
 		hud.addActor(pauseTable);
+
+		Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
+		p.setColor(0.f, 0.f, 0.f, 0.7f);
+		p.fill();
+		LabelStyle dialogueBoxStyle = new LabelStyle(font, Color.WHITE);
+		dialogueBoxStyle.background =  new TextureRegionDrawable(new TextureRegion(new Texture(p)));
+		p.dispose();
+		dialogueBox = new Label("", dialogueBoxStyle);
+		dialogueBox.setPosition(10.f, 10.f);
+		dialogueBox.setSize(hud.getWidth() - 20.f, hud.getHeight() / 4.f);
+		dialogueBox.setAlignment(Align.center);
+		dialogueBox.setWrap(true);
+		dialogueBox.setVisible(false);
+		dialogueBox.setFontScale(2.f);
+		
+		hud.addActor(dialogueBox);
 	}
 	
 	public void onResize(int width, int height) {
 		hud.getViewport().setScreenSize(width, height);
 	}
 	
-	private void update(final Player player, boolean gamePaused) {
+	private void update(final Scene scene, boolean gamePaused) {
+		Player player = scene.getPlayer();
 		progressBar.setValue(player.getHp());
 		
 		ArrayList<Ability> abilities = player.getAbilityList();
@@ -153,6 +172,13 @@ public class Hud implements Disposable {
 		}
 		
 		pauseTable.setVisible(gamePaused);
+		if (scene.getSceneAnimation() != null) {
+			dialogueBox.setText(scene.getSceneAnimation().getDialogueText());
+			dialogueBox.setVisible(true);
+		} else {
+			dialogueBox.setText("");
+			dialogueBox.setVisible(false);
+		}
 	}
 	
 	private void dimBackground() {
@@ -164,8 +190,8 @@ public class Hud implements Disposable {
 		shapeRenderer.end();
 	}
 	
-	public void render(final Player player, boolean gamePaused) {
-		update(player, gamePaused);
+	public void render(final Scene scene, boolean gamePaused) {
+		update(scene, gamePaused);
 		
 		if (gamePaused)
 			dimBackground();

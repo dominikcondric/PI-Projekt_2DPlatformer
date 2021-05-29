@@ -40,11 +40,11 @@ public class FireballItem extends Item {
 	public void update(Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		if (triggerPickup) {
-			scene.beginAnimation(new PickupAnimation(this, scene.getPlayer()));
+			String message = "Wooow, You just found a fireball\n To use it tap F.";
+			scene.beginAnimation(new PickupAnimation(this, scene.getPlayer(), message));
 			scene.getPlayer().getAbilityList().get(0).active = true;
 		}
 		
 		triggerPickup = false;
 	}
-
 }
