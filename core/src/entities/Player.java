@@ -25,8 +25,10 @@ import scenes.Scene;
 public class Player extends Entity {
 	private int hp = 50; 
 	private int maxHp = 50;
+	private TextureAtlas atlas;
 	
 	private ArrayList<Ability> abilities;
+	private ArrayList<Item> items;
 	
 	private Animation<TextureRegion> playerIdleAnim;
 	private Animation<TextureRegion> playerRunAnim;
@@ -63,12 +65,12 @@ public class Player extends Entity {
 	FixtureDef fdef;
 	Fixture melee;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Player(Vector2 position) {
 		super(position);
 		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\movement_casting_v2.atlas"));
 		abilities = new ArrayList<Ability>(2);
 		abilities.add(new FireballAbility());
+		items = new ArrayList<Item>(1);
 		
 		Array<TextureRegion> framesIdle = new Array<TextureRegion>();
 		Array<TextureRegion> framesRun = new Array<TextureRegion>();
@@ -117,7 +119,7 @@ public class Player extends Entity {
 			
 		}
 		*/
-		playerIdleAnim = new Animation(0.1f, framesIdle);
+		playerIdleAnim = new Animation<TextureRegion>(0.1f, framesIdle);
 		
 		for(int i = 0; i < 6; i++) {
 			switch(i) {
@@ -143,7 +145,7 @@ public class Player extends Entity {
 		}
 		
 		}
-		playerRunAnim = new Animation(0.1f, framesRun);
+		playerRunAnim = new Animation<TextureRegion>(0.1f, framesRun);
 	
 		for(int i = 0; i < 5; i++) {
 			switch(i) {
@@ -164,7 +166,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerCastAnim = new Animation(0.1f, framesCast);
+		playerCastAnim = new Animation<TextureRegion>(0.1f, framesCast);
 		
 		/*for(int i = 0; i < 4; i++) {
 			switch(i) {
@@ -183,7 +185,7 @@ public class Player extends Entity {
 			}
 			
 		}
-		playerCrouchAnim = new Animation(0.1f, framesCrouch); */
+		playerCrouchAnim = new Animation<TextureRegion>(0.1f, framesCrouch); */
 		
 		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\aero_attacks.atlas"));
 		
@@ -207,7 +209,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim1 = new Animation(0.05f,framesAttack1);
+		playerAttackAnim1 = new Animation<TextureRegion>(0.05f,framesAttack1);
 		currentAttackAnim = playerAttackAnim1;
 		
 		for(int i = 0; i < 6; i++) {
@@ -231,7 +233,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim2 = new Animation(0.05f,framesAttack2);
+		playerAttackAnim2 = new Animation<TextureRegion>(0.05f,framesAttack2);
 		
 		for(int i = 0; i < 6; i++) {
 			switch(i) {
@@ -253,7 +255,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim3 = new Animation(0.05f,framesAttack3);
+		playerAttackAnim3 = new Animation<TextureRegion>(0.05f,framesAttack3);
 		
 	}
 	
@@ -353,9 +355,8 @@ public class Player extends Entity {
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
 		melee = this.body.createFixture(fdef);
-		melee.setUserData("meleehitbox");
+		melee.setUserData(this);
 		hasAttacked = true;
-		
 	}
 
 
@@ -469,8 +470,16 @@ public class Player extends Entity {
         return stateTimer;
     }
 	
+	public boolean hasAttacked() {
+		return hasAttacked;
+	}
+	
 	public ArrayList<Ability> getAbilityList() {
 		return abilities;
+	}
+	
+	public void addItem(Item item) {
+		items.add(item);
 	}
 	
 	public void onHit(float x) {
@@ -478,13 +487,12 @@ public class Player extends Entity {
 		if(this.hp<=0)
 			setToDestroy = true;
 		if(x==0) return;
-		if(this.getBody().getPosition().x < x) {
-	    	body.applyLinearImpulse(new Vector2(-12f, 2f), body.getWorldCenter(), true);
+		if(this.body.getPosition().x < x) {
+	    	body.applyLinearImpulse(new Vector2(-10f, 1f), body.getWorldCenter(), true);
 		}
 		else {
-			body.applyLinearImpulse(new Vector2(12f, 2f), body.getWorldCenter(), true);
+			body.applyLinearImpulse(new Vector2(10f, 1f), body.getWorldCenter(), true);
 		}		
-		System.out.print(this.hp);
 	}
 	
 	public int getHp() {
@@ -532,8 +540,8 @@ public class Player extends Entity {
 
 	@Override
 	public void resolveCollision(Fixture self, Fixture other) {
-		if(other.getUserData() instanceof Enemy && !other.isSensor()) {
-			onHit(((Enemy) other.getUserData()).getBody().getPosition().x);
+		if(other.getUserData() instanceof Enemy && !other.isSensor() && !hasAttacked) {
+			onHit(((Enemy) other.getUserData()).getPosition().x);
 		}
 	}
 }

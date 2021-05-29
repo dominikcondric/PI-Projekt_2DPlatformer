@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import entities.Entity;
 import entities.Player;
+import sceneAnimations.SceneAnimation;
 import tools.CollisionListener;
 
 public abstract class Scene {
@@ -22,6 +23,8 @@ public abstract class Scene {
 	protected ArrayList<Entity> entities;
 	protected ArrayList<SceneTrigger> triggers;
 	private ArrayList<Integer> toDestroy = new ArrayList<Integer>();
+	protected SceneAnimation runningAnimation = null;
+	protected Player player = null;
 	
 	public Scene(final TmxMapLoader mapLoader, String mapFilePath, final SpriteBatch batch) {
 		this.map = mapLoader.load(mapFilePath);
@@ -39,6 +42,10 @@ public abstract class Scene {
 	protected abstract void constructTileMap();
 	public abstract void constructEntities();
 	
+	public void beginAnimation(SceneAnimation animation) {
+		runningAnimation = animation;
+	}
+	
 	public World getWorld() {
 		return box2DWorld;
 	}
@@ -47,9 +54,13 @@ public abstract class Scene {
 		return triggers;
 	}
 	
+	public void resetPlayer() {
+		player = null;
+	}
+	
 	public void resetEntities() {
 		for (Entity e : entities)
-			box2DWorld.destroyBody(e.getBody());
+			e.destroyBody(box2DWorld);
 		
 		entities.clear();
 		constructEntities();
@@ -63,6 +74,10 @@ public abstract class Scene {
 		return new Vector2(width, height);
 	}
 	
+	public Player getPlayer() {
+		return player;
+	}
+	
 	public void addTrigger(SceneTrigger trigger) {
 		triggers.add(trigger);
 	}
@@ -71,18 +86,9 @@ public abstract class Scene {
 		entities.add(entity);
 		entity.addToWorld(box2DWorld);
 		if (entity instanceof Player) {
-			placePlayerOnScene(entity);
+			player = (Player)entity;
+			placePlayerOnScene(player);
 		}
-	}
-	
-	public Player getPlayer() {
-		for (Entity e : entities) {
-			if (e instanceof Player) {
-				return (Player)e;
-			}
-		}
-		
-		return null;
 	}
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera) {
@@ -96,21 +102,30 @@ public abstract class Scene {
 	}
 	
 	public void update(float deltaTime) {
-		box2DWorld.step(deltaTime, 10, 10);
-		for (int i = entities.size() - 1; i >= 0; --i) {
-			if (entities.get(i).isSetToDestroy()) {
-				toDestroy.add(i);
-			} else {
-				entities.get(i).update(this, deltaTime);
+		if (runningAnimation != null) {
+			runningAnimation.animate(deltaTime);
+			if (runningAnimation.isFinished())
+				runningAnimation = null;
+		} 
+		
+		if (runningAnimation == null || (runningAnimation != null && !runningAnimation.shouldSceneStop())) {
+			box2DWorld.step(deltaTime, 10, 10);
+			for (int i = entities.size() - 1; i >= 0; --i) {
+				if (entities.get(i).isSetToDestroy()) {
+					toDestroy.add(i);
+				} else {
+					entities.get(i).update(this, deltaTime);
+				}
 			}
+			
+			for (Integer i : toDestroy) {
+				entities.get(i.intValue()).destroyBody(box2DWorld);
+				entities.remove(i.intValue());
+			}
+			
+			toDestroy.clear();
 		}
 		
-		for (Integer i : toDestroy) {
-			box2DWorld.destroyBody(entities.get(i.intValue()).getBody());
-			entities.remove(i.intValue());
-		}
-		
-		toDestroy.clear();
 	}
 	
 	public void dispose() {
@@ -118,5 +133,5 @@ public abstract class Scene {
 		map.dispose();
 	}
 
-	protected abstract void placePlayerOnScene(Entity player);
+	protected abstract void placePlayerOnScene(Player player);
 }

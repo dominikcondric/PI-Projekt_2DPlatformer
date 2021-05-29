@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Enemy;
-import entities.Entity;
+import entities.Player;
 
 public class CaveScene extends Scene {
 
@@ -54,7 +54,7 @@ public class CaveScene extends Scene {
 	}
 
 	@Override
-	public void placePlayerOnScene(Entity player) {
+	public void placePlayerOnScene(Player player) {
 		player.setPosition(new Vector2(2.f, 8.f));
 	}
 }

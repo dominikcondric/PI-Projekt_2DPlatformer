@@ -18,6 +18,7 @@ public class Fireball extends Entity {
 	private boolean firedRight;
 	private Animation<TextureRegion> flying;
 	private float stateTimer;
+	private TextureAtlas atlas;
 	
 	public Fireball(Vector2 entityPosition, boolean firedRight) {
 		super(entityPosition);

@@ -14,6 +14,7 @@ import com.platformer.Platformer;
 import entities.Player;
 import scenes.CaveScene;
 import scenes.ForestScene;
+import scenes.OutOfMapTrigger;
 import scenes.Scene;
 import screens.GameOverScreen.ScreenType;
 import utility.Hud;
@@ -43,10 +44,12 @@ public class GameScreen implements Screen {
 		inGameHud = new Hud(player, game.batch, game.font);
 		
 		Scene caveScene = new CaveScene(tiledMapLoader, game.batch);
-		sceneManager.addScene(caveScene, "Cave", true);
+		sceneManager.addScene(caveScene, "Cave", false);
 		
 		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(forestScene, "Forest", true);
+		
+		forestScene.addTrigger(new OutOfMapTrigger(caveScene, player, new Vector2(124.f, 80.f), true));
 		
 		forestScene.addEntity(player);
 	}
@@ -56,7 +59,7 @@ public class GameScreen implements Screen {
 			debug = !debug;
 		}
 		
-		Vector2 playerPosition = player.getBody().getPosition();
+		Vector2 playerPosition = player.getPosition();
 		Vector2 activeMapSize = sceneManager.getActiveScene().getTiledMapSize();
 		
 		if (playerPosition.x - camera.viewportWidth / 2f < 0f) {

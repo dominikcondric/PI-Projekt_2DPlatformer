@@ -15,15 +15,15 @@ import com.badlogic.gdx.utils.Array;
 import scenes.Scene;
 
 public class Enemy extends Entity {
-	float stateTimer;
-	int direction;
+	private float stateTimer;
 	private TextureRegion slimeIdle;
 	private Animation<TextureRegion> slimeIdleAnim;
-	protected int hp=3;
+	protected int hp = 3;
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
-	protected boolean active=false;
+	protected boolean active = false;
 	private Array<TextureRegion> idleFrames = new Array<TextureRegion>();
+	private TextureAtlas atlas;
 
 	public Enemy(Vector2 position) {
 		super(position);
@@ -95,7 +95,7 @@ public class Enemy extends Entity {
 
 	public int getDirection(Player player) {
 		//enemy manji x dakle true onda se mice enemy u desno
-		//inace se mice u ljevo
+		//inace se mice u lijevo
 		int dir = 0;
 		if (this.sprite.getX()<player.sprite.getX()) {
 			dir++;
@@ -110,37 +110,38 @@ public class Enemy extends Entity {
 	}
 
 	public void move(int direction) {
-		this.direction = direction;
-		
 		if (direction == -1 || direction == 2) {
 			moveLeft();
-		} else if (direction == 1 || direction == 4 ){
+		} else if (direction == 1 || direction == 4){
 			moveRight();
 		}
 		
-		if(direction >= 2 && this.getBody().getLinearVelocity().y == 0) {
+		if(direction >= 2 && this.body.getLinearVelocity().y == 0) {
 			jump();
 		}
 	}
 
 	public void jump() {
 		body.applyLinearImpulse(new Vector2(0, 11f), body.getWorldCenter(), true);
-		
 	}
 
 	public void moveLeft() {
-    	body.applyLinearImpulse(new Vector2(-0.5f, 0), body.getWorldCenter(), true);
+    	body.applyLinearImpulse(new Vector2(-0.3f, 0.f), body.getWorldCenter(), true);
     	body.setLinearDamping(12);
 	}
 
 	public void moveRight() {
-		body.applyLinearImpulse(new Vector2(0.5f, 0), body.getWorldCenter(), true);
+		body.applyLinearImpulse(new Vector2(0.3f, 0), body.getWorldCenter(), true);
     	body.setLinearDamping(12);
 	}
 
-	public void onHit() {
+	private void onHit(boolean pushRight) {
+		float xPush = 10f;
+		if (!pushRight) 
+			xPush *= -1.f;
+		
+		body.applyLinearImpulse(new Vector2(xPush, 0.f), body.getWorldCenter(), true);
 		this.hp--;
-		System.out.println(this.hp);
 		if (this.hp <= 0)
 			setToDestroy = true;
 	}
@@ -175,8 +176,10 @@ public class Enemy extends Entity {
 			activate();
 			if (((Player)other.getUserData()).getHp() <= 0)
 				stop();
-		} else if (other.getUserData() == "meleehitbox" || other.getUserData() instanceof Fireball)	{
-			onHit();
+		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
+			onHit(((Player)other.getUserData()).facingRight);
+		} else if (!self.isSensor() && other.getUserData() instanceof Fireball) {
+			onHit(((Fireball)other.getUserData()).facingRight);
 		}
 	}
 }

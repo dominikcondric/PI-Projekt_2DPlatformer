@@ -11,8 +11,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
+import entities.Chest;
 import entities.Enemy;
-import entities.Entity;
+import entities.Key;
+import entities.Player;
 
 public class ForestScene extends Scene {
 
@@ -48,13 +50,16 @@ public class ForestScene extends Scene {
 
 	@Override
 	public void constructEntities() {
-		addEntity(new Enemy(new Vector2(97.f, 57.f)));
+		addEntity(new Enemy(new Vector2(15.f, 37.f)));
 		addEntity(new Enemy(new Vector2(39.f, 50.f)));
+		Key key = new Key(new Vector2(85.1f, 32.f), "first");
+		addEntity(key);
+		addEntity(new Chest(new Vector2(85.f, 32.f), key));
 	}
 
 	@Override
-	protected void placePlayerOnScene(Entity player) {
-		player.setPosition(new Vector2(2.f, 39.f));
+	protected void placePlayerOnScene(Player player) {
+		player.setPosition(new Vector2(3.f, 39.f));
 	}
 
 }

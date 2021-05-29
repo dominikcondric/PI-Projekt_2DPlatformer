@@ -5,6 +5,7 @@ import java.util.function.BiConsumer;
 
 import com.badlogic.gdx.utils.Disposable;
 
+import entities.Player;
 import scenes.Scene;
 import scenes.SceneTrigger;
 
@@ -52,7 +53,10 @@ public class SceneManager implements Disposable {
 	public void update() {
 		for (SceneTrigger trigger : activeScene.getTriggers()) {
 			if (trigger.isTriggered()) {
+				Player p = activeScene.getPlayer();
+				activeScene.resetPlayer();
 				activeScene = trigger.sceneToFollow;
+				activeScene.addEntity(p);
 			}
 		}
 	}
