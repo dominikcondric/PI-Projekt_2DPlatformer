@@ -2,6 +2,8 @@ package scenes;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
@@ -21,7 +23,7 @@ import entities.Player;
 
 public class CastleScene extends Scene {
 	private ArrayList<PointLight> lights;
-
+	Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/castle_music.mp3"));
 	public CastleScene(TmxMapLoader mapLoader, SpriteBatch batch) {
 		super(mapLoader, "Castle/castle_map.tmx", batch);
 	}
@@ -123,6 +125,15 @@ public class CastleScene extends Scene {
 	@Override
 	protected void placePlayerOnScene(Player player) {
 		player.setPosition(new Vector2(2.f, 10.f));
+	}
+	
+	@Override
+	public void update(float deltaTime) {
+		super.update(deltaTime);
+		music.setVolume(0.1f);
+		music.play();
+		music.setLooping(true);
+		
 	}
 
 
