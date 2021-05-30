@@ -114,7 +114,6 @@ public class RangedGuard extends Enemy {
 			stopTime=stateTimer+1f;
 		}
 		else if(stopTime<=stateTimer) {
-			System.out.println("tu");
 			shoot(scene);
 			stopTime=stateTimer+1f;
 		}
