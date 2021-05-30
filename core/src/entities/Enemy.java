@@ -14,28 +14,31 @@ import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
 
-public class Enemy extends Entity {
-	private float stateTimer;
-	private TextureRegion slimeIdle;
-	private Animation<TextureRegion> slimeIdleAnim;
+public abstract class Enemy extends Entity {
+	protected float stateTimer;
+	protected TextureRegion idle;
+	protected Animation<TextureRegion> idleAnim;
 	protected int hp = 5;
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
+	protected float jumpheight=11f;
+	protected float movespeed=0.3f;
+	protected int direction;
 	protected boolean active = false;
-	private Array<TextureRegion> idleFrames = new Array<TextureRegion>();
-	private TextureAtlas atlas;
+	protected Array<TextureRegion> idleFrames = new Array<TextureRegion>();
+	protected TextureAtlas atlas;
 
 	public Enemy(Vector2 position) {
 		super(position);
-		atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\idle_slime.atlas"));
-		slimeIdle = new TextureRegion(atlas.findRegion("idle_slime01"), 0, 0, 19, 18);
+		/*atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\idle_slime.atlas"));
+		idle = new TextureRegion(atlas.findRegion("idle_slime01"), 0, 0, 19, 18);
 		for(int i = 0; i < 6; i++) {
 			idleFrames.add(new TextureRegion(atlas.findRegion("idle_slime01"), i * 23+5 , 0, 19, 18 ));
 		}
-		slimeIdleAnim = new Animation<TextureRegion>(0.1f, idleFrames);
-		sprite.setRegion(slimeIdle);
+		idleAnim = new Animation<TextureRegion>(0.1f, idleFrames);
+		sprite.setRegion(idle);
 		sprite.setSize(0.9f, 0.9f);
-		sprite.setScale(2f, 2f);
+		sprite.setScale(2f, 2f);*/
 	}
 	
 	@Override
@@ -45,7 +48,6 @@ public class Enemy extends Entity {
 		
 		
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
-		//bodyDefinition.type = BodyDef.BodyType.StaticBody;
 		
 		this.body = world.createBody(bodyDefinition);
 		
@@ -56,9 +58,6 @@ public class Enemy extends Entity {
 		fdef.shape = polShape;
 
 		this.body.createFixture(fdef).setUserData(this);
-		
-		/*EdgeShape vision = new EdgeShape();
-		vision.set(new Vector2(-2,-2), new Vector2(2,2));*/
 		
 		PolygonShape vision = new PolygonShape();
 		vision.setAsBox(visionLength, visionHeight, new Vector2(0,visionHeight-(sprite.getHeight()/2)), 0);
@@ -109,7 +108,7 @@ public class Enemy extends Entity {
 		return dir;
 	}
 
-	public void move(int direction) {
+	/*public void move(int direction) {
 		if (direction == -1 || direction == 2) {
 			moveLeft();
 		} else if (direction == 1 || direction == 4){
@@ -119,20 +118,22 @@ public class Enemy extends Entity {
 		if(direction >= 2 && this.body.getLinearVelocity().y == 0) {
 			jump();
 		}
-	}
+	}*/
+	
+	public abstract void move(int direction);
 
 	public void jump() {
-		body.applyLinearImpulse(new Vector2(0, 11f), body.getWorldCenter(), true);
+		body.applyLinearImpulse(new Vector2(0, this.jumpheight), body.getWorldCenter(), true);
 	}
 
 	public void moveLeft() {
-    	body.applyLinearImpulse(new Vector2(-0.3f, 0.f), body.getWorldCenter(), true);
-    	body.setLinearDamping(12);
+    	body.applyLinearImpulse(new Vector2(-(this.movespeed), 0), body.getWorldCenter(), true);
+    	body.setLinearDamping(20);
 	}
 
 	public void moveRight() {
-		body.applyLinearImpulse(new Vector2(0.3f, 0), body.getWorldCenter(), true);
-    	body.setLinearDamping(12);
+		body.applyLinearImpulse(new Vector2(this.movespeed, 0), body.getWorldCenter(), true);
+    	body.setLinearDamping(20);
 	}
 
 	private void onHit(boolean pushRight) {
@@ -156,7 +157,7 @@ public class Enemy extends Entity {
 	}
 	
 	public TextureRegion getFrame(float deltaTime) {
-		TextureRegion region = (TextureRegion) slimeIdleAnim.getKeyFrame(stateTimer, true);
+		TextureRegion region = (TextureRegion) idleAnim.getKeyFrame(stateTimer, true);
         
         if (body.getLinearVelocity().x < 0 && region.isFlipX()) {
             region.flip(true, false);

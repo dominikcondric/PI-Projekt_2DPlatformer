@@ -16,6 +16,7 @@ import entities.Enemy;
 import entities.FireballItem;
 import entities.Key;
 import entities.Player;
+import entities.Slime;
 
 public class ForestScene extends Scene {
 
@@ -51,8 +52,8 @@ public class ForestScene extends Scene {
 
 	@Override
 	public void constructEntities() {
-		addEntity(new Enemy(new Vector2(15.f, 37.f)));
-		addEntity(new Enemy(new Vector2(39.f, 50.f)));
+		addEntity(new Slime(new Vector2(15.f, 37.f)));
+		addEntity(new Slime(new Vector2(39.f, 50.f)));
 		Key key = new Key(new Vector2(85.1f, 32.f), "first");
 		FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 39.1f));
 		addEntity(fireballItem);

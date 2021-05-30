@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Enemy;
 import entities.Player;
+import entities.Slime;
 
 public class CaveScene extends Scene {
 
@@ -49,8 +50,8 @@ public class CaveScene extends Scene {
 
 	@Override
 	public void constructEntities() {
-		addEntity(new Enemy(new Vector2(82.f, 20.f)));
-		addEntity(new Enemy(new Vector2(8.f, 15.f)));
+		addEntity(new Slime(new Vector2(82.f, 20.f)));
+		addEntity(new Slime(new Vector2(8.f, 15.f)));
 	}
 
 	@Override
