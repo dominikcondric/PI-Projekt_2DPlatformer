@@ -1,6 +1,7 @@
 package sceneAnimations;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
@@ -19,7 +20,7 @@ public class PickupAnimation extends SceneAnimation {
 		this.message = message;
 		this.player = player;
 		stopScene = true;
-		minimumDuration = 3.f;
+		minimumDuration = 1.f;
 	}
 
 	@Override
@@ -27,15 +28,15 @@ public class PickupAnimation extends SceneAnimation {
 		minimumDuration -= deltaTime;
 		if (minimumDuration > 0.f) {
 			if(Vector2.len2(item.getPosition().x - player.getPosition().x, item.getPosition().y - player.getPosition().y) > 1e-1f) {
-				item.setPosition(item.getPosition().add(player.getPosition().sub(item.getPosition()).scl(deltaTime * 2)));
-				if (dialogueText.isEmpty()) {
-					dialogueText.append(message);
-				}
-			}else if(!isPlaying){
+				item.setPosition(item.getPosition().add(player.getPosition().sub(item.getPosition()).nor().scl(deltaTime * 2.f)));
+			} else if (!isPlaying) {
 				pickup.play();
 				isPlaying = true;
+				if (dialogueText.isEmpty()) {
+					dialogueText.append(message + "\nPress Enter to continue...");
+				}
 			}
-		} else {
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			finished = true;
 			item.setToDestroy(true);
 			player.addItem(item);

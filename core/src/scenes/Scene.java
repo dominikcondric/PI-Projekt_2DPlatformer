@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 
 import entities.Entity;
@@ -25,6 +26,7 @@ public abstract class Scene {
 	private ArrayList<Integer> toDestroy = new ArrayList<Integer>();
 	protected SceneAnimation runningAnimation = null;
 	protected Player player = null;
+	protected float visibleMapScale = 4.f;
 	
 	public Scene(final TmxMapLoader mapLoader, String mapFilePath, final SpriteBatch batch) {
 		this.map = mapLoader.load(mapFilePath);
@@ -70,12 +72,12 @@ public abstract class Scene {
 		constructEntities();
 	}
 	
-	public Vector2 getTiledMapSize() {
+	public Vector3 getTiledMapSize() {
 		MapProperties props = map.getProperties();
 		int width = props.get("width", Integer.class);
 		int height = props.get("height", Integer.class);
 		
-		return new Vector2(width, height);
+		return new Vector3(width, height, visibleMapScale);
 	}
 	
 	public Player getPlayer() {
@@ -106,30 +108,28 @@ public abstract class Scene {
 	}
 	
 	public void update(float deltaTime) {
+		box2DWorld.step(deltaTime, 10, 10);
+		
 		if (runningAnimation != null) {
 			runningAnimation.animate(deltaTime);
 			if (runningAnimation.isFinished())
 				runningAnimation = null;
 		} 
 		
-		if (runningAnimation == null || (runningAnimation != null && !runningAnimation.shouldSceneStop())) {
-			box2DWorld.step(deltaTime, 10, 10);
-			for (int i = entities.size() - 1; i >= 0; --i) {
-				if (entities.get(i).isSetToDestroy()) {
-					toDestroy.add(i);
-				} else {
-					entities.get(i).update(this, deltaTime);
-				}
+		for (int i = entities.size() - 1; i >= 0; --i) {
+			if (entities.get(i).isSetToDestroy()) {
+				toDestroy.add(i);
+			} else {
+				entities.get(i).update(this, deltaTime);
 			}
-			
-			for (Integer i : toDestroy) {
-				entities.get(i.intValue()).destroyBody(box2DWorld);
-				entities.remove(i.intValue());
-			}
-			
-			toDestroy.clear();
 		}
 		
+		for (Integer i : toDestroy) {
+			entities.get(i.intValue()).destroyBody(box2DWorld);
+			entities.remove(i.intValue());
+		}
+		
+		toDestroy.clear();
 	}
 	
 	public void dispose() {

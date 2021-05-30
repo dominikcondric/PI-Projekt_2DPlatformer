@@ -37,7 +37,7 @@ import scenes.Scene;
 
 public class Hud implements Disposable {
 	private Stage hud;
-	private ArrayList<Label> cooldownTimers;
+	private ArrayList<Stack> abilityIcons;
 	private int maxHp;
 	private ProgressBar progressBar;
 	private ShapeRenderer shapeRenderer;
@@ -80,7 +80,7 @@ public class Hud implements Disposable {
 		
 		progressBarColor.dispose();
 		
-		cooldownTimers = new ArrayList<Label>(4);
+		abilityIcons = new ArrayList<Stack>(4);
 		for (Ability ability : player.getAbilityList()) {
 			Image fireballImage = new Image(new TextureRegion(ability.getHudTextureRegion()));
 			Label cooldownTimer = new Label(Integer.toString((int)ability.getCooldownTime()), new LabelStyle(font, Color.BLACK));
@@ -92,7 +92,8 @@ public class Hud implements Disposable {
 			abilityFireball.addActor(cooldownTimer);
 			abilityFireball.setPosition(hud.getWidth() - 60.f, hud.getHeight() - 60f);
 			abilityFireball.setSize(40.f, 40.f);
-			cooldownTimers.add(cooldownTimer);
+			abilityFireball.setVisible(ability.active);
+			abilityIcons.add(abilityFireball);
 			hud.addActor(abilityFireball);
 		}
 		
@@ -163,11 +164,24 @@ public class Hud implements Disposable {
 		ArrayList<Ability> abilities = player.getAbilityList();
 		for (int i = 0; i < abilities.size(); ++i) {
 			Ability ability = abilities.get(i);
-			cooldownTimers.get(i).setText(Integer.toString((int)ability.getCurrentCooldownTime() + 1));
-			if (ability.getCurrentCooldownTime() < ability.getCooldownTime()) {
-				cooldownTimers.get(i).setVisible(true);
+			if (ability.active) {
+				abilityIcons.get(i).setVisible(true);
+				Label cooldownTimer = null;
+				
+				if (abilityIcons.get(i).getChild(1) instanceof Label) {
+					cooldownTimer = (Label)abilityIcons.get(i).getChild(1);
+				} else {
+					cooldownTimer = (Label)abilityIcons.get(i).getChild(0);
+				}
+				
+				cooldownTimer.setText(Integer.toString((int)ability.getCurrentCooldownTime() + 1));
+				if (ability.getCurrentCooldownTime() < ability.getCooldownTime()) {
+					cooldownTimer.setVisible(true);
+				} else {
+					cooldownTimer.setVisible(false);
+				}
 			} else {
-				cooldownTimers.get(i).setVisible(false);
+				abilityIcons.get(i).setVisible(false);
 			}
 		}
 		

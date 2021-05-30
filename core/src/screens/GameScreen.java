@@ -7,11 +7,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
 
 import entities.Player;
+import scenes.CastleInDistanceScene;
 import scenes.CaveScene;
 import scenes.ForestScene;
 import scenes.OutOfMapTrigger;
@@ -49,9 +51,11 @@ public class GameScreen implements Screen {
 		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(forestScene, "Forest", true);
 		
-		forestScene.addTrigger(new OutOfMapTrigger(caveScene, player, new Vector2(124.f, 80.f), true));
+		Scene introScene = new CastleInDistanceScene(tiledMapLoader, game.batch);
+		sceneManager.addScene(introScene, "Intro", true);
 		
-		forestScene.addEntity(player);
+		introScene.addTrigger(new OutOfMapTrigger(forestScene, player, new Vector2(19.f, 19.f), true));
+		introScene.addEntity(player);
 	}
 
 	private void update(float deltaTime) {
@@ -60,8 +64,12 @@ public class GameScreen implements Screen {
 		}
 		
 		Vector2 playerPosition = player.getPosition();
-		Vector2 activeMapSize = sceneManager.getActiveScene().getTiledMapSize();
+		Vector3 activeMapSize = sceneManager.getActiveScene().getTiledMapSize();
 		
+		float cameraZoom = activeMapSize.y / activeMapSize.z;
+		float aspectRatio = (float)Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+		
+		camera.setToOrtho(false, cameraZoom * aspectRatio, cameraZoom);
 		if (playerPosition.x - camera.viewportWidth / 2f < 0f) {
 			camera.position.x = camera.viewportWidth / 2f;
 		} else if (playerPosition.x + camera.viewportWidth / 2.f > activeMapSize.x) {

@@ -12,7 +12,6 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Chest;
-import entities.Enemy;
 import entities.FireballItem;
 import entities.Key;
 import entities.Player;

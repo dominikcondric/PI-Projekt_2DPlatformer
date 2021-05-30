@@ -147,11 +147,11 @@ public abstract class Enemy extends Entity {
 			setToDestroy = true;
 	}
 
-	private void activate() {
+	public void activate() {
 		this.active = true;
 	}
 
-	private void stop() {
+	public void stop() {
 		this.active = false;
 		
 	}

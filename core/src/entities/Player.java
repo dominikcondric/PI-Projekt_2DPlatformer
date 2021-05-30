@@ -29,6 +29,7 @@ public class Player extends Entity {
 	private int maxHp = 50;
 	private int jumpCount = 0;
 	private TextureAtlas atlas;
+	public boolean controllable = true;
 	
 	private Sound swordSlash = Gdx.audio.newSound(Gdx.files.internal("sounds/sword.wav"));
 	private Sound footstep = Gdx.audio.newSound(Gdx.files.internal("sounds/footstep.wav"));
@@ -352,19 +353,21 @@ public class Player extends Entity {
         	jumpCount = 0;
         }
 		
-		if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && (playerVelocity.y == ON_GROUND || jumpCount < 2)) {
-			jumpCount++;
-			jump.play();
-			jump();
-		}	
-
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && playerVelocity.x <= MOVE_THRESHOLD_RIGHT) {
-        	moveRight();	
-        }	
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && playerVelocity.x >= MOVE_THRESHOLD_LEFT) {
-        	moveLeft();
-        }
+		if (controllable) {
+			if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && (playerVelocity.y == ON_GROUND || jumpCount < 2)) {
+				jumpCount++;
+				jump.play();
+				jump();
+			}	
+	
+	        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && playerVelocity.x <= MOVE_THRESHOLD_RIGHT) {
+	        	moveRight();	
+	        }	
+	        
+	        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && playerVelocity.x >= MOVE_THRESHOLD_LEFT) {
+	        	moveLeft();
+	        }
+		}
         
         if(playerVelocity.x == 0 || playerVelocity.y != ON_GROUND) {
 			isPlaying = false;
@@ -503,15 +506,16 @@ public class Player extends Entity {
             return State.STANDING;
     }
 
-	private void jump() {
+	public void jump() {
 		body.applyLinearImpulse(new Vector2(0, 9.5f), body.getWorldCenter(), true);
 	}
 	
-	private void moveRight() {
+	public void moveRight() {
 		body.applyLinearImpulse(new Vector2(3f, 0), body.getWorldCenter(), true);
     	facingRight = true;
 	}
-	private void moveLeft() {
+	
+	public void moveLeft() {
     	body.applyLinearImpulse(new Vector2(-3f, 0), body.getWorldCenter(), true);
     	facingRight = false;
 	}

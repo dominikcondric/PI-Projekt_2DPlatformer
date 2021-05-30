@@ -12,16 +12,17 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Player;
-import entities.Slime;
+import sceneAnimations.IntroAnimation;
 
-public class CaveScene extends Scene {
+public class CastleInDistanceScene extends Scene {
 
-	public CaveScene(TmxMapLoader mapLoader, SpriteBatch batch) {
-		super(mapLoader, "Cave/Maps/demo3.tmx", batch);
+	public CastleInDistanceScene(TmxMapLoader mapLoader, SpriteBatch batch) {
+		super(mapLoader, "CastleInDistance/CastleInDistance.tmx", batch);
+		visibleMapScale = 1.8f;
 	}
 
 	@Override
-	public void constructTileMap() {
+	protected void constructTileMap() {
 		BodyDef bodyDef = null;
 		PolygonShape shape = null;
 		FixtureDef fixtureDef = null;
@@ -46,15 +47,14 @@ public class CaveScene extends Scene {
 		}
 	}
 
-
 	@Override
 	public void constructEntities() {
-		addEntity(new Slime(new Vector2(82.f, 20.f)));
-		addEntity(new Slime(new Vector2(8.f, 15.f)));
 	}
 
 	@Override
-	public void placePlayerOnScene(Player player) {
-		player.setPosition(new Vector2(2.f, 8.f));
+	protected void placePlayerOnScene(Player player) {
+		player.setPosition(new Vector2(2.f, 1.7f));
+		runningAnimation = new IntroAnimation(player);
 	}
+
 }
