@@ -2,6 +2,7 @@ package scenes;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 
+import box2dLight.RayHandler;
 import entities.Entity;
 import entities.Player;
 import sceneAnimations.SceneAnimation;
@@ -23,10 +25,12 @@ public abstract class Scene {
 	protected OrthogonalTiledMapRenderer mapRenderer;
 	protected ArrayList<Entity> entities;
 	protected ArrayList<SceneTrigger> triggers;
+	protected RayHandler rayHandler;
 	private ArrayList<Integer> toDestroy = new ArrayList<Integer>();
 	protected SceneAnimation runningAnimation = null;
 	protected Player player = null;
 	protected float visibleMapScale = 4.f;
+	protected Color ambientLight = Color.BLACK;
 	
 	public Scene(final TmxMapLoader mapLoader, String mapFilePath, final SpriteBatch batch) {
 		this.map = mapLoader.load(mapFilePath);
@@ -34,6 +38,7 @@ public abstract class Scene {
 		mapRenderer = new OrthogonalTiledMapRenderer(this.map, 1 / mapTileSize, batch);
 		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
 		box2DWorld.setContactListener(new CollisionListener());
+		rayHandler = new RayHandler(box2DWorld);
 		
 		entities = new ArrayList<Entity>(5);
 		triggers = new ArrayList<SceneTrigger>(2);
@@ -100,11 +105,14 @@ public abstract class Scene {
 	public void render(SpriteBatch batch, OrthographicCamera camera) {
 		mapRenderer.setView(camera);
 		mapRenderer.render();
+		rayHandler.setCombinedMatrix(camera);
+		rayHandler.setAmbientLight(ambientLight);
 		batch.begin();
 		for (final Entity e : entities) {
 			e.render(batch);
 		}
 		batch.end();
+		rayHandler.updateAndRender();
 	}
 	
 	public void update(float deltaTime) {

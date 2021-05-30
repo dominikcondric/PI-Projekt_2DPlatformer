@@ -14,10 +14,12 @@ import com.platformer.Platformer;
 
 import entities.Player;
 import scenes.CastleInDistanceScene;
+import scenes.CastleScene;
 import scenes.CaveScene;
 import scenes.ForestScene;
 import scenes.OutOfMapTrigger;
 import scenes.Scene;
+import scenes.SnowScene;
 import screens.GameOverScreen.ScreenType;
 import utility.Hud;
 import utility.SceneManager;
@@ -45,16 +47,14 @@ public class GameScreen implements Screen {
 		player = new Player(new Vector2(2.f, 39.f));
 		inGameHud = new Hud(player, game.batch, game.font);
 		
-		Scene caveScene = new CaveScene(tiledMapLoader, game.batch);
-		sceneManager.addScene(caveScene, "Cave", false);
 		
-		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
-		sceneManager.addScene(forestScene, "Forest", true);
+		Scene castleScene = new CastleScene(tiledMapLoader, game.batch);
+		sceneManager.addScene(castleScene, "Castle", true);
 		
 		Scene introScene = new CastleInDistanceScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(introScene, "Intro", true);
 		
-		introScene.addTrigger(new OutOfMapTrigger(forestScene, player, new Vector2(19.f, 19.f), true));
+		introScene.addTrigger(new OutOfMapTrigger(castleScene, player, new Vector2(19.f, 19.f), true));
 		introScene.addEntity(player);
 	}
 

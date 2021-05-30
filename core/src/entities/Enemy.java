@@ -1,6 +1,5 @@
 package entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,11 +13,14 @@ import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
 
+
 public abstract class Enemy extends Entity {
 	protected float stateTimer;
 	protected TextureRegion idle;
 	protected Animation<TextureRegion> idleAnim;
 	protected int hp = 5;
+
+
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
 	protected float jumpheight=11f;
@@ -136,15 +138,16 @@ public abstract class Enemy extends Entity {
     	body.setLinearDamping(20);
 	}
 
-	private void onHit(boolean pushRight) {
+	private void onHit(boolean pushRight, float dmg) {
 		float xPush = 15f;
 		if (!pushRight) 
 			xPush *= -1.f;
 		
 		body.applyLinearImpulse(new Vector2(xPush, 0.f), body.getWorldCenter(), true);
-		this.hp--;
+		hp -= dmg;
 		if (this.hp <= 0)
 			setToDestroy = true;
+		System.out.println(hp);
 	}
 
 	public void activate() {
@@ -178,9 +181,16 @@ public abstract class Enemy extends Entity {
 			if (((Player)other.getUserData()).getHp() <= 0)
 				stop();
 		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
-			onHit(((Player)other.getUserData()).facingRight);
+			Player player = (Player)other.getUserData();
+			onHit(player.facingRight, player.getSwordDmg());
 		} else if (!self.isSensor() && other.getUserData() instanceof Fireball) {
-			onHit(((Fireball)other.getUserData()).facingRight);
+			Fireball fireball = (Fireball)other.getUserData();
+			if(fireball.didExplode()) {
+				onHit(fireball.facingRight, fireball.getExplosionDmg());
+			}else {
+				onHit(fireball.facingRight, fireball.getHitDmg());
+			}
+			
 		}
 	}
 }

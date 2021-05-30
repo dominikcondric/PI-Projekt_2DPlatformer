@@ -57,4 +57,10 @@ public abstract class Entity {
 	public void setToDestroy(boolean destroy) {
 		setToDestroy = destroy;
 	}
+
+	public Body getBody() {
+		return body;
+	}
+	
+	
 }

@@ -31,10 +31,13 @@ public class Player extends Entity {
 	private TextureAtlas atlas;
 	public boolean controllable = true;
 	
+	private float swordDmg;
+		
 	private Sound swordSlash = Gdx.audio.newSound(Gdx.files.internal("sounds/sword.wav"));
 	private Sound footstep = Gdx.audio.newSound(Gdx.files.internal("sounds/footstep.wav"));
 	private Sound jump = Gdx.audio.newSound(Gdx.files.internal("sounds/jump.wav"));
 	private Sound land = Gdx.audio.newSound(Gdx.files.internal("sounds/landing.wav"));
+	
 	private ArrayList<Ability> abilities;
 	private ArrayList<Item> items;
 	
@@ -80,6 +83,7 @@ public class Player extends Entity {
 		abilities = new ArrayList<Ability>(2);
 		abilities.add(new FireballAbility());
 		items = new ArrayList<Item>(1);
+		swordDmg = 1;
 		
 		Array<TextureRegion> framesIdle = new Array<TextureRegion>();
 		Array<TextureRegion> framesRun = new Array<TextureRegion>();
@@ -368,7 +372,7 @@ public class Player extends Entity {
 	        	moveLeft();
 	        }
 		}
-        
+
         if(playerVelocity.x == 0 || playerVelocity.y != ON_GROUND) {
 			isPlaying = false;
 			footstep.stop();
@@ -410,6 +414,7 @@ public class Player extends Entity {
 		melee = this.body.createFixture(fdef);
 		melee.setUserData(this);
 		hasAttacked = true;
+		attackRange.dispose();
 	}
 	/*private void crouch() {
 		((PolygonShape)(body.getFixtureList().get(0).getShape())).setAsBox(0.78f / 2.f, isCrouching ? 1.25f / 2.f : 1.25f / 2.f / 2f);
@@ -506,8 +511,10 @@ public class Player extends Entity {
             return State.STANDING;
     }
 
-	public void jump() {
-		body.applyLinearImpulse(new Vector2(0, 9.5f), body.getWorldCenter(), true);
+
+	private void jump() {
+		//body.applyLinearImpulse(new Vector2(0, 9.5f), body.getWorldCenter(), true);
+		body.setLinearVelocity(new Vector2(0, 9.5f));
 	}
 	
 	public void moveRight() {
@@ -598,4 +605,9 @@ public class Player extends Entity {
 			onHit(((Enemy) other.getUserData()).getPosition().x);
 		}
 	}
+
+	public float getSwordDmg() {
+		return swordDmg;
+	}
+	
 }
