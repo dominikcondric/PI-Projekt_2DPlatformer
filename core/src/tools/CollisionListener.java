@@ -7,9 +7,13 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 import entities.Chest;
+import entities.Enemy;
 import entities.Entity;
+import entities.Slime;
 
 public class CollisionListener implements ContactListener {
+	
+	
 	@Override
 	public void beginContact(Contact contact) {
 		Fixture A = contact.getFixtureA();
@@ -32,18 +36,37 @@ public class CollisionListener implements ContactListener {
 		
 		if (A.getUserData() instanceof Chest) {
 			((Entity)A.getUserData()).resolveCollision(A, B);
-		}
+			}
 		
 		if (B.getUserData() instanceof Chest) {
 			((Entity)A.getUserData()).resolveCollision(B, A);
+		}
+		
+		if(A.getUserData() instanceof Enemy) {
+			((Entity)A.getUserData()).resolveCollisionEnd(A, B);
+		}
+		
+		if(B.getUserData() instanceof Enemy) {
+			((Entity)B.getUserData()).resolveCollisionEnd(B, A);
 		}
 	}
 
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
+		Fixture A = contact.getFixtureA();
+		Fixture B = contact.getFixtureB();
+		
+		if(A.getUserData() instanceof Enemy) {
+			((Entity)A.getUserData()).resolvePreSolve(A, B);
+		}
+		
+		if(B.getUserData() instanceof Enemy ) {
+			((Entity)B.getUserData()).resolvePreSolve(B, A);
+		}
 	}
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
+
 	}
 }

@@ -116,4 +116,14 @@ public class Fireball extends Entity {
 			onHit();
 		}
 	}
+	
+	@Override
+	public void resolveCollisionEnd(Fixture A, Fixture B) {
+	}
+	
+	@Override
+	public void resolvePreSolve(Fixture A, Fixture B) {
+		// TODO Auto-generated method stub
+		
+	}
 }

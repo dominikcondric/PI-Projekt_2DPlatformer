@@ -37,6 +37,16 @@ public class FireballItem extends Item {
 	}
 	
 	@Override
+	public void resolveCollisionEnd(Fixture A, Fixture B) {
+	}
+	
+	@Override
+	public void resolvePreSolve(Fixture A, Fixture B) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
 	public void update(Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		if (triggerPickup) {
@@ -47,4 +57,5 @@ public class FireballItem extends Item {
 		
 		triggerPickup = false;
 	}
+
 }

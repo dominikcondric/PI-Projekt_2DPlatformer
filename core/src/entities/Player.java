@@ -594,4 +594,12 @@ public class Player extends Entity {
 			onHit(((Enemy) other.getUserData()).getPosition().x);
 		}
 	}
+	
+	@Override
+	public void resolveCollisionEnd(Fixture A, Fixture B) {
+	}
+	
+	@Override
+	public void resolvePreSolve(Fixture A, Fixture B) {		
+	}
 }

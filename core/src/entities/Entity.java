@@ -57,4 +57,9 @@ public abstract class Entity {
 	public void setToDestroy(boolean destroy) {
 		setToDestroy = destroy;
 	}
+
+	public abstract void resolveCollisionEnd(Fixture A, Fixture B);
+	
+	public abstract void resolvePreSolve(Fixture A, Fixture B);
+
 }
