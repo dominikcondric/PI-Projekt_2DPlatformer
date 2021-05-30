@@ -23,7 +23,6 @@ import entities.FireballItem;
 import entities.Key;
 import entities.Player;
 import entities.Slime;
-import entities.Sorcerer;
 
 public class ForestScene extends Scene {
 	private ArrayList<PointLight> lights;
@@ -66,7 +65,6 @@ public class ForestScene extends Scene {
 		addEntity(new Slime(new Vector2(15.f, 37.f)));
 		addEntity(new Slime(new Vector2(17.f, 37.f)));
 		addEntity(new Slime(new Vector2(39.f, 50.f)));
-		addEntity(new Sorcerer(new Vector2(13.f, 37.f)));
 		Key key = new Key(new Vector2(85.1f, 32.f), "first");
 		FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 39.1f));
 		addEntity(fireballItem);
