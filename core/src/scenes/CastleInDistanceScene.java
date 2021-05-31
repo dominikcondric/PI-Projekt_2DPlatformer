@@ -1,5 +1,6 @@
 package scenes;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -19,6 +20,7 @@ public class CastleInDistanceScene extends Scene {
 	public CastleInDistanceScene(TmxMapLoader mapLoader, SpriteBatch batch) {
 		super(mapLoader, "CastleInDistance/CastleInDistance.tmx", batch);
 		visibleMapScale = 1.8f;
+		ambientLight = new Color(0.1f, 0.1f, 0.1f, 0.8f);
 	}
 
 	@Override

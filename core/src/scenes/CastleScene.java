@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -17,8 +18,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import box2dLight.PointLight;
-import entities.Enemy;
-import entities.Entity;
+import entities.Coin;
 import entities.Player;
 
 public class CastleScene extends Scene {
@@ -117,8 +117,17 @@ public class CastleScene extends Scene {
 			Color c = new Color(Color.WHITE);
 			c.a *= 0.6;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
-			
 			lights.add(light);
+		}
+		
+		// COINS
+		TiledMapTileLayer coinLayer = (TiledMapTileLayer)map.getLayers().get("Coin Layer");
+		for (RectangleMapObject object : map.getLayers().get("Coin Object").getObjects().getByType(RectangleMapObject.class)) {
+			Rectangle rect = object.getRectangle();
+			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
+			Coin coin = new Coin(rect.getPosition(new Vector2()), coinLayer.getCell((int)rect.getX(), (int)rect.getY()));
+			coin.addToWorld(box2DWorld);
+			coins.add(coin);
 		}
 	}
 

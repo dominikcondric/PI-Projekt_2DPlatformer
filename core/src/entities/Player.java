@@ -30,6 +30,7 @@ public class Player extends Entity {
 	private int jumpCount = 0;
 	private TextureAtlas atlas;
 	public boolean controllable = true;
+	private int coinCount = 0;
 	
 	private float swordDmg;
 		
@@ -279,6 +280,7 @@ public class Player extends Entity {
 		
 		this.body = world.createBody(bodyDefinition);
 		fdef = new FixtureDef();
+		fdef.filter.categoryBits = 0x01; // Player bit set to 1
 		
 		EdgeShape bottomShape = new EdgeShape();
 		bottomShape.set(body.getLocalCenter().x - 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f, body.getLocalCenter().x + 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f);
@@ -357,6 +359,11 @@ public class Player extends Entity {
         	jumpCount = 0;
         }
 		
+		if(hasAttacked) {
+        	body.destroyFixture(melee);
+        	hasAttacked = false;
+        }
+		
 		if (controllable) {
 			if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && (playerVelocity.y == ON_GROUND || jumpCount < 2)) {
 				jumpCount++;
@@ -371,28 +378,22 @@ public class Player extends Entity {
 	        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && playerVelocity.x >= MOVE_THRESHOLD_LEFT) {
 	        	moveLeft();
 	        }
+	        
+	        if(attackCooldown == 0) {
+	        	if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+	        		swordSlash.play();
+	        		meleeAttack();
+	        		attackCooldown = 0.25f;
+	        	}
+	        }
+	        attackCooldown -= deltaTime;
+	        if(attackCooldown < 0) attackCooldown = 0;
 		}
 
         if(playerVelocity.x == 0 || playerVelocity.y != ON_GROUND) {
 			isPlaying = false;
 			footstep.stop();
 		}
-        
-        if(hasAttacked) {
-        	body.destroyFixture(melee);
-        	hasAttacked = false;
-        }
-        
-        if(attackCooldown == 0) {
-        	if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-        		swordSlash.play();
-        		meleeAttack();
-        		attackCooldown = 0.25f;
-        	}
-        }
-        attackCooldown -= deltaTime;
-        if(attackCooldown < 0) attackCooldown = 0;
-        
         
         /*if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
         	crouch();
@@ -603,6 +604,9 @@ public class Player extends Entity {
 	public void resolveCollision(Fixture self, Fixture other) {
 		if(other.getUserData() instanceof Enemy && !other.isSensor() && !hasAttacked) {
 			onHit(((Enemy) other.getUserData()).getPosition().x);
+		} else if (other.getUserData() instanceof Coin && !((Coin)other.getUserData()).isSetToDestroy()) {
+			((Coin)other.getUserData()).setToDestroy(true);
+			++coinCount;
 		}
 	}
 
