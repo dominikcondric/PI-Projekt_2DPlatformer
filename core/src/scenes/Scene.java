@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 
 import box2dLight.RayHandler;
+import entities.Coin;
 import entities.Entity;
 import entities.Player;
 import sceneAnimations.SceneAnimation;
@@ -32,6 +33,7 @@ public abstract class Scene {
 	protected Player player = null;
 	protected float visibleMapScale = 4.f;
 	protected Color ambientLight = Color.BLACK;
+	protected ArrayList<Coin> coins;
 	protected Music music;
 	
 	public Scene(final TmxMapLoader mapLoader, String mapFilePath, final SpriteBatch batch) {
@@ -41,6 +43,7 @@ public abstract class Scene {
 		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
 		box2DWorld.setContactListener(new CollisionListener());
 		rayHandler = new RayHandler(box2DWorld);
+		coins = new ArrayList<Coin>(10);
 		
 		entities = new ArrayList<Entity>(5);
 		triggers = new ArrayList<SceneTrigger>(2);
@@ -101,6 +104,7 @@ public abstract class Scene {
 		if (entity instanceof Player) {
 			player = (Player)entity;
 			placePlayerOnScene(player);
+			player.controllable = true;
 		}
 	}
 	
@@ -121,9 +125,12 @@ public abstract class Scene {
 		box2DWorld.step(deltaTime, 10, 10);
 		
 		if (runningAnimation != null) {
+			player.controllable = false;
 			runningAnimation.animate(deltaTime);
-			if (runningAnimation.isFinished())
+			if (runningAnimation.isFinished()) {
 				runningAnimation = null;
+				player.controllable = true;
+			}
 		} 
 		
 		for (int i = entities.size() - 1; i >= 0; --i) {
@@ -140,6 +147,10 @@ public abstract class Scene {
 		}
 		
 		toDestroy.clear();
+		
+		for (Coin coin : coins) {
+			coin.update();
+		}
 	}
 	
 	public void dispose() {

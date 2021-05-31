@@ -203,7 +203,6 @@ public class RangedGuard extends Enemy {
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		
-		System.out.println(this.contactsleft + " " + this.contactsright);
 		if(!this.playerInVision) { 
 			activate();
 		}

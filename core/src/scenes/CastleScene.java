@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -20,6 +21,7 @@ import box2dLight.PointLight;
 import entities.Chest;
 import entities.Enemy;
 import entities.Entity;
+import entities.Coin;
 import entities.FireballItem;
 import entities.Player;
 import entities.RangedGuard;
@@ -62,6 +64,7 @@ public class CastleScene extends Scene {
 	@Override
 	public void constructEntities() {
 		lights = new ArrayList<PointLight>(4);
+
 		addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
@@ -74,6 +77,13 @@ public class CastleScene extends Scene {
         addEntity(new Slime(new Vector2(53.f, 12.f)));
         addEntity(new Slime(new Vector2(22.f, 11.f)));
         addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
+
+
+
+		
+		//TORCH
+		addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
+		//addEntity(new RangedGuard(new Vector2(50.f, 12.f)));
 
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
 		for(MapObject object : map.getLayers().get(1).getObjects().getByType(RectangleMapObject.class)) {
@@ -132,8 +142,17 @@ public class CastleScene extends Scene {
 			Color c = new Color(Color.WHITE);
 			c.a *= 0.6;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
-			
 			lights.add(light);
+		}
+		
+		// COINS
+		TiledMapTileLayer coinLayer = (TiledMapTileLayer)map.getLayers().get("Coin Layer");
+		for (RectangleMapObject object : map.getLayers().get("Coin Object").getObjects().getByType(RectangleMapObject.class)) {
+			Rectangle rect = object.getRectangle();
+			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
+			Coin coin = new Coin(rect.getPosition(new Vector2()), coinLayer.getCell((int)rect.getX(), (int)rect.getY()));
+			coin.addToWorld(box2DWorld);
+			coins.add(coin);
 		}
 	}
 

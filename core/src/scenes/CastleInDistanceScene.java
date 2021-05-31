@@ -1,5 +1,6 @@
 package scenes;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
@@ -21,6 +22,7 @@ public class CastleInDistanceScene extends Scene {
 		super(mapLoader, "CastleInDistance/CastleInDistance.tmx", batch);
 		music = Gdx.audio.newMusic(Gdx.files.internal("sounds/intro_music.mp3"));
 		visibleMapScale = 1.8f;
+		ambientLight = new Color(0.1f, 0.1f, 0.1f, 0.8f);
 	}
 
 	@Override

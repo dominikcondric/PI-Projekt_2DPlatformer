@@ -14,7 +14,6 @@ public class IntroAnimation extends SceneAnimation {
 
 	@Override
 	public void animate(float deltaTime) {
-		player.controllable = false;
 		if (player.getPosition().x < 2.5f) {
 			player.getBody().setLinearVelocity(3f, 0f);
 		} else if (thinkingDuration > 0.f) {
@@ -28,8 +27,6 @@ public class IntroAnimation extends SceneAnimation {
 			}
 		} else {
 			player.getBody().setLinearVelocity(6f, 0f);
-			if (player.getPosition().x >= 11.9f) 
-				player.controllable = true;
 		}
 	}
 }
