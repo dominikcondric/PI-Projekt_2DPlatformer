@@ -327,7 +327,7 @@ public class RangedGuard extends Enemy {
 
 
 	private void shoot(Scene scene) {
-		scene.addEntity(new Fireball(this.getPosition(), this.getFacingDirection(), 0, 0));
+		scene.addEntity(new Arrow(this.getPosition(), this.getFacingDirection(), 0));
 		hasAttacked = true;
 
 	}
