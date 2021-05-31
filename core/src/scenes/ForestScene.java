@@ -22,15 +22,15 @@ import entities.Chest;
 import entities.FireballItem;
 import entities.Key;
 import entities.Player;
+import entities.RangedGuard;
 import entities.Slime;
 
 public class ForestScene extends Scene {
 	private ArrayList<PointLight> lights;
 	
-	Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/forest_music.mp3"));
-
-	public ForestScene(TmxMapLoader mapLoader, SpriteBatch batch) {
+	public ForestScene(TmxMapLoader mapLoader, SpriteBatch batch) {	
 		super(mapLoader, "Forest/forest.tmx", batch);
+		music = Gdx.audio.newMusic(Gdx.files.internal("sounds/forest_music.mp3"));
 	}
 
 	@Override
@@ -53,7 +53,8 @@ public class ForestScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1f;
-			
+			fixtureDef.filter.categoryBits=3;
+
 			body.createFixture(fixtureDef);
 			shape.dispose();
 		}
@@ -61,10 +62,11 @@ public class ForestScene extends Scene {
 
 	@Override
 	public void constructEntities() {
-
+		
 		addEntity(new Slime(new Vector2(15.f, 37.f)));
 		addEntity(new Slime(new Vector2(17.f, 37.f)));
 		addEntity(new Slime(new Vector2(39.f, 50.f)));
+		addEntity(new RangedGuard(new Vector2(15.f, 37.f)));
 		Key key = new Key(new Vector2(85.1f, 32.f), "first");
 		FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 39.1f));
 		addEntity(fireballItem);
@@ -81,9 +83,7 @@ public class ForestScene extends Scene {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		music.setVolume(0.1f);
-		music.play();
-		music.setLooping(true);
+		
 		
 	}
 	

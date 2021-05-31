@@ -62,5 +62,7 @@ public abstract class Entity {
 		return body;
 	}
 	
+	public abstract void resolveCollisionEnd(Fixture A, Fixture B);
 	
+	public abstract void resolvePreSolve(Fixture A, Fixture B);
 }

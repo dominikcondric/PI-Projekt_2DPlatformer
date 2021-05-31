@@ -16,6 +16,7 @@ import scenes.Scene;
 
 public abstract class Enemy extends Entity {
 	protected float stateTimer;
+	protected float stopTime;
 	protected TextureRegion idle;
 	protected Animation<TextureRegion> idleAnim;
 	protected int hp = 5;
@@ -24,9 +25,15 @@ public abstract class Enemy extends Entity {
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
 	protected float jumpheight=11f;
-	protected float movespeed=0.3f;
+	protected float movespeed=0.6f;
 	protected int direction;
 	protected boolean active = false;
+	protected boolean shouldBeStopped = false;
+	//
+	protected float contactsleft=0;
+	protected float contactsright=0;
+	protected boolean playerInVision=false;
+	//
 	protected Array<TextureRegion> idleFrames = new Array<TextureRegion>();
 	protected TextureAtlas atlas;
 
@@ -44,33 +51,7 @@ public abstract class Enemy extends Entity {
 	}
 	
 	@Override
-	public void addToWorld(World world) {
-		BodyDef bodyDefinition = new BodyDef();
-		bodyDefinition.position.set(sprite.getX() + sprite.getWidth() / 2.f, sprite.getY() + sprite.getHeight() / 2.f);
-		
-		
-		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
-		
-		this.body = world.createBody(bodyDefinition);
-		
-		PolygonShape polShape = new PolygonShape();
-		polShape.setAsBox(sprite.getWidth() / 2.f, sprite.getHeight() / 2.f);
-		
-		FixtureDef fdef = new FixtureDef();
-		fdef.shape = polShape;
-
-		this.body.createFixture(fdef).setUserData(this);
-		
-		PolygonShape vision = new PolygonShape();
-		vision.setAsBox(visionLength, visionHeight, new Vector2(0,visionHeight-(sprite.getHeight()/2)), 0);
-		
-		fdef.shape = vision;
-		fdef.isSensor=true;
-		this.body.createFixture(fdef).setUserData(this);
-		
-		
-		polShape.dispose();
-	}
+	public abstract void addToWorld(World world);
 	
 	@Override
 	public void update(final Scene scene, float deltaTime) {
@@ -81,15 +62,7 @@ public abstract class Enemy extends Entity {
 			setToDestroy = true;
 		}
 		
-		if (this.active) {
-			this.move(this.getDirection(scene.getPlayer()));
-		}
-		
-        if (body.getLinearVelocity().y < 0)  {
-			body.setLinearDamping(0);
-        } else {
-            body.setLinearDamping(12);
-        }
+
 	}
 	
 
@@ -138,7 +111,9 @@ public abstract class Enemy extends Entity {
     	body.setLinearDamping(20);
 	}
 
-	private void onHit(boolean pushRight, float dmg) {
+
+	protected void onHit(boolean pushRight, float dmg) {
+
 		float xPush = 15f;
 		if (!pushRight) 
 			xPush *= -1.f;
@@ -150,14 +125,15 @@ public abstract class Enemy extends Entity {
 		System.out.println(hp);
 	}
 
+
 	public void activate() {
 		this.active = true;
 	}
 
 	public void stop() {
 		this.active = false;
-		
 	}
+
 	
 	public TextureRegion getFrame(float deltaTime) {
 		TextureRegion region = (TextureRegion) idleAnim.getKeyFrame(stateTimer, true);
@@ -169,17 +145,29 @@ public abstract class Enemy extends Entity {
         }
 
         stateTimer = stateTimer + deltaTime;
+        
         return region;
     }
 
 	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
+	public abstract void resolveCollision(Fixture self, Fixture other); //{
 		//kontakt playera i enemy visiona
 		//posto ne postoji senzor s player objektom u userdata to znaci da enemy u ovom slucaju mora biti senzor a player mora biti sam hitbox playera
+		/*if(this.shouldBeStopped && other.getFilterData().categoryBits==3) {
+			if(this.facingRight && self.getFilterData().categoryBits==0x0004) this.shouldBeStopped=false;
+			else if(!this.facingRight && self.getFilterData().categoryBits==0x0002) this.shouldBeStopped=false;
+			System.out.println("should not be stopped");
+		}*//*
+		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).active) {
+			if(self.getFilterData().categoryBits==4)this.contactsright++;
+			else if(self.getFilterData().categoryBits==2) this.contactsleft++;
+		}
 		if (other.getUserData() instanceof Player && self.isSensor()) {
 			activate();
-			if (((Player)other.getUserData()).getHp() <= 0)
+			((Enemy) self.getUserData()).playerInVision=true;
+			if (((Player)other.getUserData()).getHp() <= 0) {
 				stop();
+			}
 		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
 			Player player = (Player)other.getUserData();
 			onHit(player.facingRight, player.getSwordDmg());
@@ -192,5 +180,5 @@ public abstract class Enemy extends Entity {
 			}
 			
 		}
-	}
+	}*/
 }

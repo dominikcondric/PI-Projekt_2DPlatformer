@@ -1,0 +1,62 @@
+
+archer_idle.png
+size: 256, 64
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+tile000
+  rotate: false
+  xy: 2, 4
+  size: 25, 39
+  orig: 128, 128
+  offset: 50, 52
+  index: -1
+tile001
+  rotate: false
+  xy: 31, 4
+  size: 25, 39
+  orig: 128, 128
+  offset: 50, 52
+  index: -1
+tile002
+  rotate: false
+  xy: 60, 4
+  size: 27, 39
+  orig: 128, 128
+  offset: 48, 52
+  index: -1
+tile003
+  rotate: false
+  xy: 89, 4
+  size: 26, 38
+  orig: 128, 128
+  offset: 49, 52
+  index: -1
+tile004
+  rotate: false
+  xy: 118, 4
+  size: 25, 38
+  orig: 128, 128
+  offset: 50, 52
+  index: -1
+tile005
+  rotate: false
+  xy: 147, 4
+  size: 25, 37
+  orig: 128, 128
+  offset: 50, 52
+  index: -1
+tile006
+  rotate: false
+  xy: 176, 4
+  size: 25, 38
+  orig: 128, 128
+  offset: 50, 52
+  index: -1
+tile007
+  rotate: false
+  xy: 205, 4
+  size: 25, 40
+  orig: 128, 128
+  offset: 50, 52
+  index: -1

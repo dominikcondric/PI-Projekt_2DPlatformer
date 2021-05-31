@@ -1,0 +1,62 @@
+
+archer_run.png
+size: 512, 64
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+tile000
+  rotate: false
+  xy: 2, 4
+  size: 42, 31
+  orig: 128, 128
+  offset: 44, 52
+  index: -1
+tile001
+  rotate: false
+  xy: 47, 4
+  size: 42, 32
+  orig: 128, 128
+  offset: 44, 52
+  index: -1
+tile002
+  rotate: false
+  xy: 92, 4
+  size: 43, 33
+  orig: 128, 128
+  offset: 44, 52
+  index: -1
+tile003
+  rotate: false
+  xy: 137, 4
+  size: 42, 33
+  orig: 128, 128
+  offset: 44, 52
+  index: -1
+tile004
+  rotate: false
+  xy: 182, 4
+  size: 40, 33
+  orig: 128, 128
+  offset: 44, 52
+  index: -1
+tile005
+  rotate: false
+  xy: 227, 4
+  size: 38, 33
+  orig: 128, 128
+  offset: 43, 52
+  index: -1
+tile006
+  rotate: false
+  xy: 272, 4
+  size: 33, 34
+  orig: 128, 128
+  offset: 43, 52
+  index: -1
+tile007
+  rotate: false
+  xy: 317, 4
+  size: 37, 32
+  orig: 128, 128
+  offset: 43, 52
+  index: -1

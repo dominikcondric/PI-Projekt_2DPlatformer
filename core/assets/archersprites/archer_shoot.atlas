@@ -1,0 +1,69 @@
+
+archer_shoot.png
+size: 512, 64
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+tile000
+  rotate: false
+  xy: 2, 4
+  size: 25, 39
+  orig: 180, 128
+  offset: 50, 52
+  index: -1
+tile001
+  rotate: false
+  xy: 44, 4
+  size: 25, 39
+  orig: 180, 128
+  offset: 50, 52
+  index: -1
+tile002
+  rotate: false
+  xy: 86, 4
+  size: 30, 39
+  orig: 180, 128
+  offset: 45, 52
+  index: -1
+tile003
+  rotate: false
+  xy: 128, 4
+  size: 26, 39
+  orig: 180, 128
+  offset: 51, 52
+  index: -1
+tile004
+  rotate: false
+  xy: 170, 4
+  size: 40, 38
+  orig: 180, 128
+  offset: 50, 52
+  index: -1
+tile005
+  rotate: false
+  xy: 212, 4
+  size: 37, 38
+  orig: 180, 128
+  offset: 50, 52
+  index: -1
+tile006
+  rotate: false
+  xy: 254, 4
+  size: 28, 36
+  orig: 180, 128
+  offset: 48, 52
+  index: -1
+tile007
+  rotate: false
+  xy: 296, 4
+  size: 28, 36
+  orig: 180, 128
+  offset: 48, 52
+  index: -1
+tile008
+  rotate: false
+  xy: 338, 4
+  size: 28, 36
+  orig: 180, 128
+  offset: 48, 52
+  index: -1

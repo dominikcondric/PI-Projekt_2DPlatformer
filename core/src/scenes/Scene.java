@@ -2,6 +2,7 @@ package scenes;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -33,6 +34,7 @@ public abstract class Scene {
 	protected float visibleMapScale = 4.f;
 	protected Color ambientLight = Color.BLACK;
 	protected ArrayList<Coin> coins;
+	protected Music music;
 	
 	public Scene(final TmxMapLoader mapLoader, String mapFilePath, final SpriteBatch batch) {
 		this.map = mapLoader.load(mapFilePath);
@@ -154,6 +156,21 @@ public abstract class Scene {
 	public void dispose() {
 		box2DWorld.dispose();
 		map.dispose();
+	}
+	
+
+	public Music getMusic() {
+		return music;
+	}
+	
+	public void playMusic(){
+		music.setVolume(0.1f);
+		music.play();
+		music.setLooping(true);
+	}
+	
+	public void stopMusic() {
+		music.stop();
 	}
 
 	protected abstract void placePlayerOnScene(Player player);
