@@ -18,9 +18,12 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import box2dLight.PointLight;
+import entities.Chest;
 import entities.Coin;
+import entities.FireballItem;
 import entities.Player;
 import entities.RangedGuard;
+import entities.Slime;
 
 public class CastleScene extends Scene {
 	private ArrayList<PointLight> lights;
@@ -61,6 +64,19 @@ public class CastleScene extends Scene {
 		lights = new ArrayList<PointLight>(4);
 		//addEntity(new Enemy(new Vector2(97.f, 57.f)));
 		//addEntity(new Enemy(new Vector2(39.f, 50.f)));
+		addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
+        addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
+        addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
+        addEntity(new RangedGuard(new Vector2(135.f, 13.f)));
+        addEntity(new RangedGuard(new Vector2(160f, 13.f)));
+        addEntity(new RangedGuard(new Vector2(192f, 13.f)));
+        FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 8.1f));
+        addEntity(fireballItem);
+        addEntity(new Slime(new Vector2(15.f, 9.f)));
+        addEntity(new Slime(new Vector2(53.f, 12.f)));
+        addEntity(new Slime(new Vector2(22.f, 11.f)));
+        addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
+		
 		//TORCH
 		addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
 		//addEntity(new RangedGuard(new Vector2(50.f, 12.f)));
