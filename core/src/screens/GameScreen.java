@@ -3,23 +3,31 @@ package screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
 
 import entities.Player;
+import scenes.CastleInDistanceScene;
+import scenes.CastleScene;
 import scenes.CaveScene;
 import scenes.ForestScene;
+import scenes.OutOfMapTrigger;
 import scenes.Scene;
+import scenes.SnowScene;
 import screens.GameOverScreen.ScreenType;
 import utility.Hud;
 import utility.SceneManager;
 
 public class GameScreen implements Screen {
+	
+	
 	private final Platformer game;
 	private final TmxMapLoader tiledMapLoader;
 	private Box2DDebugRenderer physicsDebugRenderer;
@@ -42,23 +50,29 @@ public class GameScreen implements Screen {
 		player = new Player(new Vector2(2.f, 39.f));
 		inGameHud = new Hud(player, game.batch, game.font);
 		
-		Scene caveScene = new CaveScene(tiledMapLoader, game.batch);
-		sceneManager.addScene(caveScene, "Cave", true);
 		
-		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
-		sceneManager.addScene(forestScene, "Forest", true);
+		Scene castleScene = new CastleScene(tiledMapLoader, game.batch);
+		sceneManager.addScene(castleScene, "Castle", true);
 		
-		forestScene.addEntity(player);
+		Scene introScene = new CastleInDistanceScene(tiledMapLoader, game.batch);
+		sceneManager.addScene(introScene, "Intro", true);
+		
+		introScene.addTrigger(new OutOfMapTrigger(castleScene, player, new Vector2(19.f, 19.f), true));
+		introScene.addEntity(player);
 	}
 
 	private void update(float deltaTime) {
-		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.P) && !paused) {
 			debug = !debug;
 		}
 		
-		Vector2 playerPosition = player.getBody().getPosition();
-		Vector2 activeMapSize = sceneManager.getActiveScene().getTiledMapSize();
+		Vector2 playerPosition = player.getPosition();
+		Vector3 activeMapSize = sceneManager.getActiveScene().getTiledMapSize();
 		
+		float cameraZoom = activeMapSize.y / activeMapSize.z;
+		float aspectRatio = (float)Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
+		
+		camera.setToOrtho(false, cameraZoom * aspectRatio, cameraZoom);
 		if (playerPosition.x - camera.viewportWidth / 2f < 0f) {
 			camera.position.x = camera.viewportWidth / 2f;
 		} else if (playerPosition.x + camera.viewportWidth / 2.f > activeMapSize.x) {
@@ -107,13 +121,13 @@ public class GameScreen implements Screen {
 		
 		if (!paused) {
 			activeScene.update(delta);
-			if (debug) {
-				physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
-			}
 		} 
 		
 		activeScene.render(game.batch, camera);
-		inGameHud.render(player, paused);
+		if (debug) {
+			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
+		}
+		inGameHud.render(activeScene, paused);
 		update(delta);
 	}
 	

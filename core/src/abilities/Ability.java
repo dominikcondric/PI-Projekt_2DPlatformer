@@ -1,15 +1,18 @@
 package abilities;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import entities.Entity;
 import scenes.Scene;
 
 public abstract class Ability {
+	protected Sound sound;
 	protected float cooldownTime;
 	protected float currentCooldownTime;
 	protected boolean triggered = false;
 	protected TextureRegion hudTexture;
+	public boolean active = false;
 	
 	protected Ability(float cooldownTime) {
 		this.cooldownTime = cooldownTime;
@@ -41,6 +44,6 @@ public abstract class Ability {
 	}
 	
 	public boolean isTriggered() {
-		return triggered;
+		return triggered && active;
 	}
 }

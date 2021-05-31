@@ -33,10 +33,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 
 import entities.Player;
+import scenes.Scene;
 
 public class Hud implements Disposable {
 	private Stage hud;
-	private ArrayList<Label> cooldownTimers;
+	private ArrayList<Stack> abilityIcons;
 	private int maxHp;
 	private ProgressBar progressBar;
 	private ShapeRenderer shapeRenderer;
@@ -44,6 +45,7 @@ public class Hud implements Disposable {
 	public TextButton quitButton;
 	public TextButton resumeButton;
 	public TextButton optionsButton;
+	private Label dialogueBox;
 	
 	public Hud(Player player, SpriteBatch batch, BitmapFont font) {
 		shapeRenderer = new ShapeRenderer();
@@ -78,7 +80,7 @@ public class Hud implements Disposable {
 		
 		progressBarColor.dispose();
 		
-		cooldownTimers = new ArrayList<Label>(4);
+		abilityIcons = new ArrayList<Stack>(4);
 		for (Ability ability : player.getAbilityList()) {
 			Image fireballImage = new Image(new TextureRegion(ability.getHudTextureRegion()));
 			Label cooldownTimer = new Label(Integer.toString((int)ability.getCooldownTime()), new LabelStyle(font, Color.BLACK));
@@ -90,7 +92,8 @@ public class Hud implements Disposable {
 			abilityFireball.addActor(cooldownTimer);
 			abilityFireball.setPosition(hud.getWidth() - 60.f, hud.getHeight() - 60f);
 			abilityFireball.setSize(40.f, 40.f);
-			cooldownTimers.add(cooldownTimer);
+			abilityFireball.setVisible(ability.active);
+			abilityIcons.add(abilityFireball);
 			hud.addActor(abilityFireball);
 		}
 		
@@ -132,27 +135,64 @@ public class Hud implements Disposable {
 		quitButton.getLabel().setFontScale(buttonHeight / 25.f);
 		
 		hud.addActor(pauseTable);
+
+		Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
+		p.setColor(0.f, 0.f, 0.f, 0.7f);
+		p.fill();
+		LabelStyle dialogueBoxStyle = new LabelStyle(font, Color.WHITE);
+		dialogueBoxStyle.background =  new TextureRegionDrawable(new TextureRegion(new Texture(p)));
+		p.dispose();
+		dialogueBox = new Label("", dialogueBoxStyle);
+		dialogueBox.setPosition(10.f, 10.f);
+		dialogueBox.setSize(hud.getWidth() - 20.f, hud.getHeight() / 4.f);
+		dialogueBox.setAlignment(Align.center);
+		dialogueBox.setWrap(true);
+		dialogueBox.setVisible(false);
+		dialogueBox.setFontScale(2.f);
+		
+		hud.addActor(dialogueBox);
 	}
 	
 	public void onResize(int width, int height) {
 		hud.getViewport().setScreenSize(width, height);
 	}
 	
-	private void update(final Player player, boolean gamePaused) {
+	private void update(final Scene scene, boolean gamePaused) {
+		Player player = scene.getPlayer();
 		progressBar.setValue(player.getHp());
 		
 		ArrayList<Ability> abilities = player.getAbilityList();
 		for (int i = 0; i < abilities.size(); ++i) {
 			Ability ability = abilities.get(i);
-			cooldownTimers.get(i).setText(Integer.toString((int)ability.getCurrentCooldownTime() + 1));
-			if (ability.getCurrentCooldownTime() < ability.getCooldownTime()) {
-				cooldownTimers.get(i).setVisible(true);
+			if (ability.active) {
+				abilityIcons.get(i).setVisible(true);
+				Label cooldownTimer = null;
+				
+				if (abilityIcons.get(i).getChild(1) instanceof Label) {
+					cooldownTimer = (Label)abilityIcons.get(i).getChild(1);
+				} else {
+					cooldownTimer = (Label)abilityIcons.get(i).getChild(0);
+				}
+				
+				cooldownTimer.setText(Integer.toString((int)ability.getCurrentCooldownTime() + 1));
+				if (ability.getCurrentCooldownTime() < ability.getCooldownTime()) {
+					cooldownTimer.setVisible(true);
+				} else {
+					cooldownTimer.setVisible(false);
+				}
 			} else {
-				cooldownTimers.get(i).setVisible(false);
+				abilityIcons.get(i).setVisible(false);
 			}
 		}
 		
 		pauseTable.setVisible(gamePaused);
+		if (scene.getSceneAnimation() != null) {
+			dialogueBox.setText(scene.getSceneAnimation().getDialogueText());
+			dialogueBox.setVisible(true);
+		} else {
+			dialogueBox.setText("");
+			dialogueBox.setVisible(false);
+		}
 	}
 	
 	private void dimBackground() {
@@ -164,8 +204,8 @@ public class Hud implements Disposable {
 		shapeRenderer.end();
 	}
 	
-	public void render(final Player player, boolean gamePaused) {
-		update(player, gamePaused);
+	public void render(final Scene scene, boolean gamePaused) {
+		update(scene, gamePaused);
 		
 		if (gamePaused)
 			dimBackground();

@@ -2,9 +2,9 @@ package entities;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
 import scenes.Scene;
@@ -13,7 +13,6 @@ public abstract class Entity {
 	protected Body body;
 	protected Sprite sprite;
 	protected boolean setToDestroy = false;
-	protected TextureAtlas atlas;
 	protected boolean facingRight = true;
 	
 	protected Entity(Vector2 position) {
@@ -22,9 +21,15 @@ public abstract class Entity {
 	}
 	
 	public abstract void addToWorld(World world);
+	
+	public abstract void resolveCollision(Fixture self, Fixture other);
 
-	public Body getBody() {
-		return body;
+	public Vector2 getPosition() {
+		return new Vector2(sprite.getX(), sprite.getY());
+	}
+	
+	public void destroyBody(World world) {
+		if (body != null) world.destroyBody(body);
 	}
 	
 	public boolean getFacingDirection() {
@@ -36,11 +41,12 @@ public abstract class Entity {
 	}
 	
 	public void setPosition(Vector2 position) {
-		body.setTransform(position, 0);
+		sprite.setPosition(position.x, position.y);
+		if (body != null) body.setTransform(position, 0);
 	}
 	
 	public void update(final Scene scene, float deltaTime) {
-		sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2.f, body.getPosition().y - sprite.getHeight() / 2.f);
+		if (body != null) sprite.setPosition(body.getPosition().x - sprite.getWidth() / 2.f, body.getPosition().y - sprite.getHeight() / 2.f);
 		setToDestroy = false;
 	}
 	
@@ -51,4 +57,12 @@ public abstract class Entity {
 	public void setToDestroy(boolean destroy) {
 		setToDestroy = destroy;
 	}
+
+	public Body getBody() {
+		return body;
+	}
+	
+	public abstract void resolveCollisionEnd(Fixture A, Fixture B);
+	
+	public abstract void resolvePreSolve(Fixture A, Fixture B);
 }

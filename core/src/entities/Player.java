@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -25,8 +27,20 @@ import scenes.Scene;
 public class Player extends Entity {
 	private int hp = 50; 
 	private int maxHp = 50;
+	private int jumpCount = 0;
+	private TextureAtlas atlas;
+	public boolean controllable = true;
+	private int coinCount = 0;
+	
+	private float swordDmg;
+		
+	private Sound swordSlash = Gdx.audio.newSound(Gdx.files.internal("sounds/sword.wav"));
+	private Sound footstep = Gdx.audio.newSound(Gdx.files.internal("sounds/footstep.wav"));
+	private Sound jump = Gdx.audio.newSound(Gdx.files.internal("sounds/jump.wav"));
+	private Sound land = Gdx.audio.newSound(Gdx.files.internal("sounds/landing.wav"));
 	
 	private ArrayList<Ability> abilities;
+	private ArrayList<Item> items;
 	
 	private Animation<TextureRegion> playerIdleAnim;
 	private Animation<TextureRegion> playerRunAnim;
@@ -45,8 +59,8 @@ public class Player extends Entity {
 	private Array<TextureRegion> framesAttack3 = new Array<TextureRegion>();
 	private Array<TextureRegion> framesAttackCurrent = new Array<TextureRegion>();
 	
-	private final int MOVE_THRESHOLD_LEFT = -6;
-	private final int MOVE_THRESHOLD_RIGHT = 6;
+	private float MOVE_THRESHOLD_LEFT = -6;
+	private float MOVE_THRESHOLD_RIGHT = 6;
 	private final int ON_GROUND = 0;
 	
 	private enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD, CASTING, ATTACKING };
@@ -59,16 +73,18 @@ public class Player extends Entity {
 	private TextureRegion currentRegion;
 	private boolean hasAttacked = false;
 	private float attackCooldown = 0.25f;
+	private boolean isPlaying = false;
 	
 	FixtureDef fdef;
 	Fixture melee;
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Player(Vector2 position) {
 		super(position);
 		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\movement_casting_v2.atlas"));
 		abilities = new ArrayList<Ability>(2);
 		abilities.add(new FireballAbility());
+		items = new ArrayList<Item>(1);
+		swordDmg = 1;
 		
 		Array<TextureRegion> framesIdle = new Array<TextureRegion>();
 		Array<TextureRegion> framesRun = new Array<TextureRegion>();
@@ -117,7 +133,7 @@ public class Player extends Entity {
 			
 		}
 		*/
-		playerIdleAnim = new Animation(0.1f, framesIdle);
+		playerIdleAnim = new Animation<TextureRegion>(0.1f, framesIdle);
 		
 		for(int i = 0; i < 6; i++) {
 			switch(i) {
@@ -143,7 +159,7 @@ public class Player extends Entity {
 		}
 		
 		}
-		playerRunAnim = new Animation(0.1f, framesRun);
+		playerRunAnim = new Animation<TextureRegion>(0.1f, framesRun);
 	
 		for(int i = 0; i < 5; i++) {
 			switch(i) {
@@ -164,7 +180,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerCastAnim = new Animation(0.1f, framesCast);
+		playerCastAnim = new Animation<TextureRegion>(0.1f, framesCast);
 		
 		/*for(int i = 0; i < 4; i++) {
 			switch(i) {
@@ -183,7 +199,7 @@ public class Player extends Entity {
 			}
 			
 		}
-		playerCrouchAnim = new Animation(0.1f, framesCrouch); */
+		playerCrouchAnim = new Animation<TextureRegion>(0.1f, framesCrouch); */
 		
 		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\aero_attacks.atlas"));
 		
@@ -207,7 +223,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim1 = new Animation(0.05f,framesAttack1);
+		playerAttackAnim1 = new Animation<TextureRegion>(0.05f,framesAttack1);
 		currentAttackAnim = playerAttackAnim1;
 		
 		for(int i = 0; i < 6; i++) {
@@ -231,7 +247,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim2 = new Animation(0.05f,framesAttack2);
+		playerAttackAnim2 = new Animation<TextureRegion>(0.05f,framesAttack2);
 		
 		for(int i = 0; i < 6; i++) {
 			switch(i) {
@@ -253,7 +269,7 @@ public class Player extends Entity {
 					break;
 			}
 		}
-		playerAttackAnim3 = new Animation(0.05f,framesAttack3);
+		playerAttackAnim3 = new Animation<TextureRegion>(0.05f,framesAttack3);
 		
 	}
 	
@@ -263,14 +279,39 @@ public class Player extends Entity {
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
 		this.body = world.createBody(bodyDefinition);
-		
-		PolygonShape polShape = new PolygonShape();
-		polShape.setAsBox(0.78f / 2.f, 1.25f / 2.f);
-
 		fdef = new FixtureDef();
-		fdef.shape = polShape;
-		//fdef.filter.categoryBits = 1;
+		fdef.filter.categoryBits = 0x01; // Player bit set to 1
+		
+		EdgeShape bottomShape = new EdgeShape();
+		bottomShape.set(body.getLocalCenter().x - 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f, body.getLocalCenter().x + 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f);
+		fdef.shape = bottomShape;
+		fdef.friction = 2f;
 		this.body.createFixture(fdef).setUserData(this);
+		
+		EdgeShape leftShape = new EdgeShape();
+		leftShape.set(body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y - 1.23f / 2.f, body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
+		fdef.shape = leftShape;
+		fdef.friction = 0;
+		this.body.createFixture(fdef).setUserData(this);
+		
+		EdgeShape rightShape = new EdgeShape();
+		rightShape.set(body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y - 1.23f / 2.f, body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
+		fdef.shape = rightShape;
+		fdef.friction = 0;
+		this.body.createFixture(fdef).setUserData(this);
+		
+		EdgeShape topShape = new EdgeShape();
+		topShape.set(body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f, body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
+		fdef.shape = topShape;
+		fdef.friction = 0;
+		this.body.createFixture(fdef).setUserData(this);
+		//PolygonShape polShape = new PolygonShape();
+		//polShape.setAsBox(0.78f / 2.f, 1.25f / 2.f);
+
+		
+		//fdef.shape = polShape;
+		//fdef.filter.categoryBits = 1;
+		//this.body.createFixture(fdef).setUserData(this);
 		
 		/*PolygonShape meleeRange = new PolygonShape();
 		meleeRange.setAsBox(0.78f * 2, 1.25f / 2.f);
@@ -278,7 +319,12 @@ public class Player extends Entity {
 		fdef.filter.categoryBits = 2;
 		this.body.createFixture(fdef).setUserData(this);
 		*/
-		polShape.dispose();
+		//polShape.dispose();
+		
+		bottomShape.dispose();
+		topShape.dispose();
+		leftShape.dispose();
+		rightShape.dispose();
 		
 	}
 	
@@ -289,7 +335,7 @@ public class Player extends Entity {
 			hp = maxHp;
 			return;
 		}
-		
+		//System.out.println(body.getPosition());
 		Vector2 playerVelocity = body.getLinearVelocity();
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
@@ -299,45 +345,64 @@ public class Player extends Entity {
 		currentRegion = getFrame(deltaTime);
 		sprite.setRegion(currentRegion);
 		
+	     if(previousState == State.FALLING && currentState == State.STANDING) 
+				land.play();
+			
+		if(currentState == State.RUNNING && !isPlaying) {
+			footstep.loop(0.4f);
+			isPlaying = true;
+		}
 		for (Ability ability : abilities)
 			ability.update(deltaTime);
 		
-		if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && playerVelocity.y == ON_GROUND) {
-			jump();
-		}	
-
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && playerVelocity.x <= MOVE_THRESHOLD_RIGHT) {
-        	moveRight();
-        }	
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && playerVelocity.x >= MOVE_THRESHOLD_LEFT) {
-        	moveLeft();
+		if(playerVelocity.y == ON_GROUND){
+        	jumpCount = 0;
+        	MOVE_THRESHOLD_LEFT = -6;
+        	MOVE_THRESHOLD_RIGHT = 6;
+        }else {
+        	MOVE_THRESHOLD_LEFT = -4.5f;
+        	MOVE_THRESHOLD_RIGHT = 4.5f;
         }
-        
-        if(hasAttacked) {
+		
+		if(hasAttacked) {
         	body.destroyFixture(melee);
         	hasAttacked = false;
         }
-        
-        if(attackCooldown == 0) {
-        	if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-        		meleeAttack();
-        		attackCooldown = 0.25f;
-        	}
-        }
-        attackCooldown -= deltaTime;
-        if(attackCooldown < 0) attackCooldown = 0;
-        
+		
+		if (controllable) {
+			if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && (playerVelocity.y == ON_GROUND || jumpCount < 2)) {
+				jumpCount++;
+				jump.play();
+				jump();
+			}	
+	
+	        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && playerVelocity.x <= MOVE_THRESHOLD_RIGHT) {
+	        	moveRight();	
+	        }	
+	        
+	        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && playerVelocity.x >= MOVE_THRESHOLD_LEFT) {
+	        	moveLeft();
+	        }
+	        
+	        if(attackCooldown == 0) {
+	        	if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+	        		swordSlash.play();
+	        		meleeAttack();
+	        		attackCooldown = 0.25f;
+	        	}
+	        }
+	        attackCooldown -= deltaTime;
+	        if(attackCooldown < 0) attackCooldown = 0;
+		}
+
+        if(playerVelocity.x == 0 || playerVelocity.y != ON_GROUND) {
+			isPlaying = false;
+			footstep.stop();
+		}
         
         /*if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
         	crouch();
         }*/
-        
-        if(playerVelocity.y < ON_GROUND - 0.1 || playerVelocity.y > ON_GROUND + 0.1) {
-        	body.setLinearDamping(0);
-        }else {
-        	body.setLinearDamping(12);
-        }
 
 
         if (body.getPosition().y < 0.f) {
@@ -353,13 +418,10 @@ public class Player extends Entity {
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
 		melee = this.body.createFixture(fdef);
-		melee.setUserData("meleehitbox");
+		melee.setUserData(this);
 		hasAttacked = true;
-		
+		attackRange.dispose();
 	}
-
-
-
 	/*private void crouch() {
 		((PolygonShape)(body.getFixtureList().get(0).getShape())).setAsBox(0.78f / 2.f, isCrouching ? 1.25f / 2.f : 1.25f / 2.f / 2f);
     	body.setTransform(sprite.getX() + sprite.getWidth() / 2.f, isCrouching ? sprite.getY() + sprite.getHeight() / 2.f + 0.3f : sprite.getY() + sprite.getHeight() / 2.f - 0.3f, 0);
@@ -367,7 +429,7 @@ public class Player extends Entity {
 	} */
 
 	public TextureRegion getFrame(float deltaTime){
-		
+		previousState = currentState;
 		TextureRegion region;
 		Random randomAnimation = new Random();
 		
@@ -384,6 +446,8 @@ public class Player extends Entity {
 			
 			return region;
 		}
+		
+		
         currentState = getState();
         
         
@@ -430,9 +494,10 @@ public class Player extends Entity {
         }
         	
         needsFlip(region);
+        
 
         stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
-        previousState = currentState;
+        
         return region;
 
     }
@@ -452,16 +517,19 @@ public class Player extends Entity {
             return State.STANDING;
     }
 
+
 	private void jump() {
-		body.applyLinearImpulse(new Vector2(0, 11f), body.getWorldCenter(), true);
+		//body.applyLinearImpulse(new Vector2(0, 9.5f), body.getWorldCenter(), true);
+		body.setLinearVelocity(new Vector2(0, 8f));
 	}
 	
-	private void moveRight() {
-		body.applyLinearImpulse(new Vector2(3.5f, 0), body.getWorldCenter(), true);
+	public void moveRight() {
+		body.applyLinearImpulse(new Vector2(1.5f, 0), body.getWorldCenter(), true);
     	facingRight = true;
 	}
-	private void moveLeft() {
-    	body.applyLinearImpulse(new Vector2(-3.5f, 0), body.getWorldCenter(), true);
+	
+	public void moveLeft() {
+    	body.applyLinearImpulse(new Vector2(-1.5f, 0), body.getWorldCenter(), true);
     	facingRight = false;
 	}
 	
@@ -469,8 +537,16 @@ public class Player extends Entity {
         return stateTimer;
     }
 	
+	public boolean hasAttacked() {
+		return hasAttacked;
+	}
+	
 	public ArrayList<Ability> getAbilityList() {
 		return abilities;
+	}
+	
+	public void addItem(Item item) {
+		items.add(item);
 	}
 	
 	public void onHit(float x) {
@@ -478,13 +554,12 @@ public class Player extends Entity {
 		if(this.hp<=0)
 			setToDestroy = true;
 		if(x==0) return;
-		if(this.getBody().getPosition().x < x) {
-	    	body.applyLinearImpulse(new Vector2(-12f, 2f), body.getWorldCenter(), true);
+		if(this.body.getPosition().x < x) {
+	    	body.applyLinearImpulse(new Vector2(-10f, 1f), body.getWorldCenter(), true);
 		}
 		else {
-			body.applyLinearImpulse(new Vector2(12f, 2f), body.getWorldCenter(), true);
+			body.applyLinearImpulse(new Vector2(10f, 1f), body.getWorldCenter(), true);
 		}		
-		System.out.print(this.hp);
 	}
 	
 	public int getHp() {
@@ -529,4 +604,30 @@ public class Player extends Entity {
 		batch.draw(atlasRegion, sprite.getX()-0.5f, sprite.getY()-0.65f, drawOriginX, drawOriginY, drawWidth, drawHeight, drawScaleX, drawScaleY, 0);
 		
 	}
+
+	@Override
+	public void resolveCollision(Fixture self, Fixture other) {
+		if(other.getUserData() instanceof Enemy && !other.isSensor() && !hasAttacked) {
+			onHit(((Enemy) other.getUserData()).getPosition().x);
+		} else if (other.getUserData() instanceof Coin && !((Coin)other.getUserData()).isSetToDestroy()) {
+			((Coin)other.getUserData()).setToDestroy(true);
+			++coinCount;
+		}
+	}
+
+
+	public float getSwordDmg() {
+		return swordDmg;
+	}
+	
+
+	
+	@Override
+	public void resolveCollisionEnd(Fixture A, Fixture B) {
+	}
+	
+	@Override
+	public void resolvePreSolve(Fixture A, Fixture B) {		
+	}
+
 }

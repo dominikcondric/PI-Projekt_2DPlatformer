@@ -12,6 +12,7 @@ public class FireballAbility extends Ability {
 
 	public FireballAbility() {
 		super(3f);
+		sound = Gdx.audio.newSound(Gdx.files.internal("sounds/fireball.wav"));
 		hudTexture = new TextureRegion(new Texture(Gdx.files.internal("projectiles/fireball.png")));
 		hudTexture.setRegionWidth(35);
 		hudTexture.setRegionHeight(28);
@@ -19,8 +20,9 @@ public class FireballAbility extends Ability {
 
 	@Override
 	public void cast(Scene scene, Entity caster) {
-		if (currentCooldownTime == cooldownTime) {
-			scene.addEntity(new Fireball(caster.getBody().getPosition(), caster.getFacingDirection()));
+		if (currentCooldownTime == cooldownTime && active) {
+			scene.addEntity(new Fireball(caster.getPosition(), caster.getFacingDirection(), 2f, 1f));
+			sound.play();
 			triggered = true;
 		}
 	}

@@ -11,9 +11,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import entities.Enemy;
-import entities.Entity;
 import entities.Player;
+import entities.Slime;
 
 public class CaveScene extends Scene {
 
@@ -40,7 +39,7 @@ public class CaveScene extends Scene {
 			shape.setAsBox(rect.getWidth() / 2f, rect.getHeight() / 2f);
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
-			fixtureDef.friction = 0.f;
+			fixtureDef.friction = 1f;
 			
 			body.createFixture(fixtureDef);
 			shape.dispose();
@@ -50,12 +49,12 @@ public class CaveScene extends Scene {
 
 	@Override
 	public void constructEntities() {
-		addEntity(new Enemy(new Vector2(82.f, 20.f)));
-		addEntity(new Enemy(new Vector2(8.f, 15.f)));
+		addEntity(new Slime(new Vector2(82.f, 20.f)));
+		addEntity(new Slime(new Vector2(8.f, 15.f)));
 	}
 
 	@Override
-	public void placePlayerOnScene(Entity player) {
+	public void placePlayerOnScene(Player player) {
 		player.setPosition(new Vector2(2.f, 8.f));
 	}
 }
