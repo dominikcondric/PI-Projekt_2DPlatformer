@@ -606,8 +606,19 @@ public class Player extends Entity {
 		}
 	}
 
+
 	public float getSwordDmg() {
 		return swordDmg;
 	}
 	
+
+	
+	@Override
+	public void resolveCollisionEnd(Fixture A, Fixture B) {
+	}
+	
+	@Override
+	public void resolvePreSolve(Fixture A, Fixture B) {		
+	}
+
 }

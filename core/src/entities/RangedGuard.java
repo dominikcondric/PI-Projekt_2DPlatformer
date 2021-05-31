@@ -4,18 +4,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
-
-
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
-
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -24,18 +20,22 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import abilities.Ability;
+import abilities.FireballAbility;
 import scenes.Scene;
 
-public class Slime extends Enemy {
+public class RangedGuard extends Enemy {
 	
-
 	protected Fixture left;
 	protected Fixture right;
 	protected boolean drawleftright=true;
+	protected boolean previousRight=false;
+	protected boolean playerWasInVision;
+
+
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-
-	public Slime(Vector2 position) {
+	public RangedGuard(Vector2 position) {
 		super(position);		
 		atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\idle_slime.atlas"));
 		idle = new TextureRegion(atlas.findRegion("idle_slime01"), 0, 0, 19, 18);
@@ -48,10 +48,12 @@ public class Slime extends Enemy {
 		sprite.setScale(2f, 2f);
 		
 
-		stopTime=-1f;
+		active=true;
 		facingRight=false;
 		movespeed=0.3f;
 		jumpheight=11f;
+		
+
 
 	}
 	
@@ -66,7 +68,8 @@ public class Slime extends Enemy {
 		
 		PolygonShape polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f, sprite.getHeight() / 2.f);
-		
+		//polShape.setAsBox(sprite.getWidth() / 1.5f, sprite.getHeight() / 1.5f);
+
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 
@@ -79,6 +82,21 @@ public class Slime extends Enemy {
 		fdef.isSensor=true;
 		this.body.createFixture(fdef).setUserData(this);
 		
+		EdgeShape wallcheck = new EdgeShape();
+		wallcheck.set(new Vector2(1f,0f), new Vector2(1f,2.5f));
+
+		//0x0005 left 0x0006 right
+		fdef.shape = wallcheck;
+		fdef.isSensor=true;
+		fdef.filter.categoryBits = 0x0005;
+		this.body.createFixture(fdef).setUserData(this);
+
+		wallcheck.set(new Vector2(-1f,0f), new Vector2(-1f,2.5f));
+		fdef.shape = wallcheck;
+		fdef.isSensor = true;
+		fdef.filter.categoryBits = 0x0006;
+		this.body.createFixture(fdef).setUserData(this);
+		
 		polShape.dispose();
 	}
 
@@ -86,8 +104,18 @@ public class Slime extends Enemy {
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		
+		if(!this.playerInVision) { 
+			activate();
+		}
+		
 		if (this.active) {
-			this.move(this.getDirection(scene.getPlayer()));
+			if(this.facingRight)this.move(1);
+			else this.move(0);
+			stopTime=stateTimer+1f;
+		}
+		else if(stopTime<=stateTimer) {
+			shoot(scene);
+			stopTime=stateTimer+1f;
 		}
 		
         if (body.getLinearVelocity().y < 0)  {
@@ -95,7 +123,6 @@ public class Slime extends Enemy {
         } else {
             body.setLinearDamping(12);
         }
-        
         
 		if(this.active && drawleftright){
 			this.contactsright=0;
@@ -105,7 +132,6 @@ public class Slime extends Enemy {
 
 			EdgeShape dropcheck = new EdgeShape();
 			dropcheck.set(new Vector2(1f,-1.15f), new Vector2(1f,-2.5f));
-			//0x0002 left 0x0004 right
 			
 			//0x0002 left 0x0004 right/*
 			
@@ -131,45 +157,45 @@ public class Slime extends Enemy {
 			body.destroyFixture(right);
 			this.contactsright=0;
 			this.contactsleft=0;
-
 			drawleftright=true;
 		}
-		
-		if(!this.facingRight && this.contactsright<=0 && this.active && !playerInVision) {
-				this.active=false;			
 
-		}
-		else if(this.facingRight && this.contactsleft<=0 && this.active && !playerInVision) {
-			this.active=false;
-			}
 	}
 
 
 
+	private void shoot(Scene scene) {
+		//add shooting
+
+	}
+
 	@Override
 	public void move(int direction) {
 		this.direction = direction;
-		if(direction==-1 || direction==2 && this.body.getLinearVelocity().y>=0 && this.contactsright!=0) {
+		if(this.contactsright==0 && !this.playerWasInVision) this.facingRight=true;
+		else if(this.contactsleft==0  && !this.playerWasInVision) this.facingRight=false;
+		
+		playerWasInVision=false;
+		
+		if(direction==0 && this.body.getLinearVelocity().y>=0 ) {
 			moveLeft();
-			this.facingRight=false;
 		}
-		else if (direction==1 || direction == 4 && this.body.getLinearVelocity().y>=0 && this.contactsleft!=0){
+		else if (direction==1 && this.body.getLinearVelocity().y>=0 ){
 			moveRight();
-			this.facingRight=true;
 		}
-		if(direction>=2 && this.body.getLinearVelocity().y==0) {
-			jump();
-		}		
+	
 	}
 
 	@Override
 	public void resolveCollisionEnd(Fixture self, Fixture other) {
 		if(other.getUserData() instanceof Player && self.isSensor() && self.getFilterData().categoryBits==1) {
 			((Enemy) self.getUserData()).playerInVision=false;
+			((RangedGuard) self.getUserData()).playerWasInVision=true;
 		}
 		if(other.getFilterData().categoryBits!=3 || !((Enemy) self.getUserData()).active)return;
 		if(self.getFilterData().categoryBits == 0x0002) this.contactsleft--;
 		else if(self.getFilterData().categoryBits == 0x0004) this.contactsright--;
+
 	}
 
 	@Override
@@ -181,9 +207,16 @@ public class Slime extends Enemy {
 		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).active) {
 			if(self.getFilterData().categoryBits==4)this.contactsright++;
 			else if(self.getFilterData().categoryBits==2) this.contactsleft++;
+			if(self.getFilterData().categoryBits==5) {
+				this.facingRight=false;
+			}
+			else if(self.getFilterData().categoryBits==6) {
+				this.facingRight=true;
+			}
 		}
 		if (other.getUserData() instanceof Player && self.isSensor()) {
-			activate();
+			stop();
+			((RangedGuard) self.getUserData()).previousRight=((RangedGuard) self.getUserData()).facingRight;
 			((Enemy) self.getUserData()).playerInVision=true;
 			if (((Player)other.getUserData()).getHp() <= 0) {
 				stop();
@@ -199,6 +232,7 @@ public class Slime extends Enemy {
 				onHit(fireball.facingRight, fireball.getHitDmg());
 			}
 		}		
-	}
+	}		
+	
 
 }
