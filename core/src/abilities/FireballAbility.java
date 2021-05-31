@@ -11,7 +11,7 @@ import scenes.Scene;
 public class FireballAbility extends Ability {
 
 	public FireballAbility() {
-		super(3f);
+		super(10f);
 		sound = Gdx.audio.newSound(Gdx.files.internal("sounds/fireball.wav"));
 		hudTexture = new TextureRegion(new Texture(Gdx.files.internal("projectiles/fireball.png")));
 		hudTexture.setRegionWidth(35);

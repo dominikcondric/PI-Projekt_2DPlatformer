@@ -210,11 +210,11 @@ public class RangedGuard extends Enemy {
 		if (this.active) {
 			if(this.facingRight)this.move(1);
 			else this.move(0);
-			stopTime=stateTimer+1f;
+			stopTime=stateTimer+0.5f;
 		}
 		else if(stopTime<=stateTimer) {
 			shoot(scene);
-			stopTime=stateTimer+1f;
+			stopTime=stateTimer+0.5f;
 		}
 		
 		
