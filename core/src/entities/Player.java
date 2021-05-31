@@ -333,7 +333,7 @@ public class Player extends Entity {
 			hp = maxHp;
 			return;
 		}
-		System.out.println(body.getPosition());
+		//System.out.println(body.getPosition());
 		Vector2 playerVelocity = body.getLinearVelocity();
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {

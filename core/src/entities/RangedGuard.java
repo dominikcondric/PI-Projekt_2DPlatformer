@@ -182,7 +182,7 @@ public class RangedGuard extends Enemy {
 		this.body.createFixture(fdef).setUserData(this);
 		
 		EdgeShape wallcheck = new EdgeShape();
-		wallcheck.set(new Vector2(1f,0f), new Vector2(1f,2.5f));
+		wallcheck.set(new Vector2(1f,0f), new Vector2(1f,1.5f));
 
 		//0x0005 left 0x0006 right
 		fdef.shape = wallcheck;
@@ -190,7 +190,7 @@ public class RangedGuard extends Enemy {
 		fdef.filter.categoryBits = 0x0005;
 		this.body.createFixture(fdef).setUserData(this);
 
-		wallcheck.set(new Vector2(-1f,0f), new Vector2(-1f,2.5f));
+		wallcheck.set(new Vector2(-1f,0f), new Vector2(-1f,1.5f));
 		fdef.shape = wallcheck;
 		fdef.isSensor = true;
 		fdef.filter.categoryBits = 0x0006;
@@ -203,6 +203,7 @@ public class RangedGuard extends Enemy {
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		
+		System.out.println(this.contactsleft + " " + this.contactsright);
 		if(!this.playerInVision) { 
 			activate();
 		}
@@ -378,8 +379,16 @@ public class RangedGuard extends Enemy {
 		}
 		if (other.getUserData() instanceof Player && self.isSensor()) {
 			stop();
-			((RangedGuard) self.getUserData()).previousRight=((RangedGuard) self.getUserData()).facingRight;
 			((Enemy) self.getUserData()).playerInVision=true;
+			if(other.getBody().getPosition().x < this.getBody().getPosition().x) {
+				this.move(0);
+				this.facingRight=false;
+			}
+			else {
+				this.move(1);
+				this.facingRight=true;
+			}
+			((RangedGuard) self.getUserData()).previousRight=((RangedGuard) self.getUserData()).facingRight;
 			if (((Player)other.getUserData()).getHp() <= 0) {
 				stop();
 			}

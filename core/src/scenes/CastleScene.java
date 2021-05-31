@@ -49,7 +49,8 @@ public class CastleScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1.f;
-			
+			fixtureDef.filter.categoryBits=3;
+
 			body.createFixture(fixtureDef);
 			shape.dispose();
 		}
@@ -62,7 +63,7 @@ public class CastleScene extends Scene {
 		//addEntity(new Enemy(new Vector2(39.f, 50.f)));
 		//TORCH
 		addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
-		addEntity(new RangedGuard(new Vector2(50.f, 12.f)));
+		//addEntity(new RangedGuard(new Vector2(50.f, 12.f)));
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
 		for(MapObject object : map.getLayers().get(1).getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
