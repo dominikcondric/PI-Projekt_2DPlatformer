@@ -32,6 +32,7 @@ public class Slime extends Enemy {
 	protected Fixture left;
 	protected Fixture right;
 	protected boolean drawleftright=true;
+	private Sound slime = Gdx.audio.newSound(Gdx.files.internal("sounds/slime_jump.wav"));
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 
