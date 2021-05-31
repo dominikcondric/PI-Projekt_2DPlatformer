@@ -58,8 +58,8 @@ public class Player extends Entity {
 	private Array<TextureRegion> framesAttack3 = new Array<TextureRegion>();
 	private Array<TextureRegion> framesAttackCurrent = new Array<TextureRegion>();
 	
-	private final int MOVE_THRESHOLD_LEFT = -6;
-	private final int MOVE_THRESHOLD_RIGHT = 6;
+	private float MOVE_THRESHOLD_LEFT = -6;
+	private float MOVE_THRESHOLD_RIGHT = 6;
 	private final int ON_GROUND = 0;
 	
 	private enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD, CASTING, ATTACKING };
@@ -333,7 +333,7 @@ public class Player extends Entity {
 			hp = maxHp;
 			return;
 		}
-		
+		System.out.println(body.getPosition());
 		Vector2 playerVelocity = body.getLinearVelocity();
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
@@ -355,6 +355,11 @@ public class Player extends Entity {
 		
 		if(playerVelocity.y == ON_GROUND){
         	jumpCount = 0;
+        	MOVE_THRESHOLD_LEFT = -6;
+        	MOVE_THRESHOLD_RIGHT = 6;
+        }else {
+        	MOVE_THRESHOLD_LEFT = -4.5f;
+        	MOVE_THRESHOLD_RIGHT = 4.5f;
         }
 		
 		if (controllable) {
@@ -514,16 +519,16 @@ public class Player extends Entity {
 
 	private void jump() {
 		//body.applyLinearImpulse(new Vector2(0, 9.5f), body.getWorldCenter(), true);
-		body.setLinearVelocity(new Vector2(0, 9.5f));
+		body.setLinearVelocity(new Vector2(0, 8f));
 	}
 	
 	public void moveRight() {
-		body.applyLinearImpulse(new Vector2(3f, 0), body.getWorldCenter(), true);
+		body.applyLinearImpulse(new Vector2(1.5f, 0), body.getWorldCenter(), true);
     	facingRight = true;
 	}
 	
 	public void moveLeft() {
-    	body.applyLinearImpulse(new Vector2(-3f, 0), body.getWorldCenter(), true);
+    	body.applyLinearImpulse(new Vector2(-1.5f, 0), body.getWorldCenter(), true);
     	facingRight = false;
 	}
 	

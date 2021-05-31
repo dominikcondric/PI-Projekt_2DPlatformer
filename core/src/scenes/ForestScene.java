@@ -28,10 +28,9 @@ import entities.Slime;
 public class ForestScene extends Scene {
 	private ArrayList<PointLight> lights;
 	
-	Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/forest_music.mp3"));
-
-	public ForestScene(TmxMapLoader mapLoader, SpriteBatch batch) {
+	public ForestScene(TmxMapLoader mapLoader, SpriteBatch batch) {	
 		super(mapLoader, "Forest/forest.tmx", batch);
+		music = Gdx.audio.newMusic(Gdx.files.internal("sounds/forest_music.mp3"));
 	}
 
 	@Override
@@ -84,9 +83,7 @@ public class ForestScene extends Scene {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		music.setVolume(0.1f);
-		music.play();
-		music.setLooping(true);
+		
 		
 	}
 	

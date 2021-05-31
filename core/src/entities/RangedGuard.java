@@ -31,18 +31,117 @@ public class RangedGuard extends Enemy {
 	protected boolean drawleftright=true;
 	protected boolean previousRight=false;
 	protected boolean playerWasInVision;
-
+	private Animation<TextureRegion> runAnim;
+	private Animation<TextureRegion> shootAnim;
+	private enum State {RUNNING, SHOOTING, STANDING};
+	private State currentState;
+	private State previousState;
+	private boolean hasAttacked = false;
 
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public RangedGuard(Vector2 position) {
 		super(position);		
-		atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\idle_slime.atlas"));
-		idle = new TextureRegion(atlas.findRegion("idle_slime01"), 0, 0, 19, 18);
-		for(int i = 0; i < 6; i++) {
-			idleFrames.add(new TextureRegion(atlas.findRegion("idle_slime01"), i * 23+5 , 0, 19, 18 ));
+		atlas = new TextureAtlas(Gdx.files.internal("archersprites\\archer_idle.atlas"));
+		idle = new TextureRegion(atlas.findRegion("tile000"), 0, 0, 25, 39);
+		for(int i = 0; i < 8; i++) {
+			switch(i) {
+				case 0:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 29 , 0, 25, 39 ));
+					break;
+				case 1:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 29 , 0, 25, 39 ));
+					break;
+				case 2:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 29 , 0, 27, 39 ));
+					break;
+				case 3:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 29 , 0, 26, 38 ));
+					break;
+				case 4:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 29 , 0, 25, 38 ));
+					break;
+				case 5:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 29 , 0, 25, 37 ));
+					break;
+				case 6:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 29 , 0, 25, 38 ));
+					break;
+				case 7:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 29 , 0, 25, 40 ));
+					break;
+			}
 		}
 		idleAnim = new Animation<TextureRegion>(0.1f, idleFrames);
+		
+		idleFrames.clear();
+		atlas = new TextureAtlas(Gdx.files.internal("archersprites\\archer_run.atlas"));
+		
+		for(int i = 0; i < 8; i++) {
+			switch(i) {
+				case 0:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 45 , 0, 42, 31 ));
+					break;
+				case 1:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 45 , 0, 42, 32 ));
+					break;
+				case 2:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 45 , 0, 43, 33 ));
+					break;
+				case 3:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 45 , 0, 42, 33 ));
+					break;
+				case 4:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 45 , 0, 40, 33 ));
+					break;
+				case 5:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 45 , 0, 38, 33 ));
+					break;
+				case 6:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 45 , 0, 33, 34 ));
+					break;
+				case 7:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 45 , 0, 37, 32 ));
+					break;
+			}
+		}
+		runAnim = new Animation<TextureRegion>(0.1f, idleFrames);
+		idleFrames.clear();
+		atlas = new TextureAtlas(Gdx.files.internal("archersprites\\archer_shoot.atlas"));
+		
+		for(int i = 0; i < 9; i++) {
+			switch(i) {
+				case 0:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 25, 39 ));
+					break;
+				case 1:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 25, 39 ));
+					break;
+				case 2:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 30, 39 ));
+					break;
+				case 3:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 26, 39 ));
+					break;
+				case 4:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 40, 38 ));
+					break;
+				case 5:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 37, 38 ));
+					break;
+				case 6:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 28, 36 ));
+					break;
+				case 7:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 28, 36 ));
+					break;
+				case 8:
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 28, 36 ));
+					idleFrames.add(new TextureRegion(atlas.findRegion("tile000"), i * 42 , 0, 28, 36 ));
+					break;
+			}
+		}
+		shootAnim = new Animation<TextureRegion>(0.1f, idleFrames);
 		sprite.setRegion(idle);
 		sprite.setSize(0.9f, 0.9f);
 		sprite.setScale(2f, 2f);
@@ -107,7 +206,7 @@ public class RangedGuard extends Enemy {
 		if(!this.playerInVision) { 
 			activate();
 		}
-		
+		hasAttacked = false;
 		if (this.active) {
 			if(this.facingRight)this.move(1);
 			else this.move(0);
@@ -117,6 +216,7 @@ public class RangedGuard extends Enemy {
 			shoot(scene);
 			stopTime=stateTimer+1f;
 		}
+		
 		
         if (body.getLinearVelocity().y < 0)  {
 			body.setLinearDamping(0);
@@ -161,11 +261,73 @@ public class RangedGuard extends Enemy {
 		}
 
 	}
+	
+	@Override
+	public TextureRegion getFrame(float deltaTime) {
+		previousState = currentState;
+		TextureRegion region = null;
+		
+		if(currentState == State.SHOOTING && shootAnim.getKeyFrameIndex(stateTimer) != 9) {
+			region = (TextureRegion) shootAnim.getKeyFrame(stateTimer, true);
+			needsFlip(region);
+			stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
+			
+			return region;
+		}
+		
+		
+        currentState = getState();
+        
+        
+
+        switch(currentState){
+
+        	case SHOOTING:
+        		region = shootAnim.getKeyFrame(stateTimer, false);
+        		break;
+            case RUNNING:
+            	region = runAnim.getKeyFrame(stateTimer, true);
+                break;
+            case STANDING:
+            	region = idleAnim.getKeyFrame(stateTimer, true);
+            	break;
+        }
+        	
+        needsFlip(region);
+        
+
+        stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
+        
+        return region;
+    }
+	
+	public State getState() {
+
+		if(hasAttacked)
+			return State.SHOOTING;
+        else if(body.getLinearVelocity().x < -0.3f || body.getLinearVelocity().x > 0.3f)
+            return State.RUNNING;
+        else
+            return State.STANDING;
+    }
+	
+	private void needsFlip(TextureRegion region) {
+		 if((!facingRight) && !region.isFlipX()){
+	            region.flip(true, false);
+	            facingRight = false;
+	        }
+
+	        else if((facingRight) && region.isFlipX()){
+	            region.flip(true, false);
+	            facingRight = true;
+	        }	
+	}
 
 
 
 	private void shoot(Scene scene) {
-		//add shooting
+		scene.addEntity(new Fireball(this.getPosition(), this.getFacingDirection(), 0, 0));
+		hasAttacked = true;
 
 	}
 

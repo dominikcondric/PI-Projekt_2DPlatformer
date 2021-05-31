@@ -20,12 +20,13 @@ import box2dLight.PointLight;
 import entities.Enemy;
 import entities.Entity;
 import entities.Player;
+import entities.RangedGuard;
 
 public class CastleScene extends Scene {
 	private ArrayList<PointLight> lights;
-	Music music = Gdx.audio.newMusic(Gdx.files.internal("sounds/castle_music.mp3"));
 	public CastleScene(TmxMapLoader mapLoader, SpriteBatch batch) {
 		super(mapLoader, "Castle/castle_map.tmx", batch);
+		music = Gdx.audio.newMusic(Gdx.files.internal("sounds/castle_music.mp3"));
 	}
 
 	@Override
@@ -60,6 +61,8 @@ public class CastleScene extends Scene {
 		//addEntity(new Enemy(new Vector2(97.f, 57.f)));
 		//addEntity(new Enemy(new Vector2(39.f, 50.f)));
 		//TORCH
+		addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
+		addEntity(new RangedGuard(new Vector2(50.f, 12.f)));
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
 		for(MapObject object : map.getLayers().get(1).getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
@@ -125,16 +128,14 @@ public class CastleScene extends Scene {
 	@Override
 	protected void placePlayerOnScene(Player player) {
 		player.setPosition(new Vector2(2.f, 10.f));
+		
 	}
 	
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		music.setVolume(0.1f);
-		music.play();
-		music.setLooping(true);
+		
 		
 	}
-
 
 }
