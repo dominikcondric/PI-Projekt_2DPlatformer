@@ -2,6 +2,7 @@ package entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector2;
@@ -11,25 +12,25 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-public class Coin {
+import scenes.Scene;
+
+public class Coin extends Entity {
 	private Cell coinCell;
-	private boolean setToDestroy = false;
 	private TiledMapTile tile;
-	private Body body;
-	private Vector2 position;
 	private Sound sound;
+	private boolean justPickedUp = false;
 
 	public Coin(Vector2 position, Cell coinCell) {
+		super(position);
 		this.coinCell = coinCell;
 		this.tile = coinCell.getTile();
-		this.position = position;
 		sound = Gdx.audio.newSound(Gdx.files.internal("sounds/coin.wav"));
 	}
 	
 	public void addToWorld(World world) {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyDef.BodyType.StaticBody;
-		bodyDef.position.set(position.x + 0.5f, position.y + 0.5f);
+		bodyDef.position.set(initialPosition.x + 0.5f, initialPosition.y + 0.5f);
 		body = world.createBody(bodyDef);
 		
 		PolygonShape polyShape = new PolygonShape();
@@ -41,22 +42,33 @@ public class Coin {
 		
 		polyShape.dispose();
 	}
+	
+	@Override
+	public void render(SpriteBatch batch) {
+	}
 
-	public void setToDestroy(boolean destroy) {
-		setToDestroy = destroy;
-	}
-	
-	public boolean isSetToDestroy() {
-		return setToDestroy;
-	}
-	
-	public void update() {
-		if (setToDestroy && body != null) {
+	@Override
+	public void update(Scene scene, float deltaTime) {
+		super.update(scene, deltaTime);
+		if (justPickedUp == true) {
 			coinCell.setTile(null);
-			body.getWorld().destroyBody(body);
-			body = null;
 			sound.play();
+			active = false;
+		}
+		justPickedUp = false;
+	}
+	
+	@Override
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
+		if (other.getUserData() instanceof Player) {
+			justPickedUp = true;
+			active = false;
 		}
 	}
 	
+	@Override 
+	public void reset(World world) {
+		super.reset(world);
+		coinCell.setTile(tile);
+	}
 }

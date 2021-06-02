@@ -165,9 +165,8 @@ public class Fireball extends Entity {
     }
 
 	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
 		if (!other.isSensor()) {
-			
 			onHit();
 		}
 	}
@@ -181,16 +180,5 @@ public class Fireball extends Entity {
 
 	public float getExplosionDmg() {
 		return explosionDmg;
-	}
-	
-	
-	@Override
-	public void resolveCollisionEnd(Fixture A, Fixture B) {
-	}
-	
-	@Override
-	public void resolvePreSolve(Fixture A, Fixture B) {
-		// TODO Auto-generated method stub
-		
 	}
 }

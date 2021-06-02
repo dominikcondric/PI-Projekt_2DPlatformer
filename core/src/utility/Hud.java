@@ -46,6 +46,7 @@ public class Hud implements Disposable {
 	public TextButton resumeButton;
 	public TextButton optionsButton;
 	private Label dialogueBox;
+	private Label coinCount;
 	
 	public Hud(Player player, SpriteBatch batch, BitmapFont font) {
 		shapeRenderer = new ShapeRenderer();
@@ -151,6 +152,18 @@ public class Hud implements Disposable {
 		dialogueBox.setFontScale(2.f);
 		
 		hud.addActor(dialogueBox);
+		
+		coinCount = new Label("", new LabelStyle(font, Color.BROWN));
+		coinCount.setFontScale(2.5f);
+		coinCount.setSize(40f, 40f);
+		coinCount.setPosition(hud.getWidth() / 2.f, hud.getHeight() - 50.f);
+		coinCount.setAlignment(Align.center);
+		hud.addActor(coinCount);
+		
+		Image coinImage = new Image(new TextureRegion(new Texture(Gdx.files.internal("Castle/Castle_Tilesets/Coin/Coin.png")), 0, 0, 32, 32));
+		coinImage.setPosition(hud.getWidth() / 2.f - 40f, hud.getHeight() - 50.f);
+		coinImage.setSize(40f, 40f);
+		hud.addActor(coinImage);
 	}
 	
 	public void onResize(int width, int height) {
@@ -160,6 +173,7 @@ public class Hud implements Disposable {
 	private void update(final Scene scene, boolean gamePaused) {
 		Player player = scene.getPlayer();
 		progressBar.setValue(player.getHp());
+		coinCount.setText(Integer.toString(player.getCoinCount()));
 		
 		ArrayList<Ability> abilities = player.getAbilityList();
 		for (int i = 0; i < abilities.size(); ++i) {

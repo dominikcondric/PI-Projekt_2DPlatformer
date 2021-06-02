@@ -20,11 +20,11 @@ public class CollisionListener implements ContactListener {
 		Fixture B = contact.getFixtureB();
 		
 		if (A.getUserData() instanceof Entity) {
-			((Entity)A.getUserData()).resolveCollision(A, B);
+			((Entity)A.getUserData()).resolveCollisionBegin(A, B);
 		}
 		
 		if (B.getUserData() instanceof Entity) {
-			((Entity)B.getUserData()).resolveCollision(B, A);
+			((Entity)B.getUserData()).resolveCollisionBegin(B, A);
 		}
 		
 	}
@@ -35,11 +35,11 @@ public class CollisionListener implements ContactListener {
 		Fixture B = contact.getFixtureB();
 		
 		if (A.getUserData() instanceof Chest) {
-			((Entity)A.getUserData()).resolveCollision(A, B);
+			((Entity)A.getUserData()).resolveCollisionEnd(A, B);
 			}
 		
 		if (B.getUserData() instanceof Chest) {
-			((Entity)A.getUserData()).resolveCollision(B, A);
+			((Entity)A.getUserData()).resolveCollisionEnd(B, A);
 		}
 		
 		if(A.getUserData() instanceof Enemy) {

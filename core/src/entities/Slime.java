@@ -51,9 +51,8 @@ public class Slime extends Enemy {
 
 		stopTime=-1f;
 		facingRight=false;
-		movespeed=0.3f;
-		jumpheight=11f;
-
+		moveSpeed=0.3f;
+		jumpHeight=11f;
 	}
 	
 	public void addToWorld(World world) {
@@ -87,7 +86,7 @@ public class Slime extends Enemy {
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		
-		if (this.active) {
+		if (this.activeAI) {
 			this.move(this.getDirection(scene.getPlayer()));
 		}
 		
@@ -98,7 +97,7 @@ public class Slime extends Enemy {
         }
         
         
-		if(this.active && drawleftright){
+		if(this.activeAI && drawleftright){
 			this.contactsright=0;
 			this.contactsleft=0;
 			
@@ -127,7 +126,7 @@ public class Slime extends Enemy {
 			return;
 			}
 		
-		if(!this.active && drawleftright==false) {
+		if(!this.activeAI && drawleftright==false) {
 			body.destroyFixture(left);
 			body.destroyFixture(right);
 			this.contactsright=0;
@@ -136,12 +135,12 @@ public class Slime extends Enemy {
 			drawleftright=true;
 		}
 		
-		if(!this.facingRight && this.contactsright<=0 && this.active && !playerInVision) {
-				this.active=false;			
+		if(!this.facingRight && this.contactsright<=0 && this.activeAI && !playerInVision) {
+				this.activeAI=false;			
 
 		}
-		else if(this.facingRight && this.contactsleft<=0 && this.active && !playerInVision) {
-			this.active=false;
+		else if(this.facingRight && this.contactsleft<=0 && this.activeAI && !playerInVision) {
+			this.activeAI=false;
 			}
 	}
 
@@ -168,7 +167,7 @@ public class Slime extends Enemy {
 		if(other.getUserData() instanceof Player && self.isSensor() && self.getFilterData().categoryBits==1) {
 			((Enemy) self.getUserData()).playerInVision=false;
 		}
-		if(other.getFilterData().categoryBits!=3 || !((Enemy) self.getUserData()).active)return;
+		if(other.getFilterData().categoryBits!=3 || !((Enemy) self.getUserData()).activeAI)return;
 		if(self.getFilterData().categoryBits == 0x0002) this.contactsleft--;
 		else if(self.getFilterData().categoryBits == 0x0004) this.contactsright--;
 	}
@@ -178,16 +177,16 @@ public class Slime extends Enemy {
 	}
 
 	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
-		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).active) {
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
+		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).activeAI) {
 			if(self.getFilterData().categoryBits==4)this.contactsright++;
 			else if(self.getFilterData().categoryBits==2) this.contactsleft++;
 		}
 		if (other.getUserData() instanceof Player && self.isSensor()) {
-			activate();
+			activateAI();
 			((Enemy) self.getUserData()).playerInVision=true;
 			if (((Player)other.getUserData()).getHp() <= 0) {
-				stop();
+				stopAI();
 			}
 		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
 			Player player = (Player)other.getUserData();

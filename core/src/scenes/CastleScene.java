@@ -73,13 +73,10 @@ public class CastleScene extends Scene {
         addEntity(new RangedGuard(new Vector2(192f, 13.f)));
         FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 8.1f));
         addEntity(fireballItem);
-        addEntity(new Slime(new Vector2(15.f, 9.f)));
+        addEntity(new Slime(new Vector2(15.f, 8.f)));
         addEntity(new Slime(new Vector2(53.f, 12.f)));
         addEntity(new Slime(new Vector2(22.f, 11.f)));
         addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
-
-
-
 		
 		//TORCH
 		addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
@@ -151,8 +148,7 @@ public class CastleScene extends Scene {
 			Rectangle rect = object.getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Coin coin = new Coin(rect.getPosition(new Vector2()), coinLayer.getCell((int)rect.getX(), (int)rect.getY()));
-			coin.addToWorld(box2DWorld);
-			coins.add(coin);
+			addEntity(coin);
 		}
 	}
 
@@ -165,8 +161,6 @@ public class CastleScene extends Scene {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		
-		
 	}
 
 }

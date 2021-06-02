@@ -3,7 +3,6 @@ package utility;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
 
 import entities.Player;
@@ -35,7 +34,11 @@ public class SceneManager implements Disposable {
 		sceneMap.put(sceneName, scene);
 		
 		if (setActive || sceneMap.isEmpty()) {
+			if (activeScene != null) 
+				activeScene.stopMusic(false);
+			
 			activeScene = scene;
+			activeScene.playMusic();
 		}
 	}
 	
@@ -46,10 +49,7 @@ public class SceneManager implements Disposable {
 	public void setActiveScene(String sceneName) {
 		if (sceneName != null && sceneMap.containsKey(sceneName)) {
 			activeScene = sceneMap.get(sceneName);
-			activeScene.getMusic().setVolume(0.1f);
-			activeScene.getMusic().play();
-			activeScene.getMusic().setLooping(true);
-			
+			activeScene.playMusic();
 		} else {
 			System.out.println("Scene doesn't exist!");
 		}
@@ -58,15 +58,13 @@ public class SceneManager implements Disposable {
 	public void update() {
 		for (SceneTrigger trigger : activeScene.getTriggers()) {
 			if (trigger.isTriggered()) {
-				activeScene.stopMusic();
+				activeScene.stopMusic(false);
 				Player p = activeScene.getPlayer();
 				activeScene = trigger.sceneToFollow;
-				activeScene.resetPlayer();
 				activeScene.addEntity(p);			
-				
+				activeScene.playMusic();
 			}	
 		}
-		activeScene.playMusic();
 	}
 	
 	@Override

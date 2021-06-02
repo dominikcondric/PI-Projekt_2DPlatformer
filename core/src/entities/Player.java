@@ -403,12 +403,6 @@ public class Player extends Entity {
         /*if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
         	crouch();
         }*/
-
-
-        if (body.getPosition().y < 0.f) {
-        	setToDestroy = true;
-        	body.setTransform(2.f, 8.f, 0.f);
-        }
 	}
 
 	private void meleeAttack() {
@@ -524,12 +518,12 @@ public class Player extends Entity {
 	}
 	
 	public void moveRight() {
-		body.applyLinearImpulse(new Vector2(1.5f, 0), body.getWorldCenter(), true);
+		body.setLinearVelocity(6f, body.getLinearVelocity().y);
     	facingRight = true;
 	}
 	
 	public void moveLeft() {
-    	body.applyLinearImpulse(new Vector2(-1.5f, 0), body.getWorldCenter(), true);
+    	body.setLinearVelocity(-6f, body.getLinearVelocity().y);
     	facingRight = false;
 	}
 	
@@ -552,7 +546,7 @@ public class Player extends Entity {
 	public void onHit(float x) {
 		this.hp--;
 		if(this.hp<=0)
-			setToDestroy = true;
+			active = false;
 		if(x==0) return;
 		if(this.body.getPosition().x < x) {
 	    	body.applyLinearImpulse(new Vector2(-10f, 1f), body.getWorldCenter(), true);
@@ -572,14 +566,14 @@ public class Player extends Entity {
 	
 	private void needsFlip(TextureRegion region) {
 		 if((!facingRight) && !region.isFlipX()){
-	            region.flip(true, false);
-	            facingRight = false;
-	        }
+            region.flip(true, false);
+            facingRight = false;
+        }
 
-	        else if((facingRight) && region.isFlipX()){
-	            region.flip(true, false);
-	            facingRight = true;
-	        }	
+        else if((facingRight) && region.isFlipX()){
+            region.flip(true, false);
+            facingRight = true;
+        }	
 	}
 	
 	@Override
@@ -602,32 +596,32 @@ public class Player extends Entity {
 		float drawOriginY = 0;
 
 		batch.draw(atlasRegion, sprite.getX()-0.5f, sprite.getY()-0.65f, drawOriginX, drawOriginY, drawWidth, drawHeight, drawScaleX, drawScaleY, 0);
-		
 	}
 
 	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
 		if(other.getUserData() instanceof Enemy && !other.isSensor() && !hasAttacked) {
 			onHit(((Enemy) other.getUserData()).getPosition().x);
-		} else if (other.getUserData() instanceof Coin && !((Coin)other.getUserData()).isSetToDestroy()) {
-			((Coin)other.getUserData()).setToDestroy(true);
+		} else if (other.getUserData() instanceof Coin && ((Coin)other.getUserData()).isActive()) {
 			++coinCount;
 		}
 	}
-
 
 	public float getSwordDmg() {
 		return swordDmg;
 	}
 	
-
-	
-	@Override
-	public void resolveCollisionEnd(Fixture A, Fixture B) {
+	public int getCoinCount() {
+		return coinCount;
 	}
 	
 	@Override
-	public void resolvePreSolve(Fixture A, Fixture B) {		
+	public void reset(World world) {
+		super.reset(world);
+		hp = maxHp;
+		items.clear();
+		abilities.clear();
+		abilities.add(new FireballAbility());
+		coinCount = 0;
 	}
-
 }

@@ -1,13 +1,10 @@
 package entities;
 
+
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
@@ -20,14 +17,14 @@ public abstract class Enemy extends Entity {
 	protected TextureRegion idle;
 	protected Animation<TextureRegion> idleAnim;
 	protected int hp = 5;
-
+	protected int maxHp = 5;
 
 	protected float visionHeight=3f;
 	protected float visionLength=4f;
-	protected float jumpheight=11f;
-	protected float movespeed=0.6f;
+	protected float jumpHeight=11f;
+	protected float moveSpeed=0.6f;
 	protected int direction;
-	protected boolean active = false;
+	protected boolean activeAI = false;
 	protected boolean shouldBeStopped = false;
 	//
 	protected float contactsleft=0;
@@ -58,11 +55,6 @@ public abstract class Enemy extends Entity {
 		super.update(scene, deltaTime);
 		TextureRegion currentRegion = getFrame(deltaTime);
 		sprite.setRegion(currentRegion);
-		if (body.getPosition().y < 0.f) {
-			setToDestroy = true;
-		}
-		
-
 	}
 	
 
@@ -98,22 +90,21 @@ public abstract class Enemy extends Entity {
 	public abstract void move(int direction);
 
 	public void jump() {
-		body.applyLinearImpulse(new Vector2(0, this.jumpheight), body.getWorldCenter(), true);
+		body.applyLinearImpulse(new Vector2(0, this.jumpHeight), body.getWorldCenter(), true);
 	}
 
 	public void moveLeft() {
-    	body.applyLinearImpulse(new Vector2(-(this.movespeed), 0), body.getWorldCenter(), true);
+		body.setLinearVelocity(-moveSpeed, body.getLinearVelocity().y);
     	body.setLinearDamping(20);
 	}
 
 	public void moveRight() {
-		body.applyLinearImpulse(new Vector2(this.movespeed, 0), body.getWorldCenter(), true);
+		body.setLinearVelocity(moveSpeed, body.getLinearVelocity().y);
     	body.setLinearDamping(20);
 	}
 
 
 	protected void onHit(boolean pushRight, float dmg) {
-
 		float xPush = 15f;
 		if (!pushRight) 
 			xPush *= -1.f;
@@ -121,19 +112,17 @@ public abstract class Enemy extends Entity {
 		body.applyLinearImpulse(new Vector2(xPush, 0.f), body.getWorldCenter(), true);
 		hp -= dmg;
 		if (this.hp <= 0)
-			setToDestroy = true;
-		System.out.println(hp);
+			active = false;
 	}
 
 
-	public void activate() {
-		this.active = true;
+	public void activateAI() {
+		this.activeAI = true;
 	}
 
-	public void stop() {
-		this.active = false;
+	public void stopAI() {
+		this.activeAI = false;
 	}
-
 	
 	public TextureRegion getFrame(float deltaTime) {
 		TextureRegion region = (TextureRegion) idleAnim.getKeyFrame(stateTimer, true);
@@ -143,42 +132,15 @@ public abstract class Enemy extends Entity {
         } else if (body.getLinearVelocity().x > 0 && !region.isFlipX()) {
             region.flip(true, false);
         }
-
-        stateTimer = stateTimer + deltaTime;
         
+        stateTimer = stateTimer + deltaTime;
         return region;
     }
-
+	
 	@Override
-	public abstract void resolveCollision(Fixture self, Fixture other); //{
-		//kontakt playera i enemy visiona
-		//posto ne postoji senzor s player objektom u userdata to znaci da enemy u ovom slucaju mora biti senzor a player mora biti sam hitbox playera
-		/*if(this.shouldBeStopped && other.getFilterData().categoryBits==3) {
-			if(this.facingRight && self.getFilterData().categoryBits==0x0004) this.shouldBeStopped=false;
-			else if(!this.facingRight && self.getFilterData().categoryBits==0x0002) this.shouldBeStopped=false;
-			System.out.println("should not be stopped");
-		}*//*
-		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).active) {
-			if(self.getFilterData().categoryBits==4)this.contactsright++;
-			else if(self.getFilterData().categoryBits==2) this.contactsleft++;
-		}
-		if (other.getUserData() instanceof Player && self.isSensor()) {
-			activate();
-			((Enemy) self.getUserData()).playerInVision=true;
-			if (((Player)other.getUserData()).getHp() <= 0) {
-				stop();
-			}
-		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
-			Player player = (Player)other.getUserData();
-			onHit(player.facingRight, player.getSwordDmg());
-		} else if (!self.isSensor() && other.getUserData() instanceof Fireball) {
-			Fireball fireball = (Fireball)other.getUserData();
-			if(fireball.didExplode()) {
-				onHit(fireball.facingRight, fireball.getExplosionDmg());
-			}else {
-				onHit(fireball.facingRight, fireball.getHitDmg());
-			}
-			
-		}
-	}*/
+	public void reset(World world) {
+		super.reset(world);
+		hp = maxHp;
+		stopAI();
+	}
 }

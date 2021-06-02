@@ -38,9 +38,8 @@ public class PickupAnimation extends SceneAnimation {
 			}
 		} else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			finished = true;
-			item.setToDestroy(true);
+			item.disappear();
 			player.addItem(item);
 		}
 	}
-
 }

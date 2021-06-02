@@ -94,6 +94,10 @@ public class GameScreen implements Screen {
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 			paused = !paused;
+			if (paused)
+				sceneManager.getActiveScene().stopMusic(true);
+			else 
+				sceneManager.getActiveScene().playMusic();
 		} 
 		
 		if (paused == true) {
@@ -105,10 +109,8 @@ public class GameScreen implements Screen {
 				dispose();
 				game.setScreen(new MainMenuScreen(game));
 			}
-		} else if (player.isSetToDestroy()) {
-			player.update(sceneManager.getActiveScene(), deltaTime);
+		} else if (!player.isActive()) {
 			sceneManager.getActiveScene().resetEntities();
-			sceneManager.getActiveScene().addEntity(player);
 			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
 		}
 	}
@@ -121,12 +123,13 @@ public class GameScreen implements Screen {
 		
 		if (!paused) {
 			activeScene.update(delta);
-		} 
+		}
 		
 		activeScene.render(game.batch, camera);
 		if (debug) {
 			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
 		}
+		
 		inGameHud.render(activeScene, paused);
 		update(delta);
 	}

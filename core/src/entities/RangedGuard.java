@@ -147,13 +147,10 @@ public class RangedGuard extends Enemy {
 		sprite.setScale(2f, 2f);
 		
 
-		active=true;
+		activeAI=true;
 		facingRight=false;
-		movespeed=0.3f;
-		jumpheight=11f;
-		
-
-
+		moveSpeed=0.3f;
+		jumpHeight=11f;
 	}
 	
 	public void addToWorld(World world) {
@@ -204,10 +201,10 @@ public class RangedGuard extends Enemy {
 		super.update(scene, deltaTime);
 		
 		if(!this.playerInVision) { 
-			activate();
+			activateAI();
 		}
 		hasAttacked = false;
-		if (this.active) {
+		if (this.activeAI) {
 			if(this.facingRight)this.move(1);
 			else this.move(0);
 			stopTime=stateTimer+0.5f;
@@ -224,7 +221,7 @@ public class RangedGuard extends Enemy {
             body.setLinearDamping(12);
         }
         
-		if(this.active && drawleftright){
+		if(this.activeAI && drawleftright){
 			this.contactsright=0;
 			this.contactsleft=0;
 			
@@ -252,7 +249,7 @@ public class RangedGuard extends Enemy {
 			return;
 			}
 		
-		if(!this.active && drawleftright==false) {
+		if(!this.activeAI && drawleftright==false) {
 			body.destroyFixture(left);
 			body.destroyFixture(right);
 			this.contactsright=0;
@@ -354,7 +351,7 @@ public class RangedGuard extends Enemy {
 			((Enemy) self.getUserData()).playerInVision=false;
 			((RangedGuard) self.getUserData()).playerWasInVision=true;
 		}
-		if(other.getFilterData().categoryBits!=3 || !((Enemy) self.getUserData()).active)return;
+		if(other.getFilterData().categoryBits!=3 || !((Enemy) self.getUserData()).activeAI)return;
 		if(self.getFilterData().categoryBits == 0x0002) this.contactsleft--;
 		else if(self.getFilterData().categoryBits == 0x0004) this.contactsright--;
 
@@ -365,8 +362,8 @@ public class RangedGuard extends Enemy {
 	}
 
 	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
-		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).active) {
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
+		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).activeAI) {
 			if(self.getFilterData().categoryBits==4)this.contactsright++;
 			else if(self.getFilterData().categoryBits==2) this.contactsleft++;
 			if(self.getFilterData().categoryBits==5) {
@@ -377,9 +374,9 @@ public class RangedGuard extends Enemy {
 			}
 		}
 		if (other.getUserData() instanceof Player && self.isSensor()) {
-			stop();
+			stopAI();
 			((Enemy) self.getUserData()).playerInVision=true;
-			if(other.getBody().getPosition().x < this.getBody().getPosition().x) {
+			if(other.getBody().getPosition().x < body.getPosition().x) {
 				this.move(0);
 				this.facingRight=false;
 			}
@@ -389,7 +386,7 @@ public class RangedGuard extends Enemy {
 			}
 			((RangedGuard) self.getUserData()).previousRight=((RangedGuard) self.getUserData()).facingRight;
 			if (((Player)other.getUserData()).getHp() <= 0) {
-				stop();
+				stopAI();
 			}
 		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
 			Player player = (Player)other.getUserData();

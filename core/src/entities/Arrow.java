@@ -18,12 +18,9 @@ import scenes.Scene;
 
 public class Arrow extends Entity{
 	private boolean firedRight;
-	private TextureAtlas atlas;
 	private Fixture fireballBody;
 	private FixtureDef fdef;
 	private float hitDmg;
-
-
 	
 	protected Arrow(Vector2 entityPosition, boolean firedRight, float hitDmg) {
 		super(entityPosition);
@@ -60,8 +57,6 @@ public class Arrow extends Entity{
 		fireballBody = this.body.createFixture(fdef);
 		fireballBody.setUserData(this);
 		
-		
-		
 		if (firedRight)
 			body.setLinearVelocity(new Vector2(10f, 0f));
 		else
@@ -73,40 +68,27 @@ public class Arrow extends Entity{
 	
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
-		
 		if(body.getLinearVelocity().y < 0) {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
-		
 	}
 
 	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
 		if (!other.isSensor()) {
-			
 			onHit();
 		}
-		
 	}
 	
 	private void onHit() {	
     	setToDestroy = true;
     }
 
-	@Override
-	public void resolveCollisionEnd(Fixture A, Fixture B) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resolvePreSolve(Fixture A, Fixture B) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public float getHitDmg() {
 		return hitDmg;
 	}
-
+	
+	public void reset(World world) {
+		setToDestroy = true;
+	}
 }

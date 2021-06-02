@@ -56,23 +56,30 @@ public class Chest extends Entity {
 			opened = true;
 			item.appear();
 		}
+		
+		if (opened) {
+			body.setActive(false);
+		}
 	}
 
 	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
 		openable = false;
 		if (!opened && other.getUserData() instanceof Player) {
 			openable = true;
 		}
 	}
-
+	
 	@Override
 	public void resolveCollisionEnd(Fixture A, Fixture B) {
+		resolveCollisionBegin(A, B);
 	}
-
+	
 	@Override
-	public void resolvePreSolve(Fixture A, Fixture B) {
-		// TODO Auto-generated method stub
-		
+	public void reset(World world) {
+		super.reset(world);
+		opened = false;
+		openable = false;
+		sprite.setRegion(0, 0, 20, 20);
 	}
 }

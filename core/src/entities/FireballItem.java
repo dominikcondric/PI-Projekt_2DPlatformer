@@ -23,27 +23,11 @@ public class FireballItem extends Item {
 	public void appear() {
 		sprite.translate(0, 0.4f);
 		triggerPickup = true;
-
 	}
 
 	@Override
 	public void addToWorld(World world) {
 
-	}
-
-	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
-
-	}
-	
-	@Override
-	public void resolveCollisionEnd(Fixture A, Fixture B) {
-	}
-	
-	@Override
-	public void resolvePreSolve(Fixture A, Fixture B) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
@@ -57,5 +41,4 @@ public class FireballItem extends Item {
 		
 		triggerPickup = false;
 	}
-
 }
