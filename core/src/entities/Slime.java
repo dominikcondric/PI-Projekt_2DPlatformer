@@ -32,18 +32,14 @@ public class Slime extends Enemy {
 	protected Fixture left;
 	protected Fixture right;
 	protected boolean drawleftright=true;
-	private Sound slime = Gdx.audio.newSound(Gdx.files.internal("sounds/slime_jump.wav"));
+	private boolean isMovingPlaying = false;
+	private Sound slimeMove = Gdx.audio.newSound(Gdx.files.internal("sounds/slime_jump.wav"));
+	private final int ON_GROUND = 0;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 
 	public Slime(Vector2 position) {
 		super(position);		
-		atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\idle_slime.atlas"));
-		idle = new TextureRegion(atlas.findRegion("idle_slime01"), 0, 0, 19, 18);
-		for(int i = 0; i < 6; i++) {
-			idleFrames.add(new TextureRegion(atlas.findRegion("idle_slime01"), i * 23+5 , 0, 19, 18 ));
-		}
-		idleAnim = new Animation<TextureRegion>(0.1f, idleFrames);
+		setAnimations();
 		sprite.setRegion(idle);
 		sprite.setSize(0.9f, 0.9f);
 		sprite.setScale(2f, 2f);
@@ -193,12 +189,21 @@ public class Slime extends Enemy {
 			onHit(player.facingRight, player.getSwordDmg());
 		} else if (!self.isSensor() && other.getUserData() instanceof Fireball) {
 			Fireball fireball = (Fireball)other.getUserData();
-			if(fireball.didExplode()) {
+			if(fireball.isSetToExplode()) {
 				onHit(fireball.facingRight, fireball.getExplosionDmg());
 			}else {
 				onHit(fireball.facingRight, fireball.getHitDmg());
 			}
 		}		
+	}
+	
+	private void setAnimations() {
+		atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\idle_slime.atlas"));
+		idle = new TextureRegion(atlas.findRegion("idle_slime01"), 0, 0, 19, 18);
+		for(int i = 0; i < 6; i++) {
+			idleFrames.add(new TextureRegion(atlas.findRegion("idle_slime01"), i * 23+5 , 0, 19, 18 ));
+		}
+		idleAnim = new Animation<TextureRegion>(0.1f, idleFrames);
 	}
 
 }

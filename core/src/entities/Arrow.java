@@ -2,23 +2,19 @@ package entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
 
 
 public class Arrow extends Entity{
 	private boolean firedRight;
-	private Fixture fireballBody;
+	private Fixture arrowBody;
 	private FixtureDef fdef;
 	private float hitDmg;
 	
@@ -54,8 +50,8 @@ public class Arrow extends Entity{
 		fdef = new FixtureDef();
 		fdef.shape = polShape;
 	
-		fireballBody = this.body.createFixture(fdef);
-		fireballBody.setUserData(this);
+		arrowBody = this.body.createFixture(fdef);
+		arrowBody.setUserData(this);
 		
 		if (firedRight)
 			body.setLinearVelocity(new Vector2(10f, 0f));

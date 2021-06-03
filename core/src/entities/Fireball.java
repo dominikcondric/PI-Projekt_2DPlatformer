@@ -25,8 +25,8 @@ public class Fireball extends Entity {
 	private FixtureDef fdef;
 	private float hitDmg;
 	private float explosionDmg;
-	private boolean didExplode = false;
-	private float animLenght;
+	private boolean setToExplode = false;
+	private float animLenght = 1.1f;
 	private boolean exploded = false;
 	private enum State { FLYING, EXPLODING};
 	private State currentState;
@@ -34,30 +34,11 @@ public class Fireball extends Entity {
 	
 	public Fireball(Vector2 entityPosition, boolean firedRight, float hitDmg, float explosionDmg) {
 		super(entityPosition);
-		animLenght = 1.1f;
+		
+		setAnimations();
 		this.firedRight = firedRight;
 		this.hitDmg = hitDmg;
 		this.explosionDmg = explosionDmg;
-		
-		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball.atlas"));
-		TextureRegion projectileImage = new TextureRegion(atlas.findRegion("FB001"),0 , 0, 35, 17);
-		
-		Array<TextureRegion> frames = new Array<TextureRegion>();
-		for(int i = 0; i < 5; i++) {
-			frames.add(new TextureRegion(atlas.findRegion("FB001"),i * 37 , 0, 35, 17));
-		}
-		
-		flying = new Animation<TextureRegion>(0.1f, frames);
-		
-		frames.clear();
-		
-		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball_explosion.atlas"));
-		for(int i = 0; i < 11; i++) {
-			frames.add(new TextureRegion(atlas.findRegion("tile003"), i * 66, 0, 64, 64));
-		}
-		explosionAnim = new Animation<TextureRegion>(0.1f, frames);
-		
-		sprite.setRegion(projectileImage);
 		
 		if (firedRight) {
 			sprite.setX(entityPosition.x + 1f);
@@ -87,7 +68,7 @@ public class Fireball extends Entity {
 		fireballBody.setUserData(this);
 		
 		body.setGravityScale(0);
-		
+		body.setBullet(true);
 		if (firedRight)
 			body.setLinearVelocity(new Vector2(10f, 0f));
 		else
@@ -104,7 +85,8 @@ public class Fireball extends Entity {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
 		
-		if(didExplode) {
+		if(setToExplode) {
+			body.setLinearVelocity(0, 0);
 			body.destroyFixture(fireballBody);
 			PolygonShape polShape = new PolygonShape();
 			polShape.setAsBox(sprite.getWidth() /2.5f , sprite.getHeight() /2.5f);
@@ -113,7 +95,7 @@ public class Fireball extends Entity {
 			explosion = this.body.createFixture(fdef);
 			explosion.setUserData(this);
 			exploded = true;
-			didExplode = false;
+			setToExplode = false;
 		}
 		if(exploded) {
 			
@@ -125,7 +107,7 @@ public class Fireball extends Entity {
 	}
     
     private void onHit() {	
-    	didExplode = true;
+    	setToExplode = true;
     }
     
     public TextureRegion getFrame(float deltaTime){
@@ -170,8 +152,8 @@ public class Fireball extends Entity {
 			onHit();
 		}
 	}
-	public boolean didExplode() {
-		return didExplode;
+	public boolean isSetToExplode() {
+		return setToExplode;
 	}
 	
 	public float getHitDmg() {
@@ -180,5 +162,27 @@ public class Fireball extends Entity {
 
 	public float getExplosionDmg() {
 		return explosionDmg;
+	}
+	
+	private void setAnimations() {
+		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball.atlas"));
+		TextureRegion projectileImage = new TextureRegion(atlas.findRegion("FB001"),0 , 0, 35, 17);
+		
+		Array<TextureRegion> frames = new Array<TextureRegion>();
+		for(int i = 0; i < 5; i++) {
+			frames.add(new TextureRegion(atlas.findRegion("FB001"),i * 37 , 0, 35, 17));
+		}
+		
+		flying = new Animation<TextureRegion>(0.1f, frames);
+		
+		frames.clear();
+		
+		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball_explosion.atlas"));
+		for(int i = 0; i < 11; i++) {
+			frames.add(new TextureRegion(atlas.findRegion("tile003"), i * 66, 0, 64, 64));
+		}
+		explosionAnim = new Animation<TextureRegion>(0.1f, frames);
+		
+		sprite.setRegion(projectileImage);
 	}
 }

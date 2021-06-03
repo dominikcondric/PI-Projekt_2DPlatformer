@@ -31,6 +31,7 @@ public abstract class Entity {
 		if (body != null) {
 			destroyBody(world);
 			addToWorld(world);
+			body.setActive(active);
 		}
 	}
 

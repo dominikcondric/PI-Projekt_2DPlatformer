@@ -49,8 +49,6 @@ public class Player extends Entity {
 	private Animation<TextureRegion> playerAttackAnim2;
 	private Animation<TextureRegion> playerAttackAnim3;
 	private Animation<TextureRegion> currentAttackAnim;
-	//private Animation<TextureRegion> playerCrouchAnim;
-	private TextureRegion playerIdle;
 	private TextureRegion playerFall;
 	private TextureRegion playerJump;
 	
@@ -59,8 +57,8 @@ public class Player extends Entity {
 	private Array<TextureRegion> framesAttack3 = new Array<TextureRegion>();
 	private Array<TextureRegion> framesAttackCurrent = new Array<TextureRegion>();
 	
-	private float MOVE_THRESHOLD_LEFT = -6;
-	private float MOVE_THRESHOLD_RIGHT = 6;
+	private float moveThresholdLeft = -6;
+	private float moveThresholdRight = 6;
 	private final int ON_GROUND = 0;
 	
 	private enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD, CASTING, ATTACKING };
@@ -68,216 +66,33 @@ public class Player extends Entity {
 	private State previousState;
     
 	public boolean inRange;
-	//private boolean isCrouching = false;
 	private float stateTimer;
 	private TextureRegion currentRegion;
 	private boolean hasAttacked = false;
 	private float attackCooldown = 0.25f;
-	private boolean isPlaying = false;
+	private boolean isFootstepPlaying = false;
+	TextureAtlas atlasAttacks;
 	
 	FixtureDef fdef;
 	Fixture melee;
 
 	public Player(Vector2 position) {
 		super(position);
-		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\movement_casting_v2.atlas"));
+		
 		abilities = new ArrayList<Ability>(2);
 		abilities.add(new FireballAbility());
 		items = new ArrayList<Item>(1);
 		swordDmg = 1;
-		
-		Array<TextureRegion> framesIdle = new Array<TextureRegion>();
-		Array<TextureRegion> framesRun = new Array<TextureRegion>();
-		Array<TextureRegion> framesCast = new Array<TextureRegion>();
-		//Array<TextureRegion> framesCrouch = new Array<TextureRegion>();
-		
-		
-		playerJump = new TextureRegion(atlas.findRegion("jump"), 46, 0, 20, 24);
-		playerFall = new TextureRegion(atlas.findRegion("jump"), 69, 0, 20, 24);
-
-		for(int i = 0; i < 4; i++) {
-			switch(i) {
-				case 0:
-					framesIdle.add(new TextureRegion(atlas.findRegion("idle_sword"), i * 27, 0, 23, 27 ));
-					break;
-				case 1:
-					framesIdle.add(new TextureRegion(atlas.findRegion("idle_sword"), i * 27, 0, 23, 27 ));
-					break;
-				case 2:
-					framesIdle.add(new TextureRegion(atlas.findRegion("idle_sword"), i * 27, 0, 25, 28 ));
-					
-					break;
-				case 3:
-					framesIdle.add(new TextureRegion(atlas.findRegion("idle_sword"), i * 27, 0, 25, 28 ));
-					break;
-			}
-			
-		}
-		
-		/*for(int i = 0; i < 4; i++) {
-			switch(i) {
-				case 0:
-					framesIdle.add(new TextureRegion(atlas.findRegion("idle"), i * 22, 0, 19, 29 ));
-					break;
-				case 1:
-					framesIdle.add(new TextureRegion(atlas.findRegion("idle"), i * 22, 0, 17, 30 ));
-					break;
-				case 2:
-					framesIdle.add(new TextureRegion(atlas.findRegion("idle"), i * 22, 0, 19, 30 ));
-					
-					break;
-				case 3:
-					framesIdle.add(new TextureRegion(atlas.findRegion("idle"), i * 22, 0, 20, 29 ));
-					break;
-			}
-			
-		}
-		*/
-		playerIdleAnim = new Animation<TextureRegion>(0.1f, framesIdle);
-		
-		for(int i = 0; i < 6; i++) {
-			switch(i) {
-			case 0:
-				framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 28 ));
-				break;
-			case 1:
-				framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 27 ));
-				break;
-			case 2:
-				framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 25 ));
-				break;
-			case 3:
-				framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 23, 28 ));
-				playerIdle = new TextureRegion(atlas.findRegion("run"), i * 25, 0, 23, 28 );
-				break;
-			case 4:
-				framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 27 ));
-				break;
-			case 5:
-				framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 25 ));
-				break;
-		}
-		
-		}
-		playerRunAnim = new Animation<TextureRegion>(0.1f, framesRun);
+		setAnimations();
 	
-		for(int i = 0; i < 5; i++) {
-			switch(i) {
-				case 0:
-					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29, 0, 21, 26 ));
-					break;
-				case 1:
-					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29, 0, 18, 25 ));
-					break;
-				case 2:
-					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29, 0, 17, 25 ));
-					break;
-				case 3:
-					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29, 0, 27, 24 ));
-					break;
-				case 4:
-					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29 - 29, 0, 27, 24 ));
-					break;
-			}
-		}
-		playerCastAnim = new Animation<TextureRegion>(0.1f, framesCast);
-		
-		/*for(int i = 0; i < 4; i++) {
-			switch(i) {
-				case 0:
-					framesCrouch.add(new TextureRegion(atlas.findRegion("crouch"), i * 22, 0, 19, 21 ));
-					break;
-				case 1:
-					framesCrouch.add(new TextureRegion(atlas.findRegion("crouch"), i * 22, 0, 20, 22 ));
-					break;
-				case 2:
-					framesCrouch.add(new TextureRegion(atlas.findRegion("crouch"), i * 22, 0, 19, 22 ));
-					break;
-				case 3:
-					framesCrouch.add(new TextureRegion(atlas.findRegion("crouch"), i * 22, 0, 17, 21 ));
-					break;
-			}
-			
-		}
-		playerCrouchAnim = new Animation<TextureRegion>(0.1f, framesCrouch); */
-		
-		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\aero_attacks.atlas"));
-		
-		for(int i = 0; i < 5; i++) {
-			switch(i) {
-				case 0:
-					framesAttack1.add(new TextureRegion(atlas.findRegion("groundattack1"), i * 36, 0, 27, 22 ));
-					break;
-				case 1:
-					framesAttack1.add(new TextureRegion(atlas.findRegion("groundattack1"), i * 36, 0, 25, 20 ));
-					break;
-				case 2:
-					framesAttack1.add(new TextureRegion(atlas.findRegion("groundattack1"), i * 36, 0, 34, 36 ));
-					break;
-				case 3:
-					framesAttack1.add(new TextureRegion(atlas.findRegion("groundattack1"), i * 36, 0, 27, 36 ));
-					break;
-				case 4:
-					framesAttack1.add(new TextureRegion(atlas.findRegion("groundattack1"), i * 36, 0, 19, 32 ));
-					framesAttack1.add(new TextureRegion(atlas.findRegion("groundattack1"), i * 36, 0, 19, 32 ));
-					break;
-			}
-		}
-		playerAttackAnim1 = new Animation<TextureRegion>(0.05f,framesAttack1);
-		currentAttackAnim = playerAttackAnim1;
-		
-		for(int i = 0; i < 6; i++) {
-			switch(i) {
-
-				case 1:
-					framesAttack2.add(new TextureRegion(atlas.findRegion("groundattack2"), i * 39, 0, 18, 27 ));
-					break;
-				case 2:
-					framesAttack2.add(new TextureRegion(atlas.findRegion("groundattack2"), i * 39, 0, 20, 27 ));
-					break;
-				case 3:
-					framesAttack2.add(new TextureRegion(atlas.findRegion("groundattack2"), i * 39, 0, 37, 29 ));
-					break;
-				case 4:
-					framesAttack2.add(new TextureRegion(atlas.findRegion("groundattack2"), i * 39, 0, 32, 21 ));
-					break;
-				case 5:
-					framesAttack2.add(new TextureRegion(atlas.findRegion("groundattack2"), i * 39, 0, 31, 22 ));
-					framesAttack2.add(new TextureRegion(atlas.findRegion("groundattack2"), i * 39, 0, 31, 22 ));
-					break;
-			}
-		}
-		playerAttackAnim2 = new Animation<TextureRegion>(0.05f,framesAttack2);
-		
-		for(int i = 0; i < 6; i++) {
-			switch(i) {
-				case 1:
-					framesAttack3.add(new TextureRegion(atlas.findRegion("groundattack3"), i * 50, 0, 20, 26 ));
-					break;
-				case 2:
-					framesAttack3.add(new TextureRegion(atlas.findRegion("groundattack3"), i * 50, 0, 48, 23 ));
-					break;
-				case 3:
-					framesAttack3.add(new TextureRegion(atlas.findRegion("groundattack3"), i * 50, 0, 31, 19 ));
-					break;
-				case 4:
-					framesAttack3.add(new TextureRegion(atlas.findRegion("groundattack3"), i * 50, 0, 34, 20 ));
-					break;
-				case 5:
-					framesAttack3.add(new TextureRegion(atlas.findRegion("groundattack3"), i * 50, 0, 34, 20 ));
-					framesAttack3.add(new TextureRegion(atlas.findRegion("groundattack3"), i * 50, 0, 34, 20 ));
-					break;
-			}
-		}
-		playerAttackAnim3 = new Animation<TextureRegion>(0.05f,framesAttack3);
-		
 	}
 	
+	
+
 	public void addToWorld(World world) {
 		BodyDef bodyDefinition = new BodyDef();
-		bodyDefinition.position.set(sprite.getX() + sprite.getWidth() / 2.f, sprite.getY() + sprite.getHeight() / 2.f);
+		bodyDefinition.position.set(initialPosition);
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
-		
 		this.body = world.createBody(bodyDefinition);
 		fdef = new FixtureDef();
 		fdef.filter.categoryBits = 0x01; // Player bit set to 1
@@ -305,21 +120,6 @@ public class Player extends Entity {
 		fdef.shape = topShape;
 		fdef.friction = 0;
 		this.body.createFixture(fdef).setUserData(this);
-		//PolygonShape polShape = new PolygonShape();
-		//polShape.setAsBox(0.78f / 2.f, 1.25f / 2.f);
-
-		
-		//fdef.shape = polShape;
-		//fdef.filter.categoryBits = 1;
-		//this.body.createFixture(fdef).setUserData(this);
-		
-		/*PolygonShape meleeRange = new PolygonShape();
-		meleeRange.setAsBox(0.78f * 2, 1.25f / 2.f);
-		fdef.shape = meleeRange;
-		fdef.filter.categoryBits = 2;
-		this.body.createFixture(fdef).setUserData(this);
-		*/
-		//polShape.dispose();
 		
 		bottomShape.dispose();
 		topShape.dispose();
@@ -335,7 +135,6 @@ public class Player extends Entity {
 			hp = maxHp;
 			return;
 		}
-		//System.out.println(body.getPosition());
 		Vector2 playerVelocity = body.getLinearVelocity();
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
@@ -343,25 +142,25 @@ public class Player extends Entity {
 		}
 		
 		currentRegion = getFrame(deltaTime);
-		sprite.setRegion(currentRegion);
 		
 	     if(previousState == State.FALLING && currentState == State.STANDING) 
 				land.play();
 			
-		if(currentState == State.RUNNING && !isPlaying) {
+		if(currentState == State.RUNNING && !isFootstepPlaying) {
 			footstep.loop(0.4f);
-			isPlaying = true;
+			isFootstepPlaying = true;
 		}
+		
 		for (Ability ability : abilities)
 			ability.update(deltaTime);
 		
-		if(playerVelocity.y == ON_GROUND){
+		if(playerVelocity.y == ON_GROUND && (currentState != State.JUMPING && currentState != State.FALLING)){
         	jumpCount = 0;
-        	MOVE_THRESHOLD_LEFT = -6;
-        	MOVE_THRESHOLD_RIGHT = 6;
+        	moveThresholdLeft = -6;
+        	moveThresholdRight = 6;
         }else {
-        	MOVE_THRESHOLD_LEFT = -4.5f;
-        	MOVE_THRESHOLD_RIGHT = 4.5f;
+        	moveThresholdLeft = -4.5f;
+        	moveThresholdRight = 4.5f;
         }
 		
 		if(hasAttacked) {
@@ -374,13 +173,16 @@ public class Player extends Entity {
 				jumpCount++;
 				jump.play();
 				jump();
-			}	
+			}
+			if(Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT)) {
+				dash();
+			}
 	
-	        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && playerVelocity.x <= MOVE_THRESHOLD_RIGHT) {
+	        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) ) {
 	        	moveRight();	
 	        }	
 	        
-	        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && playerVelocity.x >= MOVE_THRESHOLD_LEFT) {
+	        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 	        	moveLeft();
 	        }
 	        
@@ -396,13 +198,15 @@ public class Player extends Entity {
 		}
 
         if(playerVelocity.x == 0 || playerVelocity.y != ON_GROUND) {
-			isPlaying = false;
+			isFootstepPlaying = false;
 			footstep.stop();
 		}
         
-        /*if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-        	crouch();
-        }*/
+	}
+
+	private void dash() {
+		body.applyLinearImpulse(new Vector2(facingRight ? 10f : -10f, 0), body.getWorldCenter(), true);
+		
 	}
 
 	private void meleeAttack() {
@@ -416,11 +220,6 @@ public class Player extends Entity {
 		hasAttacked = true;
 		attackRange.dispose();
 	}
-	/*private void crouch() {
-		((PolygonShape)(body.getFixtureList().get(0).getShape())).setAsBox(0.78f / 2.f, isCrouching ? 1.25f / 2.f : 1.25f / 2.f / 2f);
-    	body.setTransform(sprite.getX() + sprite.getWidth() / 2.f, isCrouching ? sprite.getY() + sprite.getHeight() / 2.f + 0.3f : sprite.getY() + sprite.getHeight() / 2.f - 0.3f, 0);
-    	isCrouching = !isCrouching;
-	} */
 
 	public TextureRegion getFrame(float deltaTime){
 		previousState = currentState;
@@ -441,13 +240,9 @@ public class Player extends Entity {
 			return region;
 		}
 		
-		
         currentState = getState();
-        
-        
 
         switch(currentState){
-
         	case CASTING:
         		region = playerCastAnim.getKeyFrame(stateTimer, true);
         		break;
@@ -483,15 +278,12 @@ public class Player extends Entity {
             	region = playerIdleAnim.getKeyFrame(stateTimer, true);
             	break;
             default:
-                region = playerIdle;
+            	region = playerIdleAnim.getKeyFrame(stateTimer, true);
                 break;
         }
         	
         needsFlip(region);
-        
-
         stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
-        
         return region;
 
     }
@@ -518,13 +310,17 @@ public class Player extends Entity {
 	}
 	
 	public void moveRight() {
-		body.setLinearVelocity(6f, body.getLinearVelocity().y);
-    	facingRight = true;
+		if(body.getLinearVelocity().x <= moveThresholdRight) {
+			body.applyLinearImpulse(new Vector2(1.5f, 0), body.getWorldCenter(), true);
+			facingRight = true;
+		}
 	}
 	
 	public void moveLeft() {
-    	body.setLinearVelocity(-6f, body.getLinearVelocity().y);
-    	facingRight = false;
+		if(body.getLinearVelocity().x >= moveThresholdLeft) {
+			body.applyLinearImpulse(new Vector2(-1.5f, 0), body.getWorldCenter(), true);
+			facingRight = false;
+		}
 	}
 	
 	public float getStateTimer(){
@@ -565,13 +361,11 @@ public class Player extends Entity {
 	}
 	
 	private void needsFlip(TextureRegion region) {
-		 if((!facingRight) && !region.isFlipX()){
-            region.flip(true, false);
+		 if((!facingRight)){
             facingRight = false;
         }
 
-        else if((facingRight) && region.isFlipX()){
-            region.flip(true, false);
+        else if((facingRight)){
             facingRight = true;
         }	
 	}
@@ -579,23 +373,17 @@ public class Player extends Entity {
 	@Override
 	public void render(SpriteBatch batch) {
 		AtlasRegion atlasRegion = new AtlasRegion(currentRegion);
-		float width = 34; 
-		float height = 36;
 
-		float scaleWidth = (float) atlasRegion.packedWidth / atlasRegion.originalWidth;
-		float scaleHeight = (float) atlasRegion.packedHeight / atlasRegion.originalHeight;
-
-		float drawWidth = width * scaleWidth /16;
-		float drawHeight = height * scaleHeight /16;
-
-		float drawScaleX = 0.5f;
-		float drawScaleY = 0.5f;
-
+		float drawScaleX = (facingRight ? 1 : -1) * 1/22f;
+		float drawScaleY = 1/22f;
 
 		float drawOriginX = 0;
 		float drawOriginY = 0;
+		
+		float offsetX = 0.55f;
+		float offsetY = 0.65f;
 
-		batch.draw(atlasRegion, sprite.getX()-0.5f, sprite.getY()-0.65f, drawOriginX, drawOriginY, drawWidth, drawHeight, drawScaleX, drawScaleY, 0);
+		batch.draw(atlasRegion ,sprite.getX() + (facingRight ? -offsetX : offsetX) , sprite.getY() - offsetY , drawOriginX, drawOriginY , atlasRegion.getRegionWidth(), atlasRegion.getRegionHeight(), drawScaleX, drawScaleY, 0);
 	}
 
 	@Override
@@ -623,5 +411,80 @@ public class Player extends Entity {
 		abilities.clear();
 		abilities.add(new FireballAbility());
 		coinCount = 0;
+	}
+	
+	private void setAnimations() {
+		atlas = new TextureAtlas(Gdx.files.internal("aerosprites\\movement_casting_v2.atlas"));
+		atlasAttacks = new TextureAtlas(Gdx.files.internal("aerosprites\\aero_attacks.atlas"));
+		Array<TextureRegion> framesIdle = new Array<TextureRegion>();
+		Array<TextureRegion> framesRun = new Array<TextureRegion>();
+		Array<TextureRegion> framesCast = new Array<TextureRegion>();
+		
+		playerJump = new TextureRegion(atlas.findRegion("jump"), 46, 0, 20, 24);
+		playerFall = new TextureRegion(atlas.findRegion("jump"), 69, 0, 20, 24);
+
+		for(int i = 0; i < 6; i++) {
+			switch(i) {
+				case 0:
+					framesIdle.add(new TextureRegion(atlas.findRegion("idle_sword"), i * 27, 0, 23, 27 ));
+					framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 28 ));
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29, 0, 21, 26 ));
+					framesAttack1.add(new TextureRegion(atlasAttacks.findRegion("groundattack1"), i * 36, 0, 27, 22 ));
+					break;
+				case 1:
+					framesIdle.add(new TextureRegion(atlas.findRegion("idle_sword"), i * 27, 0, 23, 27 ));
+					framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 27 ));
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29, 0, 18, 25 ));
+					framesAttack1.add(new TextureRegion(atlasAttacks.findRegion("groundattack1"), i * 36, 0, 25, 20 ));
+					framesAttack2.add(new TextureRegion(atlasAttacks.findRegion("groundattack2"), i * 39, 0, 18, 27 ));
+					framesAttack3.add(new TextureRegion(atlasAttacks.findRegion("groundattack3"), i * 50, 0, 20, 26 ));
+					break;
+				case 2:
+					framesIdle.add(new TextureRegion(atlas.findRegion("idle_sword"), i * 27, 0, 25, 28 ));
+					framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 25 ));
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29, 0, 17, 25 ));
+					framesAttack1.add(new TextureRegion(atlasAttacks.findRegion("groundattack1"), i * 36, 0, 34, 36 ));	
+					framesAttack2.add(new TextureRegion(atlasAttacks.findRegion("groundattack2"), i * 39, 0, 20, 27 ));
+					framesAttack3.add(new TextureRegion(atlasAttacks.findRegion("groundattack3"), i * 50, 0, 48, 23 ));
+					break;
+				case 3:
+					framesIdle.add(new TextureRegion(atlas.findRegion("idle_sword"), i * 27, 0, 25, 28 ));
+					framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 23, 28 ));
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29, 0, 27, 24 ));
+					framesAttack1.add(new TextureRegion(atlasAttacks.findRegion("groundattack1"), i * 36, 0, 27, 36 ));
+					framesAttack2.add(new TextureRegion(atlasAttacks.findRegion("groundattack2"), i * 39, 0, 37, 29 ));
+					framesAttack3.add(new TextureRegion(atlasAttacks.findRegion("groundattack3"), i * 50, 0, 31, 19 ));
+					break;
+				case 4:
+					framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 27 ));
+					framesCast.add(new TextureRegion(atlas.findRegion("cast"), i * 29 - 29, 0, 27, 24 ));
+					framesAttack1.add(new TextureRegion(atlasAttacks.findRegion("groundattack1"), i * 36, 0, 19, 32 ));
+					framesAttack1.add(new TextureRegion(atlasAttacks.findRegion("groundattack1"), i * 36, 0, 19, 32 ));
+					framesAttack2.add(new TextureRegion(atlasAttacks.findRegion("groundattack2"), i * 39, 0, 32, 21 ));	
+					framesAttack3.add(new TextureRegion(atlasAttacks.findRegion("groundattack3"), i * 50, 0, 34, 20 ));
+					break;
+				case 5:
+					framesRun.add(new TextureRegion(atlas.findRegion("run"), i * 25, 0, 20, 25 ));
+					framesAttack2.add(new TextureRegion(atlasAttacks.findRegion("groundattack2"), i * 39, 0, 31, 22 ));
+					framesAttack2.add(new TextureRegion(atlasAttacks.findRegion("groundattack2"), i * 39, 0, 31, 22 ));
+					framesAttack3.add(new TextureRegion(atlasAttacks.findRegion("groundattack3"), i * 50, 0, 34, 20 ));
+					framesAttack3.add(new TextureRegion(atlasAttacks.findRegion("groundattack3"), i * 50, 0, 34, 20 ));
+					break;
+			}
+			
+		}
+		
+		playerIdleAnim = new Animation<TextureRegion>(0.1f, framesIdle);
+		framesIdle.clear();
+		playerRunAnim = new Animation<TextureRegion>(0.1f, framesRun);
+		framesRun.clear();
+		playerCastAnim = new Animation<TextureRegion>(0.1f, framesCast);	
+		framesCast.clear();
+		playerAttackAnim1 = new Animation<TextureRegion>(0.05f,framesAttack1);
+		currentAttackAnim = playerAttackAnim1;
+		playerAttackAnim2 = new Animation<TextureRegion>(0.05f,framesAttack2);
+		playerAttackAnim3 = new Animation<TextureRegion>(0.05f,framesAttack3);
+		
+		
 	}
 }

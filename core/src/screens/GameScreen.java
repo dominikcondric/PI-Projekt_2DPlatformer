@@ -53,10 +53,8 @@ public class GameScreen implements Screen {
 		
 		Scene castleScene = new CastleScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(castleScene, "Castle", true);
-		
 		Scene introScene = new CastleInDistanceScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(introScene, "Intro", true);
-		
 		introScene.addTrigger(new OutOfMapTrigger(castleScene, player, new Vector2(19.f, 19.f), true));
 		introScene.addEntity(player);
 	}

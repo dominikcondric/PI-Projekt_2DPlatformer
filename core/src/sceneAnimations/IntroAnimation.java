@@ -1,5 +1,9 @@
 package sceneAnimations;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector2;
+
 import entities.Player;
 
 public class IntroAnimation extends SceneAnimation {
@@ -27,6 +31,11 @@ public class IntroAnimation extends SceneAnimation {
 			}
 		} else {
 			player.moveRight();
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
+			thinkingDuration = 0.9f;
+			messageCounter = 1;
+			
 		}
 	}
 }
