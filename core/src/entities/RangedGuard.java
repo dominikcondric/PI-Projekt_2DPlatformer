@@ -1,6 +1,7 @@
 package entities;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -32,6 +33,7 @@ public class RangedGuard extends Enemy {
 	TextureAtlas atlasShoot;
 	Array<TextureRegion> runFrames = new Array<TextureRegion>();
 	Array<TextureRegion> shootFrames = new Array<TextureRegion>();
+	private Sound arrowShoot = Gdx.audio.newSound(Gdx.files.internal("sounds/arrow.wav"));
 
 	public RangedGuard(Vector2 position) {
 		super(position);		
@@ -211,6 +213,7 @@ public class RangedGuard extends Enemy {
 
 
 	private void shoot(Scene scene) {
+		arrowShoot.play();
 		scene.addEntity(new Arrow(this.getPosition(), this.getFacingDirection(), 0));
 		hasAttacked = true;
 
@@ -277,6 +280,7 @@ public class RangedGuard extends Enemy {
 				stopAI();
 			}
 		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
+			hit.play(0.5f);
 			Player player = (Player)other.getUserData();
 			onHit(player.facingRight, player.getSwordDmg());
 		} else if (!self.isSensor() && other.getUserData() instanceof Fireball) {

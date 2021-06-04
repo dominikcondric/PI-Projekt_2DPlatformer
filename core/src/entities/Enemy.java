@@ -1,6 +1,8 @@
 package entities;
 
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -33,6 +35,8 @@ public abstract class Enemy extends Entity {
 	//
 	protected Array<TextureRegion> idleFrames = new Array<TextureRegion>();
 	protected TextureAtlas atlas;
+	
+	protected Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/sword_hit3.wav"));
 
 	public Enemy(Vector2 position) {
 		super(position);
@@ -94,12 +98,12 @@ public abstract class Enemy extends Entity {
 	}
 
 	public void moveLeft() {
-		body.setLinearVelocity(-moveSpeed, body.getLinearVelocity().y);
+		body.applyLinearImpulse(new Vector2(-moveSpeed, 0), body.getWorldCenter(), true);
     	body.setLinearDamping(20);
 	}
 
 	public void moveRight() {
-		body.setLinearVelocity(moveSpeed, body.getLinearVelocity().y);
+		body.applyLinearImpulse(new Vector2(moveSpeed, 0), body.getWorldCenter(), true);
     	body.setLinearDamping(20);
 	}
 

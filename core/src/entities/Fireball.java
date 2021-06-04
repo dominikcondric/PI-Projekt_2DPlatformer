@@ -1,6 +1,7 @@
 package entities;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,7 +21,7 @@ public class Fireball extends Entity {
 	private Animation<TextureRegion> explosionAnim;
 	private float stateTimer;
 	private TextureAtlas atlas;
-	private Fixture explosion;
+	private Fixture explosionSensor;
 	private Fixture fireballBody;
 	private FixtureDef fdef;
 	private float hitDmg;
@@ -31,7 +32,7 @@ public class Fireball extends Entity {
 	private enum State { FLYING, EXPLODING};
 	private State currentState;
 	private State previousState;
-	
+	Sound explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/fireball.wav"));
 	public Fireball(Vector2 entityPosition, boolean firedRight, float hitDmg, float explosionDmg) {
 		super(entityPosition);
 		
@@ -89,13 +90,15 @@ public class Fireball extends Entity {
 			body.setLinearVelocity(0, 0);
 			body.destroyFixture(fireballBody);
 			PolygonShape polShape = new PolygonShape();
-			polShape.setAsBox(sprite.getWidth() /2.5f , sprite.getHeight() /2.5f);
+			polShape.setAsBox(2, 2);
 			fdef.shape = polShape;
 			fdef.isSensor = true;
-			explosion = this.body.createFixture(fdef);
-			explosion.setUserData(this);
+			explosionSensor = this.body.createFixture(fdef);
+			explosionSensor.setUserData(this);
 			exploded = true;
 			setToExplode = false;
+			explosionSound.play(0.5f);
+			body.destroyFixture(explosionSensor);
 		}
 		if(exploded) {
 			

@@ -24,6 +24,9 @@ public class Slime extends Enemy {
 	protected boolean drawleftright=true;
 	private Sound slimeMove = Gdx.audio.newSound(Gdx.files.internal("sounds/slime_jump.wav"));
 
+	private final int ON_GROUND = 0;
+	private float jumpTimer = 2;
+
 	public Slime(Vector2 position) {
 		super(position);		
 		setAnimations();
@@ -68,7 +71,7 @@ public class Slime extends Enemy {
 	@Override
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
-		
+		jumpTimer -= deltaTime;
 		if (this.activeAI) {
 			this.move(this.getDirection(scene.getPlayer()));
 		}
@@ -140,8 +143,10 @@ public class Slime extends Enemy {
 			moveRight();
 			this.facingRight=true;
 		}
-		if(direction>=2 && this.body.getLinearVelocity().y==0) {
+		if(direction>=2 && this.body.getLinearVelocity().y==0 && jumpTimer < 0) {
+			slimeMove.play(0.5f);
 			jump();
+			jumpTimer = 2;
 		}		
 	}
 
@@ -172,6 +177,7 @@ public class Slime extends Enemy {
 				stopAI();
 			}
 		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
+			hit.play(0.5f);
 			Player player = (Player)other.getUserData();
 			onHit(player.facingRight, player.getSwordDmg());
 		} else if (!self.isSensor() && other.getUserData() instanceof Fireball) {
