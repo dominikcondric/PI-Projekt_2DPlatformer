@@ -218,7 +218,7 @@ public class Hud implements Disposable {
 		shapeRenderer.end();
 	}
 	
-	public void render(final Scene scene, boolean gamePaused) {
+	public void render(final Scene scene, boolean gamePaused, boolean sceneInTransition) {
 		update(scene, gamePaused);
 		
 		if (gamePaused)

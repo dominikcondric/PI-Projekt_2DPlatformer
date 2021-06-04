@@ -3,7 +3,6 @@ package screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -16,11 +15,8 @@ import com.platformer.Platformer;
 import entities.Player;
 import scenes.CastleInDistanceScene;
 import scenes.CastleScene;
-import scenes.CaveScene;
-import scenes.ForestScene;
 import scenes.OutOfMapTrigger;
 import scenes.Scene;
-import scenes.SnowScene;
 import screens.GameOverScreen.ScreenType;
 import utility.Hud;
 import utility.SceneManager;
@@ -49,7 +45,6 @@ public class GameScreen implements Screen {
 		sceneManager = new SceneManager();
 		player = new Player(new Vector2(2.f, 39.f));
 		inGameHud = new Hud(player, game.batch, game.font);
-		
 		
 		Scene castleScene = new CastleScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(castleScene, "Castle", true);
@@ -88,7 +83,7 @@ public class GameScreen implements Screen {
 		}
 		
 		camera.update();
-		sceneManager.update();
+		sceneManager.update(deltaTime);
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 			paused = !paused;
@@ -115,11 +110,11 @@ public class GameScreen implements Screen {
 	
 	@Override
 	public void render (float delta) {
-		ScreenUtils.clear(Color.SKY);
+		ScreenUtils.clear(Color.BLACK);
 		Scene activeScene = sceneManager.getActiveScene();
 		game.batch.setProjectionMatrix(camera.combined);
 		
-		if (!paused) {
+		if (!paused && !sceneManager.isTransitionTriggered()) {
 			activeScene.update(delta);
 		}
 		
@@ -127,8 +122,8 @@ public class GameScreen implements Screen {
 		if (debug) {
 			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
 		}
-		
-		inGameHud.render(activeScene, paused);
+			
+		inGameHud.render(activeScene, paused, sceneManager.isTransitionTriggered());
 		update(delta);
 	}
 	

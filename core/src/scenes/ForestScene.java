@@ -1,10 +1,6 @@
 package scenes;
 
-
-import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
@@ -17,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import box2dLight.PointLight;
 import entities.Chest;
 import entities.FireballItem;
 import entities.Key;
@@ -26,7 +21,7 @@ import entities.RangedGuard;
 import entities.Slime;
 
 public class ForestScene extends Scene {
-	private ArrayList<PointLight> lights;
+//	private ArrayList<PointLight> lights;
 	
 	public ForestScene(TmxMapLoader mapLoader, SpriteBatch batch) {	
 		super(mapLoader, "Forest/forest.tmx", batch);

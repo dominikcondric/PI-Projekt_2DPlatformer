@@ -3,7 +3,6 @@ package scenes;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
@@ -19,8 +18,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import box2dLight.PointLight;
 import entities.Chest;
-import entities.Enemy;
-import entities.Entity;
 import entities.Coin;
 import entities.FireballItem;
 import entities.Player;
@@ -154,7 +151,7 @@ public class CastleScene extends Scene {
 
 	@Override
 	protected void placePlayerOnScene(Player player) {
-		player.setPosition(new Vector2(2.f, 10.f));
+		player.setPosition(new Vector2(2.f, 9.f));
 		
 	}
 	

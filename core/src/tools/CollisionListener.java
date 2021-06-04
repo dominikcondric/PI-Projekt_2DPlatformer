@@ -9,11 +9,8 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import entities.Chest;
 import entities.Enemy;
 import entities.Entity;
-import entities.Slime;
 
 public class CollisionListener implements ContactListener {
-	
-	
 	@Override
 	public void beginContact(Contact contact) {
 		Fixture A = contact.getFixtureA();
@@ -26,7 +23,6 @@ public class CollisionListener implements ContactListener {
 		if (B.getUserData() instanceof Entity) {
 			((Entity)B.getUserData()).resolveCollisionBegin(B, A);
 		}
-		
 	}
 
 	@Override

@@ -1,18 +1,11 @@
 package entities;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 
-
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
@@ -22,20 +15,14 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
 
 public class Slime extends Enemy {
-	
-
 	protected Fixture left;
 	protected Fixture right;
 	protected boolean drawleftright=true;
-	private boolean isMovingPlaying = false;
 	private Sound slimeMove = Gdx.audio.newSound(Gdx.files.internal("sounds/slime_jump.wav"));
-	private final int ON_GROUND = 0;
-
 
 	public Slime(Vector2 position) {
 		super(position);		

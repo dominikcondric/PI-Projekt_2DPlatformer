@@ -78,16 +78,12 @@ public class Player extends Entity {
 
 	public Player(Vector2 position) {
 		super(position);
-		
 		abilities = new ArrayList<Ability>(2);
 		abilities.add(new FireballAbility());
 		items = new ArrayList<Item>(1);
 		swordDmg = 1;
 		setAnimations();
-	
 	}
-	
-	
 
 	public void addToWorld(World world) {
 		BodyDef bodyDefinition = new BodyDef();
@@ -125,7 +121,6 @@ public class Player extends Entity {
 		topShape.dispose();
 		leftShape.dispose();
 		rightShape.dispose();
-		
 	}
 	
 	@Override
