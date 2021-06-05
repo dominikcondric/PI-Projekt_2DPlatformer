@@ -166,7 +166,7 @@ public class Player extends Entity {
 			}
 		}
 		
-		if(playerVelocity.y == ON_GROUND && (currentState != State.JUMPING && currentState != State.FALLING)){
+		if(playerVelocity.y == ON_GROUND){
         	jumpCount = 0;
         	moveThresholdLeft = -6;
         	moveThresholdRight = 6;
@@ -181,10 +181,12 @@ public class Player extends Entity {
         }
 		
 		if (controllable) {
-			if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && (playerVelocity.y == ON_GROUND || jumpCount < 2)) {
-				jumpCount++;
-				jump.play();
-				jump();
+			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+				if(((currentState == State.FALLING || currentState == State.JUMPING) && jumpCount == 1) || (playerVelocity.y == ON_GROUND && jumpCount < 2)) {
+					jumpCount++;
+					jump.play();
+					jump();
+				}
 			}
 			if(Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT)) {
 				dash();

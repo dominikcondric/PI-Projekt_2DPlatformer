@@ -1,6 +1,7 @@
 package entities;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,7 +21,7 @@ public class RangedGuard extends Enemy {
 	protected Fixture leftFixture;
 	protected Fixture rightFixture;
 	private boolean drawLeftRight = true;
-	private boolean previousRight = false;
+//	private boolean previousRight = false;
 	private boolean playerWasInVision;
 	private Animation<TextureRegion> runAnim;
 	private Animation<TextureRegion> shootAnim;
@@ -32,6 +33,7 @@ public class RangedGuard extends Enemy {
 	TextureAtlas atlasShoot;
 	Array<TextureRegion> runFrames = new Array<TextureRegion>();
 	Array<TextureRegion> shootFrames = new Array<TextureRegion>();
+	private Sound arrowShoot = Gdx.audio.newSound(Gdx.files.internal("sounds/arrow.wav"));
 
 	public RangedGuard(Vector2 position) {
 		super(position);		
@@ -208,10 +210,9 @@ public class RangedGuard extends Enemy {
 	        }	
 	}
 
-
-
 	private void shoot(Scene scene) {
 		scene.addEntity(new Arrow(getPosition(), getFacingDirection(), 0));
+		arrowShoot.play();
 		hasAttacked = true;
 }
 
@@ -272,12 +273,12 @@ public class RangedGuard extends Enemy {
 				facingRight = true;
 			}
 			
-			previousRight = facingRight;
 			if (((Player)other.getUserData()).getHp() <= 0) {
 				stopAI();
 			}
 			
 		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 && ((Player)other.getUserData()).hasAttacked()) {
+			hit.play(0.5f);
 			Player player = (Player)other.getUserData();
 			onHit(player.facingRight, player.getSwordDmg());
 		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.FIREBALL_BIT) != 0) {

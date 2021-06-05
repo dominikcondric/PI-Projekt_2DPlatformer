@@ -25,6 +25,9 @@ public class Slime extends Enemy {
 	private boolean drawLeftRight=true;
 	private Sound slimeMove = Gdx.audio.newSound(Gdx.files.internal("sounds/slime_jump.wav"));
 
+//	private final int ON_GROUND = 0;
+	private float jumpTimer = 2;
+
 	public Slime(Vector2 position) {
 		super(position);		
 		setAnimations();
@@ -72,6 +75,11 @@ public class Slime extends Enemy {
 	@Override
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
+		if (activeAI) {
+			move(getDirection(scene.getPlayer()));
+		}
+			
+		jumpTimer -= deltaTime;
 		
 		if (activeAI) {
 			move(getDirection(scene.getPlayer()));
@@ -84,7 +92,7 @@ public class Slime extends Enemy {
         }
         
         
-		if(activeAI && drawLeftRight){
+		if (activeAI && drawLeftRight) {
 			contactsRight = 0;
 			contactsLeft = 0;
 			
@@ -94,7 +102,7 @@ public class Slime extends Enemy {
 			dropcheck.set(new Vector2(1f,-1.15f), new Vector2(1f,-2.5f));
 			
 			fdef.shape = dropcheck;
-			fdef.isSensor=true;
+			fdef.isSensor = true;
 			fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.RIGHT_ENEMY_SENSOR_BIT;
 			fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
 			leftFixture = (Fixture) body.createFixture(fdef);
@@ -122,29 +130,27 @@ public class Slime extends Enemy {
 		}
 		
 		if(!facingRight && contactsRight <= 0 && activeAI && !playerInVision) {
-				activeAI=false;			
-		}
-		
-		else if(facingRight && contactsLeft<=0 && activeAI && !playerInVision) {
+			activeAI=false;			
+		} else if (facingRight && contactsLeft <= 0 && activeAI && !playerInVision) {
 			activeAI=false;
 		}
 	}
-
-
 
 	@Override
 	public void move(int direction) {
 		this.direction = direction;
 		if (direction == -1 || direction == 2 && body.getLinearVelocity().y >= 0 && contactsRight != 0) {
 			moveLeft();
-			facingRight=false;
+			facingRight = false;
 		} else if (direction == 1 || direction == 4 && body.getLinearVelocity().y >= 0 && contactsLeft != 0){
 			moveRight();
-			facingRight=true;
+			facingRight = true;
 		}
 		
-		if(direction>=2 && body.getLinearVelocity().y==0) {
+		if(direction >= 2 && body.getLinearVelocity().y == 0 && jumpTimer < 0) {
+			slimeMove.play(0.5f);
 			jump();
+			jumpTimer = 2;
 		}		
 	}
 
@@ -179,6 +185,7 @@ public class Slime extends Enemy {
 				stopAI();
 			}
 		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 && ((Player)other.getUserData()).hasAttacked()) {
+			hit.play(0.5f);
 			Player player = (Player)other.getUserData();
 			onHit(player.facingRight, player.getSwordDmg());
 		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.FIREBALL_BIT) != 0) {
