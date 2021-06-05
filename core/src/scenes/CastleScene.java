@@ -41,7 +41,7 @@ public class CastleScene extends Scene {
 		FixtureDef fixtureDef = null;
 		Body body = null;
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
-		for (MapObject object : map.getLayers().get(0).getObjects().getByType(RectangleMapObject.class)) {
+		for (MapObject object : map.getLayers().get("Wall Object").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			bodyDef = new BodyDef();
@@ -59,6 +59,25 @@ public class CastleScene extends Scene {
 			body.createFixture(fixtureDef);
 			shape.dispose();
 		}
+		for (MapObject object : map.getLayers().get("Platform Object").getObjects().getByType(RectangleMapObject.class)) {
+			Rectangle rect = ((RectangleMapObject)object).getRectangle();
+			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
+			bodyDef = new BodyDef();
+			bodyDef.type = BodyDef.BodyType.StaticBody;
+			bodyDef.position.set(rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			
+			body = box2DWorld.createBody(bodyDef);
+			shape = new PolygonShape();
+			shape.setAsBox(rect.getWidth() / 2f, rect.getHeight() / 2f);
+			fixtureDef = new FixtureDef();
+			fixtureDef.shape = shape;
+			fixtureDef.friction = 1.f;
+			fixtureDef.filter.categoryBits=3;
+
+			body.createFixture(fixtureDef);
+			shape.dispose();
+		}
+		
 	}
 
 	@Override
@@ -83,7 +102,7 @@ public class CastleScene extends Scene {
 		//addEntity(new RangedGuard(new Vector2(50.f, 12.f)));
 
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
-		for(MapObject object : map.getLayers().get(1).getObjects().getByType(RectangleMapObject.class)) {
+		for(MapObject object : map.getLayers().get("Lights Torch").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.GOLD);
@@ -93,7 +112,7 @@ public class CastleScene extends Scene {
 			lights.add(light);
 		}
 		//WINDOWS
-		for(MapObject object : map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)) {
+		for(MapObject object : map.getLayers().get("Lights Windows").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.PURPLE);
@@ -103,7 +122,7 @@ public class CastleScene extends Scene {
 			lights.add(light);
 		}
 		//BIG WINDOWS
-		for(MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)) {
+		for(MapObject object : map.getLayers().get("Lights Windows Big").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.PURPLE);
@@ -113,17 +132,17 @@ public class CastleScene extends Scene {
 			lights.add(light);
 		}
 		//CHANDELIER
-		for(MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
+		for(MapObject object : map.getLayers().get("Lights Chandelier").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.GOLD);
-			c.a *= 0.50;
+			c.a *= 0.40;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
 			
 			lights.add(light);
 		}
 		//SKY WEAK
-		for(MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
+		for(MapObject object : map.getLayers().get("Lights Sky Weak").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.WHITE);
@@ -133,7 +152,7 @@ public class CastleScene extends Scene {
 			lights.add(light);
 		}
 		//SKY STRONG
-		for(MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
+		for(MapObject object : map.getLayers().get("Lights Sky Strong").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.WHITE);
@@ -155,7 +174,7 @@ public class CastleScene extends Scene {
 	@Override
 	protected void placePlayerOnScene(Player player) {
 		player.setPosition(new Vector2(2.f, 10.f));
-		
+		//player.setPosition(new Vector2(150.f, 20.f)); //Boss room
 	}
 	
 	@Override
