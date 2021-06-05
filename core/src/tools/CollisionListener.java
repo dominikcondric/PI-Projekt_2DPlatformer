@@ -11,6 +11,20 @@ import entities.Enemy;
 import entities.Entity;
 
 public class CollisionListener implements ContactListener {
+	public static final int PLAYER_BIT = (1 << 0);
+	public static final int ENEMY_BIT = (1 << 1);
+	public static final int SOLID_WALL_BIT = (1 << 2);
+	public static final int PLATFORM_BIT = (1 << 3);
+	public static final int PROJECTILE_BIT = (1 << 4);
+	public static final int LIGHT_BIT = (1 << 5);
+	public static final int INTERACTABLE_BIT = (1 << 6);
+	public static final int OTHERS_BIT = (1 << 7);
+	public static final int FIREBALL_BIT = (1 << 8);
+	public static final int LEFT_ENEMY_SENSOR_BIT = (1 << 9);
+	public static final int RIGHT_ENEMY_SENSOR_BIT = (1 << 10);
+	public static final int COIN_BIT = (1 << 11);
+	
+	
 	@Override
 	public void beginContact(Contact contact) {
 		Fixture A = contact.getFixtureA();
@@ -30,19 +44,11 @@ public class CollisionListener implements ContactListener {
 		Fixture A = contact.getFixtureA();
 		Fixture B = contact.getFixtureB();
 		
-		if (A.getUserData() instanceof Chest) {
-			((Entity)A.getUserData()).resolveCollisionEnd(A, B);
-			}
-		
-		if (B.getUserData() instanceof Chest) {
-			((Entity)A.getUserData()).resolveCollisionEnd(B, A);
-		}
-		
-		if(A.getUserData() instanceof Enemy) {
+		if ((A.getFilterData().categoryBits & ENEMY_BIT) != 0 || (A.getFilterData().categoryBits & INTERACTABLE_BIT) != 0) {
 			((Entity)A.getUserData()).resolveCollisionEnd(A, B);
 		}
 		
-		if(B.getUserData() instanceof Enemy) {
+		if ((B.getFilterData().categoryBits & ENEMY_BIT) != 0 || (B.getFilterData().categoryBits & INTERACTABLE_BIT) != 0) {
 			((Entity)B.getUserData()).resolveCollisionEnd(B, A);
 		}
 	}

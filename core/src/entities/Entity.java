@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
+import box2dLight.Light;
 import scenes.Scene;
 
 public abstract class Entity {
@@ -24,6 +25,10 @@ public abstract class Entity {
 	}
 	
 	public abstract void addToWorld(World world);
+	
+	public void attachLightToBody(Light light) {
+		light.attachToBody(body);
+	}
 	
 	public void reset(World world) {
 		active = true;

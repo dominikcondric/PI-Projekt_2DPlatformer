@@ -19,17 +19,17 @@ public abstract class Enemy extends Entity {
 	protected int hp = 5;
 	protected int maxHp = 5;
 
-	protected float visionHeight=3f;
-	protected float visionLength=4f;
-	protected float jumpHeight=11f;
-	protected float moveSpeed=0.6f;
+	protected float visionHeight = 3f;
+	protected float visionLength = 4f;
+	protected float jumpHeight = 11f;
+	protected float moveSpeed = .6f;
 	protected int direction;
 	protected boolean activeAI = false;
 	protected boolean shouldBeStopped = false;
 	//
-	protected float contactsleft=0;
-	protected float contactsright=0;
-	protected boolean playerInVision=false;
+	protected float contactsLeft = 0;
+	protected float contactsRight = 0;
+	protected boolean playerInVision = false;
 	//
 	protected Array<TextureRegion> idleFrames = new Array<TextureRegion>();
 	protected TextureAtlas atlas;

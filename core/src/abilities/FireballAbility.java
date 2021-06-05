@@ -9,7 +9,6 @@ import entities.Fireball;
 import scenes.Scene;
 
 public class FireballAbility extends Ability {
-
 	public FireballAbility() {
 		super(10f);
 		sound = Gdx.audio.newSound(Gdx.files.internal("sounds/fireball.wav"));

@@ -33,6 +33,7 @@ public abstract class Scene {
 	protected float visibleMapScale = 4.f;
 	protected Color ambientLight = Color.BLACK;
 	protected Music music;
+	protected Color batchTintColor;
 	
 	public Scene(final TmxMapLoader mapLoader, String mapFilePath, final SpriteBatch batch) {
 		this.map = mapLoader.load(mapFilePath);
@@ -41,6 +42,7 @@ public abstract class Scene {
 		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
 		box2DWorld.setContactListener(new CollisionListener());
 		rayHandler = new RayHandler(box2DWorld);
+		batchTintColor = new Color(0.5f, 0.5f, 0.5f, 1.f);
 		
 		entities = new ArrayList<Entity>(5);
 		triggers = new ArrayList<SceneTrigger>(2);
@@ -65,6 +67,10 @@ public abstract class Scene {
 	
 	public ArrayList<SceneTrigger> getTriggers() {
 		return triggers;
+	}
+	
+	public RayHandler getRayHandler() {
+		return rayHandler;
 	}
 	
 	public void resetPlayer() {
@@ -118,7 +124,9 @@ public abstract class Scene {
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera) {
 		mapRenderer.setView(camera);
+		mapRenderer.getBatch().setColor(batchTintColor);
 		mapRenderer.render();
+		batch.setColor(batchTintColor);
 		rayHandler.setCombinedMatrix(camera);
 		rayHandler.setAmbientLight(ambientLight);
 		batch.begin();
@@ -162,6 +170,7 @@ public abstract class Scene {
 		box2DWorld.dispose();
 		map.dispose();
 		music.stop();
+		rayHandler.dispose();
 	}
 	
 	public void playMusic() {

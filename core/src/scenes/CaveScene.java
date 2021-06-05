@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Player;
 import entities.Slime;
+import tools.CollisionListener;
 
 public class CaveScene extends Scene {
 
@@ -38,6 +39,8 @@ public class CaveScene extends Scene {
 			shape = new PolygonShape();
 			shape.setAsBox(rect.getWidth() / 2f, rect.getHeight() / 2f);
 			fixtureDef = new FixtureDef();
+			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
+			fixtureDef.filter.maskBits = 0xFF;
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1f;
 			

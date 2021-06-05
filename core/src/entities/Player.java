@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.Array;
 import abilities.Ability;
 import abilities.FireballAbility;
 import scenes.Scene;
+import tools.CollisionListener;
 
 public class Player extends Entity {
 	private int hp = 50; 
@@ -97,30 +98,39 @@ public class Player extends Entity {
 		bottomShape.set(body.getLocalCenter().x - 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f, body.getLocalCenter().x + 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f);
 		fdef.shape = bottomShape;
 		fdef.friction = 2f;
+		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		EdgeShape leftShape = new EdgeShape();
 		leftShape.set(body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y - 1.23f / 2.f, body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
 		fdef.shape = leftShape;
 		fdef.friction = 0;
+		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		EdgeShape rightShape = new EdgeShape();
 		rightShape.set(body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y - 1.23f / 2.f, body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
 		fdef.shape = rightShape;
 		fdef.friction = 0;
+		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		EdgeShape topShape = new EdgeShape();
 		topShape.set(body.getLocalCenter().x - 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f, body.getLocalCenter().x + 0.78f/2f, body.getLocalCenter().y + 1.25f / 2.f);
 		fdef.shape = topShape;
 		fdef.friction = 0;
+		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		bottomShape.dispose();
 		topShape.dispose();
 		leftShape.dispose();
 		rightShape.dispose();
+		
 	}
 	
 	@Override
@@ -136,6 +146,10 @@ public class Player extends Entity {
 			abilities.get(0).cast(scene, this);
 		}
 		
+		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+			abilities.get(1).cast(scene, this);
+		}
+		
 		currentRegion = getFrame(deltaTime);
 		
 	     if(previousState == State.FALLING && currentState == State.STANDING) 
@@ -146,8 +160,11 @@ public class Player extends Entity {
 			isFootstepPlaying = true;
 		}
 		
-		for (Ability ability : abilities)
-			ability.update(deltaTime);
+		for (Ability ability : abilities) {
+			if (ability.active) {
+				ability.update(deltaTime);
+			}
+		}
 		
 		if(playerVelocity.y == ON_GROUND && (currentState != State.JUMPING && currentState != State.FALLING)){
         	jumpCount = 0;
@@ -201,7 +218,6 @@ public class Player extends Entity {
 
 	private void dash() {
 		body.applyLinearImpulse(new Vector2(facingRight ? 10f : -10f, 0), body.getWorldCenter(), true);
-		
 	}
 
 	private void meleeAttack() {
@@ -383,9 +399,9 @@ public class Player extends Entity {
 
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
-		if(other.getUserData() instanceof Enemy && !other.isSensor() && !hasAttacked) {
+		if((other.getFilterData().categoryBits & CollisionListener.ENEMY_BIT) != 0 && !other.isSensor() && !hasAttacked) {
 			onHit(((Enemy) other.getUserData()).getPosition().x);
-		} else if (other.getUserData() instanceof Coin && ((Coin)other.getUserData()).isActive()) {
+		} else if ((other.getFilterData().categoryBits & CollisionListener.COIN_BIT) != 0 && ((Coin)other.getUserData()).isActive()) {
 			++coinCount;
 		}
 	}

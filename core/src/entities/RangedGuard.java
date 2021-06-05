@@ -14,14 +14,14 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
+import tools.CollisionListener;
 
 public class RangedGuard extends Enemy {
-	
-	protected Fixture left;
-	protected Fixture right;
-	protected boolean drawleftright=true;
-	protected boolean previousRight=false;
-	protected boolean playerWasInVision;
+	protected Fixture leftFixture;
+	protected Fixture rightFixture;
+	private boolean drawLeftRight = true;
+	private boolean previousRight = false;
+	private boolean playerWasInVision;
 	private Animation<TextureRegion> runAnim;
 	private Animation<TextureRegion> shootAnim;
 	private enum State {RUNNING, SHOOTING, STANDING};
@@ -40,53 +40,57 @@ public class RangedGuard extends Enemy {
 		sprite.setSize(0.9f, 0.9f);
 		sprite.setScale(2f, 2f);
 
-		activeAI=true;
-		facingRight=false;
-		moveSpeed=0.3f;
-		jumpHeight=11f;
+		activeAI = true;
+		facingRight = false;
+		moveSpeed = 0.3f;
+		jumpHeight = 11f;
 	}
-	
-	
 
 	public void addToWorld(World world) {
 		BodyDef bodyDefinition = new BodyDef();
 		bodyDefinition.position.set(sprite.getX() + sprite.getWidth() / 2.f, sprite.getY() + sprite.getHeight() / 2.f);
-		
-		
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
-		this.body = world.createBody(bodyDefinition);
+		body = world.createBody(bodyDefinition);
 		
 		PolygonShape polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f, sprite.getHeight() / 2.f);
-		//polShape.setAsBox(sprite.getWidth() / 1.5f, sprite.getHeight() / 1.5f);
 
 		FixtureDef fdef = new FixtureDef();
+		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		fdef.shape = polShape;
 
-		this.body.createFixture(fdef).setUserData(this);
+		body.createFixture(fdef).setUserData(this);
 		
 		PolygonShape vision = new PolygonShape();
 		vision.setAsBox(visionLength, visionHeight, new Vector2(0,visionHeight-(sprite.getHeight()/2)), 0);
 		
 		fdef.shape = vision;
 		fdef.isSensor=true;
-		this.body.createFixture(fdef).setUserData(this);
+		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT | ~CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
+		body.createFixture(fdef).setUserData(this);
 		
 		EdgeShape wallcheck = new EdgeShape();
+		
 		wallcheck.set(new Vector2(1f,0f), new Vector2(1f,1.5f));
-
-		//0x0005 left 0x0006 right
 		fdef.shape = wallcheck;
 		fdef.isSensor=true;
-		fdef.filter.categoryBits = 0x0005;
-		this.body.createFixture(fdef).setUserData(this);
+		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.RIGHT_ENEMY_SENSOR_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT | ~CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
+		body.createFixture(fdef).setUserData(this);
 
 		wallcheck.set(new Vector2(-1f,0f), new Vector2(-1f,1.5f));
 		fdef.shape = wallcheck;
 		fdef.isSensor = true;
-		fdef.filter.categoryBits = 0x0006;
-		this.body.createFixture(fdef).setUserData(this);
+		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.LEFT_ENEMY_SENSOR_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT | ~CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
+		body.createFixture(fdef).setUserData(this);
 		
 		polShape.dispose();
 	}
@@ -95,20 +99,19 @@ public class RangedGuard extends Enemy {
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		
-		if(!this.playerInVision) { 
+		if(!playerInVision) { 
 			activateAI();
 		}
 		hasAttacked = false;
-		if (this.activeAI) {
-			if(this.facingRight)this.move(1);
-			else this.move(0);
+		if (activeAI) {
+			if(facingRight)move(1);
+			else move(0);
 			stopTime=stateTimer+0.5f;
 		}
-		else if(stopTime<=stateTimer) {
+		else if(stopTime<=stateTimer && active) {
 			shoot(scene);
 			stopTime=stateTimer+0.5f;
 		}
-		
 		
         if (body.getLinearVelocity().y < 0)  {
 			body.setLinearDamping(0);
@@ -116,42 +119,39 @@ public class RangedGuard extends Enemy {
             body.setLinearDamping(12);
         }
         
-		if(this.activeAI && drawleftright){
-			this.contactsright=0;
-			this.contactsleft=0;
+		if(activeAI && drawLeftRight) {
+			contactsRight = 0;
+			contactsLeft = 0;
 			
 			FixtureDef fdef=new FixtureDef();;
 
 			EdgeShape dropcheck = new EdgeShape();
 			dropcheck.set(new Vector2(1f,-1.15f), new Vector2(1f,-2.5f));
 			
-			//0x0002 left 0x0004 right/*
-			
 			fdef.shape = dropcheck;
-			fdef.isSensor=true;
+			fdef.isSensor = true;
 			fdef.filter.categoryBits = 0x0002;
-			this.left=(Fixture) this.body.createFixture(fdef);
-			this.left.setUserData(this);
+			leftFixture = (Fixture) body.createFixture(fdef);
+			leftFixture.setUserData(this);
 
 			dropcheck.set(new Vector2(-1f,-1.15f), new Vector2(-1f,-2.5f));
 			fdef.shape = dropcheck;
 			fdef.isSensor = true;
 			fdef.filter.categoryBits = 0x0004;
-			this.right=(Fixture) this.body.createFixture(fdef);
-			this.right.setUserData(this);		
+			rightFixture = (Fixture) body.createFixture(fdef);
+			rightFixture.setUserData(this);		
 			
-			drawleftright=false;
+			drawLeftRight = false;
 			return;
-			}
-		
-		if(!this.activeAI && drawleftright==false) {
-			body.destroyFixture(left);
-			body.destroyFixture(right);
-			this.contactsright=0;
-			this.contactsleft=0;
-			drawleftright=true;
 		}
-
+		
+		if(!activeAI && drawLeftRight == false) {
+			body.destroyFixture(leftFixture);
+			body.destroyFixture(rightFixture);
+			contactsRight = 0;
+			contactsLeft = 0;
+			drawLeftRight=true;
+		}
 	}
 	
 	@Override
@@ -159,7 +159,7 @@ public class RangedGuard extends Enemy {
 		previousState = currentState;
 		TextureRegion region = null;
 		
-		if(currentState == State.SHOOTING && shootAnim.getKeyFrameIndex(stateTimer) != 9) {
+		if (currentState == State.SHOOTING && shootAnim.getKeyFrameIndex(stateTimer) != 9) {
 			region = (TextureRegion) shootAnim.getKeyFrame(stateTimer, true);
 			needsFlip(region);
 			stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
@@ -211,23 +211,22 @@ public class RangedGuard extends Enemy {
 
 
 	private void shoot(Scene scene) {
-		scene.addEntity(new Arrow(this.getPosition(), this.getFacingDirection(), 0));
+		scene.addEntity(new Arrow(getPosition(), getFacingDirection(), 0));
 		hasAttacked = true;
-
-	}
+}
 
 	@Override
 	public void move(int direction) {
 		this.direction = direction;
-		if(this.contactsright==0 && !this.playerWasInVision) this.facingRight=true;
-		else if(this.contactsleft==0  && !this.playerWasInVision) this.facingRight=false;
+		if(contactsRight == 0 && !playerWasInVision) facingRight=true;
+		else if(contactsLeft == 0  && !playerWasInVision) facingRight=false;
 		
 		playerWasInVision=false;
 		
-		if(direction==0 && this.body.getLinearVelocity().y>=0 ) {
+		if(direction==0 && body.getLinearVelocity().y>=0 ) {
 			moveLeft();
 		}
-		else if (direction==1 && this.body.getLinearVelocity().y>=0 ){
+		else if (direction==1 && body.getLinearVelocity().y>=0 ){
 			moveRight();
 		}
 	
@@ -236,13 +235,17 @@ public class RangedGuard extends Enemy {
 	@Override
 	public void resolveCollisionEnd(Fixture self, Fixture other) {
 		if(other.getUserData() instanceof Player && self.isSensor() && self.getFilterData().categoryBits==1) {
-			((Enemy) self.getUserData()).playerInVision=false;
-			((RangedGuard) self.getUserData()).playerWasInVision=true;
+			playerInVision = false;
+			playerWasInVision = true;
 		}
-		if(other.getFilterData().categoryBits!=3 || !((Enemy) self.getUserData()).activeAI)return;
-		if(self.getFilterData().categoryBits == 0x0002) this.contactsleft--;
-		else if(self.getFilterData().categoryBits == 0x0004) this.contactsright--;
-
+		
+		if((other.getFilterData().categoryBits & (CollisionListener.SOLID_WALL_BIT | CollisionListener.PLATFORM_BIT)) != 0 || !activeAI) 
+			return;
+		
+		if ((self.getFilterData().categoryBits & CollisionListener.LEFT_ENEMY_SENSOR_BIT) != 0) 
+			contactsLeft--;
+		else if ((self.getFilterData().categoryBits & CollisionListener.RIGHT_ENEMY_SENSOR_BIT) != 0) 
+			contactsRight--;
 	}
 
 	@Override
@@ -251,43 +254,42 @@ public class RangedGuard extends Enemy {
 
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
-		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).activeAI) {
-			if(self.getFilterData().categoryBits==4)this.contactsright++;
-			else if(self.getFilterData().categoryBits==2) this.contactsleft++;
-			if(self.getFilterData().categoryBits==5) {
-				this.facingRight=false;
-			}
-			else if(self.getFilterData().categoryBits==6) {
-				this.facingRight=true;
-			}
+		if((other.getFilterData().categoryBits & CollisionListener.ENEMY_BIT) != 0 && ((Enemy) self.getUserData()).activeAI) {
+			if ((self.getFilterData().categoryBits & CollisionListener.LEFT_ENEMY_SENSOR_BIT) != 0) 
+				contactsLeft--;
+			else if ((self.getFilterData().categoryBits & CollisionListener.RIGHT_ENEMY_SENSOR_BIT) != 0) 
+				contactsRight--;
 		}
-		if (other.getUserData() instanceof Player && self.isSensor()) {
+		
+		if ((other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 && self.isSensor()) {
 			stopAI();
-			((Enemy) self.getUserData()).playerInVision=true;
-			if(other.getBody().getPosition().x < body.getPosition().x) {
-				this.move(0);
-				this.facingRight=false;
+			playerInVision = true;
+			if (other.getBody().getPosition().x < body.getPosition().x) {
+				move(0);
+				facingRight = false;
+			} else {
+				move(1);
+				facingRight = true;
 			}
-			else {
-				this.move(1);
-				this.facingRight=true;
-			}
-			((RangedGuard) self.getUserData()).previousRight=((RangedGuard) self.getUserData()).facingRight;
+			
+			previousRight = facingRight;
 			if (((Player)other.getUserData()).getHp() <= 0) {
 				stopAI();
 			}
-		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
+			
+		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 && ((Player)other.getUserData()).hasAttacked()) {
 			Player player = (Player)other.getUserData();
 			onHit(player.facingRight, player.getSwordDmg());
-		} else if (!self.isSensor() && other.getUserData() instanceof Fireball) {
+		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.FIREBALL_BIT) != 0) {
 			Fireball fireball = (Fireball)other.getUserData();
 			if(fireball.isSetToExplode()) {
 				onHit(fireball.facingRight, fireball.getExplosionDmg());
-			}else {
+			} else {
 				onHit(fireball.facingRight, fireball.getHitDmg());
 			}
 		}		
 	}		
+	
 	private void setAnimations() {
 		atlas = new TextureAtlas(Gdx.files.internal("archersprites\\archer_idle.atlas"));
 		atlasRun = new TextureAtlas(Gdx.files.internal("archersprites\\archer_run.atlas"));

@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import scenes.Scene;
+import tools.CollisionListener;
 
 public class Chest extends Entity {
 	private Item item;
@@ -42,6 +43,9 @@ public class Chest extends Entity {
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 		fdef.isSensor = true;
+		fdef.filter.categoryBits = CollisionListener.OTHERS_BIT | CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		polShape.dispose();
@@ -65,7 +69,7 @@ public class Chest extends Entity {
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
 		openable = false;
-		if (!opened && other.getUserData() instanceof Player) {
+		if (!opened) {
 			openable = true;
 		}
 	}

@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import scenes.Scene;
+import tools.CollisionListener;
 
 
 public class Arrow extends Entity{
@@ -49,6 +50,8 @@ public class Arrow extends Entity{
 		body.setGravityScale(0);
 		fdef = new FixtureDef();
 		fdef.shape = polShape;
+		fdef.filter.categoryBits = CollisionListener.PROJECTILE_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 	
 		arrowBody = this.body.createFixture(fdef);
 		arrowBody.setUserData(this);

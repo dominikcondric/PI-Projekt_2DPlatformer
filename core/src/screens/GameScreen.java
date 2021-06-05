@@ -12,12 +12,15 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
 
+import box2dLight.Light;
+import box2dLight.PointLight;
 import entities.Player;
 import scenes.CastleInDistanceScene;
 import scenes.CastleScene;
 import scenes.OutOfMapTrigger;
 import scenes.Scene;
 import screens.GameOverScreen.ScreenType;
+import tools.CollisionListener;
 import utility.Hud;
 import utility.SceneManager;
 
@@ -45,6 +48,7 @@ public class GameScreen implements Screen {
 		sceneManager = new SceneManager();
 		player = new Player(new Vector2(2.f, 39.f));
 		inGameHud = new Hud(player, game.batch, game.font);
+		Light.setGlobalContactFilter((short)CollisionListener.LIGHT_BIT, (short)0, (short)(CollisionListener.PLATFORM_BIT | CollisionListener.SOLID_WALL_BIT | CollisionListener.OTHERS_BIT));
 		
 		Scene castleScene = new CastleScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(castleScene, "Castle", true);

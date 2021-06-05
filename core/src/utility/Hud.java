@@ -82,20 +82,22 @@ public class Hud implements Disposable {
 		progressBarColor.dispose();
 		
 		abilityIcons = new ArrayList<Stack>(4);
+		float offset = 60.f;
 		for (Ability ability : player.getAbilityList()) {
-			Image fireballImage = new Image(new TextureRegion(ability.getHudTextureRegion()));
+			Image abilityImage = new Image(new TextureRegion(ability.getHudTextureRegion()));
 			Label cooldownTimer = new Label(Integer.toString((int)ability.getCooldownTime()), new LabelStyle(font, Color.BLACK));
 			cooldownTimer.setAlignment(Align.center);
 			cooldownTimer.setFontScale(2f);
-			fireballImage.setSize(40f, 40f);
-			Stack abilityFireball = new Stack();
-			abilityFireball.addActor(fireballImage);
-			abilityFireball.addActor(cooldownTimer);
-			abilityFireball.setPosition(hud.getWidth() - 60.f, hud.getHeight() - 60f);
-			abilityFireball.setSize(40.f, 40.f);
-			abilityFireball.setVisible(ability.active);
-			abilityIcons.add(abilityFireball);
-			hud.addActor(abilityFireball);
+			abilityImage.setSize(40f, 40f);
+			Stack abilityStack = new Stack();
+			abilityStack.addActor(abilityImage);
+			abilityStack.addActor(cooldownTimer);
+			abilityStack.setPosition(hud.getWidth() - offset, hud.getHeight() - 60.f);
+			offset *= 2.f;
+			abilityStack.setSize(40.f, 40.f);
+			abilityStack.setVisible(ability.active);
+			abilityIcons.add(abilityStack);
+			hud.addActor(abilityStack);
 		}
 		
 		// Pause game gui
@@ -179,8 +181,8 @@ public class Hud implements Disposable {
 		for (int i = 0; i < abilities.size(); ++i) {
 			Ability ability = abilities.get(i);
 			if (ability.active) {
-				abilityIcons.get(i).setVisible(true);
 				Label cooldownTimer = null;
+				abilityIcons.get(i).setVisible(true);
 				
 				if (abilityIcons.get(i).getChild(1) instanceof Label) {
 					cooldownTimer = (Label)abilityIcons.get(i).getChild(1);

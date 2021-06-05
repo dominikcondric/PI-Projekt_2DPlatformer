@@ -19,6 +19,7 @@ import entities.Key;
 import entities.Player;
 import entities.RangedGuard;
 import entities.Slime;
+import tools.CollisionListener;
 
 public class ForestScene extends Scene {
 //	private ArrayList<PointLight> lights;
@@ -48,7 +49,8 @@ public class ForestScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1f;
-			fixtureDef.filter.categoryBits=3;
+			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
+			fixtureDef.filter.maskBits = 0xFF;
 
 			body.createFixture(fixtureDef);
 			shape.dispose();

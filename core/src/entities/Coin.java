@@ -8,10 +8,12 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import scenes.Scene;
+import tools.CollisionListener;
 
 public class Coin extends Entity {
 	private Cell coinCell;
@@ -35,7 +37,12 @@ public class Coin extends Entity {
 		PolygonShape polyShape = new PolygonShape();
 		polyShape.setAsBox(0.5f, 0.5f);
 		
-		Fixture fixture = body.createFixture(polyShape, 0.f);
+		FixtureDef fdef = new FixtureDef();
+		fdef.shape = polyShape;
+		fdef.filter.categoryBits = CollisionListener.COIN_BIT | CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
+		Fixture fixture = body.createFixture(fdef);
+		
 		fixture.setSensor(true);
 		fixture.setUserData(this);
 		
@@ -59,10 +66,8 @@ public class Coin extends Entity {
 	
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
-		if (other.getUserData() instanceof Player) {
-			justPickedUp = true;
-			active = false;
-		}
+		justPickedUp = true;
+		active = false;
 	}
 	
 	@Override 

@@ -17,11 +17,12 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import scenes.Scene;
+import tools.CollisionListener;
 
 public class Slime extends Enemy {
-	protected Fixture left;
-	protected Fixture right;
-	protected boolean drawleftright=true;
+	private Fixture leftFixture;
+	private Fixture rightFixture;
+	private boolean drawLeftRight=true;
 	private Sound slimeMove = Gdx.audio.newSound(Gdx.files.internal("sounds/slime_jump.wav"));
 
 	public Slime(Vector2 position) {
@@ -30,7 +31,6 @@ public class Slime extends Enemy {
 		sprite.setRegion(idle);
 		sprite.setSize(0.9f, 0.9f);
 		sprite.setScale(2f, 2f);
-		
 
 		stopTime=-1f;
 		facingRight=false;
@@ -41,26 +41,30 @@ public class Slime extends Enemy {
 	public void addToWorld(World world) {
 		BodyDef bodyDefinition = new BodyDef();
 		bodyDefinition.position.set(sprite.getX() + sprite.getWidth() / 2.f, sprite.getY() + sprite.getHeight() / 2.f);
-		
-		
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		
-		this.body = world.createBody(bodyDefinition);
+		body = world.createBody(bodyDefinition);
 		
 		PolygonShape polShape = new PolygonShape();
 		polShape.setAsBox(sprite.getWidth() / 2.f, sprite.getHeight() / 2.f);
 		
 		FixtureDef fdef = new FixtureDef();
+		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		fdef.shape = polShape;
 
-		this.body.createFixture(fdef).setUserData(this);
+		body.createFixture(fdef).setUserData(this);
 		
 		PolygonShape vision = new PolygonShape();
 		vision.setAsBox(visionLength, visionHeight, new Vector2(0,visionHeight-(sprite.getHeight()/2)), 0);
 		
 		fdef.shape = vision;
-		fdef.isSensor=true;
-		this.body.createFixture(fdef).setUserData(this);
+		fdef.isSensor = true;
+		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT;
+		fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
+		body.createFixture(fdef).setUserData(this);
 		
 		polShape.dispose();
 	}
@@ -69,8 +73,8 @@ public class Slime extends Enemy {
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
 		
-		if (this.activeAI) {
-			this.move(this.getDirection(scene.getPlayer()));
+		if (activeAI) {
+			move(getDirection(scene.getPlayer()));
 		}
 		
         if (body.getLinearVelocity().y < 0)  {
@@ -80,51 +84,50 @@ public class Slime extends Enemy {
         }
         
         
-		if(this.activeAI && drawleftright){
-			this.contactsright=0;
-			this.contactsleft=0;
+		if(activeAI && drawLeftRight){
+			contactsRight = 0;
+			contactsLeft = 0;
 			
-			FixtureDef fdef=new FixtureDef();;
+			FixtureDef fdef = new FixtureDef();
 
 			EdgeShape dropcheck = new EdgeShape();
 			dropcheck.set(new Vector2(1f,-1.15f), new Vector2(1f,-2.5f));
-			//0x0002 left 0x0004 right
-			
-			//0x0002 left 0x0004 right/*
 			
 			fdef.shape = dropcheck;
 			fdef.isSensor=true;
-			fdef.filter.categoryBits = 0x0002;
-			this.left=(Fixture) this.body.createFixture(fdef);
-			this.left.setUserData(this);
+			fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.RIGHT_ENEMY_SENSOR_BIT;
+			fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
+			leftFixture = (Fixture) body.createFixture(fdef);
+			leftFixture.setUserData(this);
 
 			dropcheck.set(new Vector2(-1f,-1.15f), new Vector2(-1f,-2.5f));
 			fdef.shape = dropcheck;
 			fdef.isSensor = true;
-			fdef.filter.categoryBits = 0x0004;
-			this.right=(Fixture) this.body.createFixture(fdef);
-			this.right.setUserData(this);		
+			fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.RIGHT_ENEMY_SENSOR_BIT;
+			fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
+			rightFixture = (Fixture) body.createFixture(fdef);
+			rightFixture.setUserData(this);		
 			
-			drawleftright=false;
+			drawLeftRight = false;
 			return;
-			}
-		
-		if(!this.activeAI && drawleftright==false) {
-			body.destroyFixture(left);
-			body.destroyFixture(right);
-			this.contactsright=0;
-			this.contactsleft=0;
-
-			drawleftright=true;
 		}
 		
-		if(!this.facingRight && this.contactsright<=0 && this.activeAI && !playerInVision) {
-				this.activeAI=false;			
+		if(!activeAI && drawLeftRight == false) {
+			body.destroyFixture(leftFixture);
+			body.destroyFixture(rightFixture);
+			contactsRight = 0;
+			contactsLeft = 0;
 
+			drawLeftRight=true;
 		}
-		else if(this.facingRight && this.contactsleft<=0 && this.activeAI && !playerInVision) {
-			this.activeAI=false;
-			}
+		
+		if(!facingRight && contactsRight <= 0 && activeAI && !playerInVision) {
+				activeAI=false;			
+		}
+		
+		else if(facingRight && contactsLeft<=0 && activeAI && !playerInVision) {
+			activeAI=false;
+		}
 	}
 
 
@@ -132,27 +135,28 @@ public class Slime extends Enemy {
 	@Override
 	public void move(int direction) {
 		this.direction = direction;
-		if(direction==-1 || direction==2 && this.body.getLinearVelocity().y>=0 && this.contactsright!=0) {
+		if (direction == -1 || direction == 2 && body.getLinearVelocity().y >= 0 && contactsRight != 0) {
 			moveLeft();
-			this.facingRight=false;
-		}
-		else if (direction==1 || direction == 4 && this.body.getLinearVelocity().y>=0 && this.contactsleft!=0){
+			facingRight=false;
+		} else if (direction == 1 || direction == 4 && body.getLinearVelocity().y >= 0 && contactsLeft != 0){
 			moveRight();
-			this.facingRight=true;
+			facingRight=true;
 		}
-		if(direction>=2 && this.body.getLinearVelocity().y==0) {
+		
+		if(direction>=2 && body.getLinearVelocity().y==0) {
 			jump();
 		}		
 	}
 
 	@Override
 	public void resolveCollisionEnd(Fixture self, Fixture other) {
-		if(other.getUserData() instanceof Player && self.isSensor() && self.getFilterData().categoryBits==1) {
-			((Enemy) self.getUserData()).playerInVision=false;
+		if((other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 && self.isSensor()) {
+			((Enemy) self.getUserData()).playerInVision = false;
 		}
-		if(other.getFilterData().categoryBits!=3 || !((Enemy) self.getUserData()).activeAI)return;
-		if(self.getFilterData().categoryBits == 0x0002) this.contactsleft--;
-		else if(self.getFilterData().categoryBits == 0x0004) this.contactsright--;
+		
+//		if(other.getFilterData().categoryBits!=3 || !((Enemy) self.getUserData()).activeAI)return;
+//		if(self.getFilterData().categoryBits == 0x0002) contactsLeft--;
+//		else if(self.getFilterData().categoryBits == 0x0004) contactsRight--;
 	}
 
 	@Override
@@ -161,24 +165,27 @@ public class Slime extends Enemy {
 
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
-		if(other.getFilterData().categoryBits==3 && ((Enemy) self.getUserData()).activeAI) {
-			if(self.getFilterData().categoryBits==4)this.contactsright++;
-			else if(self.getFilterData().categoryBits==2) this.contactsleft++;
+		if ((other.getFilterData().categoryBits & CollisionListener.ENEMY_BIT) != 0 && ((Enemy) self.getUserData()).activeAI) {
+			if ((self.getFilterData().categoryBits & CollisionListener.LEFT_ENEMY_SENSOR_BIT) != 0) 
+				contactsLeft--;
+			else if ((self.getFilterData().categoryBits & CollisionListener.RIGHT_ENEMY_SENSOR_BIT) != 0) 
+				contactsRight--;
 		}
-		if (other.getUserData() instanceof Player && self.isSensor()) {
+		
+		if ((other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 && self.isSensor()) {
 			activateAI();
-			((Enemy) self.getUserData()).playerInVision=true;
+			playerInVision=true;
 			if (((Player)other.getUserData()).getHp() <= 0) {
 				stopAI();
 			}
-		} else if (!self.isSensor() && other.getUserData() instanceof Player && ((Player)other.getUserData()).hasAttacked()) {
+		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 && ((Player)other.getUserData()).hasAttacked()) {
 			Player player = (Player)other.getUserData();
 			onHit(player.facingRight, player.getSwordDmg());
-		} else if (!self.isSensor() && other.getUserData() instanceof Fireball) {
+		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.FIREBALL_BIT) != 0) {
 			Fireball fireball = (Fireball)other.getUserData();
 			if(fireball.isSetToExplode()) {
 				onHit(fireball.facingRight, fireball.getExplosionDmg());
-			}else {
+			} else {
 				onHit(fireball.facingRight, fireball.getHitDmg());
 			}
 		}		

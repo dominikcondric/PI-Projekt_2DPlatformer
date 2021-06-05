@@ -9,6 +9,7 @@ public class IntroAnimation extends SceneAnimation {
 	private Player player;
 	private float thinkingDuration = 4.f;
 	private int messageCounter = 0;
+	private boolean skipped = false;
 	
 	public IntroAnimation(final Player player) {
 		this.player = player;
@@ -31,10 +32,13 @@ public class IntroAnimation extends SceneAnimation {
 		} else {
 			player.moveRight();
 		}
-		if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
-			thinkingDuration = 0.9f;
-			messageCounter = 1;
-			
+		
+		if(Gdx.input.isKeyJustPressed(Keys.ENTER) && !skipped) {
+			skipped = true;
+			dialogueText.clear();
+			dialogueText.append("This is it.\nCan't go back now...");
+			thinkingDuration = 0.99f;
+			messageCounter = 2;
 		}
 	}
 }

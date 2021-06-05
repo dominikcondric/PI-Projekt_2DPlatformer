@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Player;
+import tools.CollisionListener;
 
 public class SnowScene extends Scene {
 
@@ -43,6 +44,8 @@ public class SnowScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 0.f;
+			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
+			fixtureDef.filter.maskBits = 0xFF;
 			
 			body.createFixture(fixtureDef);
 			shape.dispose();

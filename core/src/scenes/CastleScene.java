@@ -23,6 +23,7 @@ import entities.FireballItem;
 import entities.Player;
 import entities.RangedGuard;
 import entities.Slime;
+import tools.CollisionListener;
 
 public class CastleScene extends Scene {
 	private ArrayList<PointLight> lights;
@@ -51,7 +52,8 @@ public class CastleScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1.f;
-			fixtureDef.filter.categoryBits=3;
+			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
+			fixtureDef.filter.maskBits = 0xFF;
 
 			body.createFixture(fixtureDef);
 			shape.dispose();
@@ -73,6 +75,7 @@ public class CastleScene extends Scene {
         addEntity(new Slime(new Vector2(15.f, 8.f)));
         addEntity(new Slime(new Vector2(53.f, 12.f)));
         addEntity(new Slime(new Vector2(22.f, 11.f)));
+        addEntity(new Slime(new Vector2(5.f, 8.f)));
         addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
 		
 		//TORCH
@@ -84,8 +87,10 @@ public class CastleScene extends Scene {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.GOLD);
-			c.a *= 0.60;
+			c.a *= 0.50f;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			light.setStaticLight(true);
+			light.setSoft(false);
 			
 			lights.add(light);
 		}
@@ -94,8 +99,10 @@ public class CastleScene extends Scene {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.PURPLE);
-			c.a *= 0.3;
+			c.a *= 0.3f;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			light.setStaticLight(true);
+			light.setSoft(false);
 			
 			lights.add(light);
 		}
@@ -104,8 +111,10 @@ public class CastleScene extends Scene {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.PURPLE);
-			c.a *= 0.70;
+			c.a *= 0.70f;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			light.setSoft(false);
+			light.setStaticLight(true);
 			
 			lights.add(light);
 		}
@@ -114,8 +123,10 @@ public class CastleScene extends Scene {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.GOLD);
-			c.a *= 0.50;
+			c.a *= 0.50f;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			light.setSoft(false);
+			light.setStaticLight(true);
 			
 			lights.add(light);
 		}
@@ -124,8 +135,10 @@ public class CastleScene extends Scene {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.WHITE);
-			c.a *= 0.3;
+			c.a *= 0.3f;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			light.setSoft(false);
+			light.setStaticLight(true);
 			
 			lights.add(light);
 		}
@@ -134,8 +147,11 @@ public class CastleScene extends Scene {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
 			Color c = new Color(Color.WHITE);
-			c.a *= 0.6;
+			c.a *= 0.6f;
 			PointLight light = new PointLight(rayHandler, 50, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			light.setSoft(false);
+			light.setStaticLight(true);
+			
 			lights.add(light);
 		}
 		
