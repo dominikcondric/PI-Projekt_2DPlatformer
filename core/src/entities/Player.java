@@ -230,7 +230,7 @@ public class Player extends Entity {
 		fdef.shape = attackRange;
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
-		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT ;
 		melee = this.body.createFixture(fdef);
 		melee.setUserData(this);
 		hasAttacked = true;

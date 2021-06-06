@@ -77,7 +77,7 @@ public class RangedGuard extends Enemy {
 		fdef.shape = vision;
 		fdef.isSensor=true;
 		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.ENEMY_VISION_SENSOR_BIT;
-		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT | ~CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.INTERACTABLE_BIT;
 		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		body.createFixture(fdef).setUserData(this);
 		
@@ -87,7 +87,7 @@ public class RangedGuard extends Enemy {
 		fdef.shape = wallcheck;
 		fdef.isSensor=true;
 		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.RIGHT_UPPER_ENEMY_SENSOR_BIT;
-		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT | ~CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.INTERACTABLE_BIT;
 		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		body.createFixture(fdef).setUserData(this);
 
@@ -95,7 +95,7 @@ public class RangedGuard extends Enemy {
 		fdef.shape = wallcheck;
 		fdef.isSensor = true;
 		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT;
-		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT | ~CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.INTERACTABLE_BIT;
 		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		body.createFixture(fdef).setUserData(this);
 		
@@ -243,7 +243,10 @@ public class RangedGuard extends Enemy {
 
 	@Override
 	public void resolveCollisionEnd(Fixture self, Fixture other) {
-		if((other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 && self.isSensor() && (self.getFilterData().categoryBits & CollisionListener.ENEMY_VISION_SENSOR_BIT) != 0) {
+		if((other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0 
+				&& self.isSensor() 
+				&& (self.getFilterData().categoryBits & CollisionListener.ENEMY_VISION_SENSOR_BIT) != 0 && !other.isSensor()){
+			
 			playerInVision = false;
 			playerWasInVision = true;
 		}
