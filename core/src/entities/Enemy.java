@@ -20,7 +20,6 @@ public abstract class Enemy extends Entity {
 	protected Animation<TextureRegion> idleAnim;
 	protected int hp = 5;
 	protected int maxHp = 5;
-
 	protected float visionHeight = 3f;
 	protected float visionLength = 4f;
 	protected float jumpHeight = 11f;
@@ -35,6 +34,7 @@ public abstract class Enemy extends Entity {
 	//
 	protected Array<TextureRegion> idleFrames = new Array<TextureRegion>();
 	protected TextureAtlas atlas;
+	protected TextureRegion currentRegion;
 	
 	protected Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/sword_hit3.wav"));
 
@@ -57,8 +57,6 @@ public abstract class Enemy extends Entity {
 	@Override
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
-		TextureRegion currentRegion = getFrame(deltaTime);
-		sprite.setRegion(currentRegion);
 	}
 	
 
@@ -67,13 +65,13 @@ public abstract class Enemy extends Entity {
 		//enemy manji x dakle true onda se mice enemy u desno
 		//inace se mice u lijevo
 		int dir = 0;
-		if (this.sprite.getX()<player.sprite.getX()) {
+		if (this.body.getPosition().x < player.body.getPosition().x) {
 			dir++;
 		} else {
 			dir--;
 		}
 		
-		if (this.sprite.getY()<player.sprite.getY())
+		if (this.body.getPosition().y < player.body.getPosition().y)
 			dir	+= 3;
 		
 		return dir;
@@ -94,17 +92,21 @@ public abstract class Enemy extends Entity {
 	public abstract void move(int direction);
 
 	public void jump() {
-		body.applyLinearImpulse(new Vector2(0, this.jumpHeight), body.getWorldCenter(), true);
+		body.setLinearDamping(0);
+		body.setLinearVelocity(new Vector2(0, jumpHeight));
+		
 	}
 
 	public void moveLeft() {
+		body.setLinearDamping(10);
 		body.applyLinearImpulse(new Vector2(-moveSpeed, 0), body.getWorldCenter(), true);
-    	body.setLinearDamping(20);
+    	
 	}
 
 	public void moveRight() {
+		body.setLinearDamping(10);
 		body.applyLinearImpulse(new Vector2(moveSpeed, 0), body.getWorldCenter(), true);
-    	body.setLinearDamping(20);
+    	
 	}
 
 
@@ -128,18 +130,8 @@ public abstract class Enemy extends Entity {
 		this.activeAI = false;
 	}
 	
-	public TextureRegion getFrame(float deltaTime) {
-		TextureRegion region = (TextureRegion) idleAnim.getKeyFrame(stateTimer, true);
-        
-        if (body.getLinearVelocity().x < 0 && region.isFlipX()) {
-            region.flip(true, false);
-        } else if (body.getLinearVelocity().x > 0 && !region.isFlipX()) {
-            region.flip(true, false);
-        }
-        
-        stateTimer = stateTimer + deltaTime;
-        return region;
-    }
+	
+	
 	
 	@Override
 	public void reset(World world) {

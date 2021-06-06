@@ -2,6 +2,7 @@ package entities;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -80,6 +81,16 @@ public abstract class Entity {
 	
 	public boolean isActive() {
 		return active;
+	}
+	
+	protected void needsFlip(TextureRegion region) {
+		 if((!facingRight)){
+	            facingRight = false;
+	        }
+
+	        else if((facingRight)){
+	            facingRight = true;
+	        }	
 	}
 	
 	public void resolveCollisionEnd(Fixture A, Fixture B) {}

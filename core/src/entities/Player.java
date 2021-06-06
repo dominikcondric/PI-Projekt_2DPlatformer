@@ -30,6 +30,7 @@ public class Player extends Entity {
 	private int maxHp = 50;
 	private int jumpCount = 0;
 	private TextureAtlas atlas;
+	TextureAtlas atlasAttacks;
 	public boolean controllable = true;
 	private int coinCount = 0;
 	
@@ -39,6 +40,7 @@ public class Player extends Entity {
 	private Sound footstep = Gdx.audio.newSound(Gdx.files.internal("sounds/footstep.wav"));
 	private Sound jump = Gdx.audio.newSound(Gdx.files.internal("sounds/jump.wav"));
 	private Sound land = Gdx.audio.newSound(Gdx.files.internal("sounds/landing.wav"));
+	private Sound gettingHit = Gdx.audio.newSound(Gdx.files.internal("sounds/aero_hurt.mp3"));
 	
 	private ArrayList<Ability> abilities;
 	private ArrayList<Item> items;
@@ -57,12 +59,13 @@ public class Player extends Entity {
 	private Array<TextureRegion> framesAttack2 = new Array<TextureRegion>();
 	private Array<TextureRegion> framesAttack3 = new Array<TextureRegion>();
 	private Array<TextureRegion> framesAttackCurrent = new Array<TextureRegion>();
+	private float castAnimationSize;
 	
 	private float moveThresholdLeft = -6;
 	private float moveThresholdRight = 6;
 	private final int ON_GROUND = 0;
 	
-	private enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD, CASTING, ATTACKING };
+	private enum State { FALLING, JUMPING, STANDING, RUNNING, CASTING, ATTACKING };
 	private State currentState;
 	private State previousState;
     
@@ -72,7 +75,7 @@ public class Player extends Entity {
 	private boolean hasAttacked = false;
 	private float attackCooldown = 0.25f;
 	private boolean isFootstepPlaying = false;
-	TextureAtlas atlasAttacks;
+	
 	
 	FixtureDef fdef;
 	Fixture melee;
@@ -92,7 +95,6 @@ public class Player extends Entity {
 		bodyDefinition.type = BodyDef.BodyType.DynamicBody;
 		this.body = world.createBody(bodyDefinition);
 		fdef = new FixtureDef();
-		fdef.filter.categoryBits = 0x01; // Player bit set to 1
 		
 		EdgeShape bottomShape = new EdgeShape();
 		bottomShape.set(body.getLocalCenter().x - 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f, body.getLocalCenter().x + 0.76f/2f, body.getLocalCenter().y - 1.25f / 2.f);
@@ -228,6 +230,7 @@ public class Player extends Entity {
 		fdef.shape = attackRange;
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
+		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
 		melee = this.body.createFixture(fdef);
 		melee.setUserData(this);
 		hasAttacked = true;
@@ -239,15 +242,15 @@ public class Player extends Entity {
 		TextureRegion region;
 		Random randomAnimation = new Random();
 		
-		if(currentState == State.CASTING && playerCastAnim.getKeyFrameIndex(stateTimer) != 4) {
+		if(currentState == State.CASTING && playerCastAnim.getKeyFrameIndex(stateTimer) != castAnimationSize) {
 			region = (TextureRegion) playerCastAnim.getKeyFrame(stateTimer, true);
-			needsFlip(region);
+			needsFlip();
 			stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
 			
 			return region;
 		}else if(currentState == State.ATTACKING && currentAttackAnim.getKeyFrameIndex(stateTimer) != framesAttackCurrent.size - 1) {
 			region = (TextureRegion) currentAttackAnim.getKeyFrame(stateTimer, true);
-			needsFlip(region);
+			needsFlip();
 			stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
 			
 			return region;
@@ -295,7 +298,7 @@ public class Player extends Entity {
                 break;
         }
         	
-        needsFlip(region);
+        needsFlip();
         stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;
         return region;
 
@@ -318,7 +321,6 @@ public class Player extends Entity {
 
 
 	private void jump() {
-		//body.applyLinearImpulse(new Vector2(0, 9.5f), body.getWorldCenter(), true);
 		body.setLinearVelocity(new Vector2(0, 8f));
 	}
 	
@@ -353,15 +355,16 @@ public class Player extends Entity {
 	}
 	
 	public void onHit(float x) {
+		gettingHit.play(0.25f);
 		this.hp--;
 		if(this.hp<=0)
 			active = false;
 		if(x==0) return;
 		if(this.body.getPosition().x < x) {
-	    	body.applyLinearImpulse(new Vector2(-10f, 1f), body.getWorldCenter(), true);
+	    	body.applyLinearImpulse(new Vector2(-5f, 1f), body.getWorldCenter(), true);
 		}
 		else {
-			body.applyLinearImpulse(new Vector2(10f, 1f), body.getWorldCenter(), true);
+			body.applyLinearImpulse(new Vector2(5f, 1f), body.getWorldCenter(), true);
 		}		
 	}
 	
@@ -373,7 +376,7 @@ public class Player extends Entity {
 		return this.maxHp;
 	}
 	
-	private void needsFlip(TextureRegion region) {
+	private void needsFlip() {
 		 if((!facingRight)){
             facingRight = false;
         }
@@ -396,7 +399,7 @@ public class Player extends Entity {
 		float offsetX = 0.55f;
 		float offsetY = 0.65f;
 
-		batch.draw(atlasRegion ,sprite.getX() + (facingRight ? -offsetX : offsetX) , sprite.getY() - offsetY , drawOriginX, drawOriginY , atlasRegion.getRegionWidth(), atlasRegion.getRegionHeight(), drawScaleX, drawScaleY, 0);
+		batch.draw(atlasRegion ,body.getPosition().x + (facingRight ? -offsetX : offsetX) , body.getPosition().y - offsetY , drawOriginX, drawOriginY , atlasRegion.getRegionWidth(), atlasRegion.getRegionHeight(), drawScaleX, drawScaleY, 0);
 	}
 
 	@Override
@@ -492,6 +495,7 @@ public class Player extends Entity {
 		playerRunAnim = new Animation<TextureRegion>(0.1f, framesRun);
 		framesRun.clear();
 		playerCastAnim = new Animation<TextureRegion>(0.1f, framesCast);	
+		castAnimationSize = framesCast.size - 1;
 		framesCast.clear();
 		playerAttackAnim1 = new Animation<TextureRegion>(0.05f,framesAttack1);
 		currentAttackAnim = playerAttackAnim1;

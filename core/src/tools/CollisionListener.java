@@ -20,9 +20,12 @@ public class CollisionListener implements ContactListener {
 	public static final int INTERACTABLE_BIT = (1 << 6);
 	public static final int OTHERS_BIT = (1 << 7);
 	public static final int FIREBALL_BIT = (1 << 8);
-	public static final int LEFT_ENEMY_SENSOR_BIT = (1 << 9);
-	public static final int RIGHT_ENEMY_SENSOR_BIT = (1 << 10);
+	public static final int LEFT_UPPER_ENEMY_SENSOR_BIT = (1 << 9);
+	public static final int RIGHT_UPPER_ENEMY_SENSOR_BIT = (1 << 10);
 	public static final int COIN_BIT = (1 << 11);
+	public static final int ENEMY_VISION_SENSOR_BIT = (1 << 12);
+	public static final int LEFT_BOTTOM_ENEMY_SENSOR_BIT = (1 << 13);
+	public static final int RIGHT_BOTTOM_ENEMY_SENSOR_BIT = (1 << 14);
 	
 	
 	@Override

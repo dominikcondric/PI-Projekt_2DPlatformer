@@ -1,0 +1,41 @@
+
+slime_sprites.png
+size: 1024, 32
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+slime_attack
+  rotate: false
+  xy: 2, 4
+  size: 152, 20
+  orig: 256, 32
+  offset: 2, 8
+  index: -1
+slime_die
+  rotate: false
+  xy: 156, 4
+  size: 130, 16
+  orig: 256, 32
+  offset: 2, 12
+  index: -1
+slime_hurt
+  rotate: false
+  xy: 310, 4
+  size: 121, 15
+  orig: 128, 32
+  offset: 2, 13
+  index: -1
+slime_idle
+  rotate: false
+  xy: 464, 4
+  size: 118, 14
+  orig: 128, 32
+  offset: 2, 14
+  index: -1
+slime_move
+  rotate: false
+  xy: 618, 4
+  size: 110, 12
+  orig: 128, 32
+  offset: 2, 16
+  index: -1

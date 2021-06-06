@@ -93,7 +93,7 @@ public class Fireball extends Entity {
 			body.setLinearVelocity(0, 0);
 			body.destroyFixture(fireballBody);
 			PolygonShape polShape = new PolygonShape();
-			polShape.setAsBox(2, 2);
+			polShape.setAsBox(5, 2.5f);
 			fdef.shape = polShape;
 			fdef.isSensor = true;
 			explosionSensor = this.body.createFixture(fdef);
@@ -104,7 +104,6 @@ public class Fireball extends Entity {
 			body.destroyFixture(explosionSensor);
 		}
 		if(exploded) {
-			
 			animLenght -= deltaTime;
 			if(animLenght <= 0) {
 				setToDestroy = true;
