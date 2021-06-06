@@ -20,7 +20,7 @@ public class FireballAbility extends Ability {
 	@Override
 	public void cast(Scene scene, Entity caster) {
 		if (currentCooldownTime == cooldownTime && active) {
-			scene.addEntity(new Fireball(caster.getPosition(), caster.getFacingDirection(), 2f, 1f));
+			scene.addEntity(new Fireball(caster.getPosition(), caster.getFacingDirection(), 200f, 100f));
 			sound.play();
 			triggered = true;
 		}

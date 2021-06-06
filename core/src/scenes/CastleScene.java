@@ -73,11 +73,11 @@ public class CastleScene extends Scene {
         addEntity(new RangedGuard(new Vector2(192f, 13.f)));
         FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 8.1f));
         addEntity(fireballItem);
-       //addEntity(new Slime(new Vector2(15.f, 8.f)));
-       addEntity(new RangedGuard(new Vector2(13.f, 8.f)));
-       addEntity(new Slime(new Vector2(53.f, 12.f)));
-       addEntity(new Slime(new Vector2(22.f, 11.f)));
-       addEntity(new Slime(new Vector2(5.f, 8.f)));
+       addEntity(new Slime(new Vector2(15.f, 8.f)));
+       //addEntity(new RangedGuard(new Vector2(13.f, 8.f)));
+       //addEntity(new Slime(new Vector2(53.f, 12.f)));
+       //addEntity(new Slime(new Vector2(22.f, 11.f)));
+       //addEntity(new Slime(new Vector2(5.f, 8.f)));
        addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
        addEntity(new Sorcerer(new Vector2(4f, 8f)));
 		

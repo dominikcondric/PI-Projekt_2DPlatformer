@@ -65,13 +65,13 @@ public abstract class Enemy extends Entity {
 		//enemy manji x dakle true onda se mice enemy u desno
 		//inace se mice u lijevo
 		int dir = 0;
-		if (this.body.getPosition().x < player.body.getPosition().x) {
+		if (body.getPosition().x < player.body.getPosition().x) {
 			dir++;
-		} else {
+		} else if (body.getPosition().x > player.body.getPosition().x){
 			dir--;
 		}
 		
-		if (this.body.getPosition().y < player.body.getPosition().y)
+		if (body.getPosition().y < player.body.getPosition().y)
 			dir	+= 3;
 		
 		return dir;
