@@ -20,6 +20,7 @@ import box2dLight.PointLight;
 import entities.Chest;
 import entities.Coin;
 import entities.FireballItem;
+import entities.MeleeGuard;
 import entities.Player;
 import entities.RangedGuard;
 import entities.Slime;
@@ -68,18 +69,20 @@ public class CastleScene extends Scene {
 		addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
+        addEntity(new MeleeGuard(new Vector2(110.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(135.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(160f, 13.f)));
         addEntity(new RangedGuard(new Vector2(192f, 13.f)));
         FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 8.1f));
         addEntity(fireballItem);
-       addEntity(new Slime(new Vector2(15.f, 8.f)));
+       //addEntity(new Slime(new Vector2(15.f, 8.f)));
+       addEntity(new MeleeGuard(new Vector2(15.f, 10.f)));
        //addEntity(new RangedGuard(new Vector2(13.f, 8.f)));
        //addEntity(new Slime(new Vector2(53.f, 12.f)));
        //addEntity(new Slime(new Vector2(22.f, 11.f)));
        //addEntity(new Slime(new Vector2(5.f, 8.f)));
        addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
-       addEntity(new Sorcerer(new Vector2(4f, 8f)));
+       addEntity(new MeleeGuard(new Vector2(68.f, 13.f)));
 		
 		//TORCH
 		addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
