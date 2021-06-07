@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -73,6 +73,21 @@ public class ForestScene extends Scene {
 		addEntity(key);
 		addEntity(new Chest(new Vector2(85.f, 32.f), key));
 		addEntity(new Chest(new Vector2(5f, 39f), fireballItem));
+		
+
+		lights = new ArrayList<PointLight>(4);
+		addEntity(new Slime(new Vector2(34.f, 23.f)));
+		//addEntity(new Enemy(new Vector2(39.f, 50.f)));
+		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
+		for(MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
+			Rectangle rect = ((RectangleMapObject)object).getRectangle();
+			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
+			Color c = new Color(Color.GOLD);
+			c.a *= 0.78;
+			PointLight light = new PointLight(rayHandler, 150, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			
+			lights.add(light);
+		}
 	}
 
 	@Override
