@@ -195,6 +195,7 @@ public class CastleScene extends Scene {
 	@Override
 	protected void placePlayerOnScene(Player player) {
 		//player.setPosition(new Vector2(2.f, 9.f));
-		player.setPosition(new Vector2(2.f, 9.f));
+		//player.setPosition(new Vector2(2.f, 9.f));
+		player.setPosition(new Vector2(195.f, 13.f));
 	}
 }

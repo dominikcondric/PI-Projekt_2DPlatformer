@@ -117,7 +117,7 @@ public class EnemyFireball extends Entity {
 			body.setLinearVelocity(0, 0);
 			body.destroyFixture(fireballBody);
 			PolygonShape polShape = new PolygonShape();
-			polShape.setAsBox(5, 2.5f);
+			polShape.setAsBox(3, 1.5f);
 			fdef.shape = polShape;
 			fdef.isSensor = true;
 			explosionSensor = this.body.createFixture(fdef);
