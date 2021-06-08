@@ -45,6 +45,8 @@ public class MeleeGuard extends Enemy {
 	private float jumpTimer = 0;
 	private int blockFramesSize;
 	private int attackFramesSize;
+	private boolean startAttackAnim = false;
+	private float attackDelay = 1f;
 
 	public MeleeGuard(Vector2 position) {
 		super(position);
@@ -76,7 +78,7 @@ public class MeleeGuard extends Enemy {
 		body.createFixture(fdef).setUserData(this);
 		
 		PolygonShape vision = new PolygonShape();
-		vision.setAsBox(visionLength, visionHeight, new Vector2(0,visionHeight-0.7f), 0);
+		vision.setAsBox(visionLength * 2, visionHeight, new Vector2(0,visionHeight-0.7f), 0);
 		
 		fdef.shape = vision;
 		fdef.isSensor = true;
@@ -104,16 +106,21 @@ public class MeleeGuard extends Enemy {
 		if(direction == 0)
 			direction = getDirection(scene.getPlayer());
 		moveDelay -= deltaTime;
+		attackDelay -= deltaTime;
+		startAttackAnim = false;
+		if(hasAttacked && attackDelay <= 0) {
+			meleeAttack();
+			destroyAttackFix = true;
+			hasAttacked = false;       	  
+			startAttackAnim = true;
+			attackDelay = 1f;
+        }
 		currentRegion = getFrame(deltaTime);
 		if(destroyAttackFix) {
 			body.destroyFixture(melee);
 			destroyAttackFix = false;
-		}		
-		if(hasAttacked) {
-			meleeAttack();
-			destroyAttackFix = true;
-			hasAttacked = false;       	    	
-        }
+		}	
+		
 		usingShield = false;
 		if (activeAI) {
 			//ako mu player dode s druge strane nego sto gleda, priceka 2 sekunde pa se okrene
@@ -415,7 +422,7 @@ public class MeleeGuard extends Enemy {
 	public State getState() {
 		if(usingShield)
 			return State.BLOCKING;
-		else if(hasAttacked)
+		else if(startAttackAnim)
 			return State.ATTACKING;
         else if(body.getLinearVelocity().x < -0.3f || body.getLinearVelocity().x > 0.3f)
             return State.MOVING;

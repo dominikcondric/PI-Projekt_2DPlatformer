@@ -87,7 +87,7 @@ public class CastleScene extends Scene {
 	public void constructEntities() {
 		lights = new ArrayList<PointLight>(4);
 
-	/*	addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
+		addEntity(new MeleeGuard(new Vector2(82.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
         addEntity(new MeleeGuard(new Vector2(110.f, 13.f)));
@@ -96,13 +96,19 @@ public class CastleScene extends Scene {
         addEntity(new RangedGuard(new Vector2(192f, 13.f)));
         FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 8.1f));
         addEntity(fireballItem);
-        addEntity(new FirstBoss(new Vector2(80f, 15.f)));
-
-
-       addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
-       addEntity(new MeleeGuard(new Vector2(68.f, 13.f)));*/
-		
-        addEntity(new FirstBoss(new Vector2(174f, 20.f)));
+	    addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
+	    addEntity(new MeleeGuard(new Vector2(68.f, 13.f)));
+	    addEntity(new Slime(new Vector2(82.f, 8.f)));
+	    addEntity(new Slime(new Vector2(109.f, 5.f)));   
+	    addEntity(new Slime(new Vector2(13.f, 9.f))); 
+	    addEntity(new RangedGuard(new Vector2(74.f, 30.f)));      
+	    addEntity(new MeleeGuard(new Vector2(47.f, 65.f)));
+	    addEntity(new RangedGuard(new Vector2(50.f, 65.f)));
+	    addEntity(new MeleeGuard(new Vector2(86.f, 65.f)));
+	    addEntity(new RangedGuard(new Vector2(128.f, 30.f)));
+	    addEntity(new MeleeGuard(new Vector2(154.f, 36.f)));
+	    addEntity(new RangedGuard(new Vector2(199.f, 47.f)));
+	    addEntity(new FirstBoss(new Vector2(174f, 20.f)));
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
 		for(MapObject object : map.getLayers().get("Lights Torch").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
@@ -189,6 +195,6 @@ public class CastleScene extends Scene {
 	@Override
 	protected void placePlayerOnScene(Player player) {
 		//player.setPosition(new Vector2(2.f, 9.f));
-		player.setPosition(new Vector2(160.f, 20.f));
+		player.setPosition(new Vector2(2.f, 9.f));
 	}
 }
