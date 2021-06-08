@@ -103,8 +103,6 @@ public class MeleeGuard extends Enemy {
 		super.update(scene, deltaTime);
 		if(direction == 0)
 			direction = getDirection(scene.getPlayer());
-		//System.out.println("lijevi: "+ contactsLeft);
-		//System.out.println("desni: "+ contactsRight);
 		moveDelay -= deltaTime;
 		currentRegion = getFrame(deltaTime);
 		if(destroyAttackFix) {
@@ -182,8 +180,6 @@ public class MeleeGuard extends Enemy {
 	@Override
 	public void move(int direction) {
 		this.direction = direction;
-		//System.out.println("lijevi" +contactsLeft);
-		//System.out.println("desni" +contactsRight);
 		
 		if ((direction == - 1 || direction == 2)  && contactsLeft != 0 ) {
 			moveLeft();

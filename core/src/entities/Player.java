@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 
 import abilities.Ability;
 import abilities.FireballAbility;
+import abilities.ShieldAbility;
 import scenes.Scene;
 import tools.CollisionListener;
 
@@ -30,7 +31,7 @@ public class Player extends Entity {
 	private int maxHp = 50;
 	private int jumpCount = 0;
 	private TextureAtlas atlas;
-	TextureAtlas atlasAttacks;
+	private TextureAtlas atlasAttacks;
 	public boolean controllable = true;
 	private int coinCount = 0;
 	
@@ -76,7 +77,6 @@ public class Player extends Entity {
 	private float attackCooldown = 0.25f;
 	private boolean isFootstepPlaying = false;
 	
-	
 	FixtureDef fdef;
 	Fixture melee;
 
@@ -84,6 +84,8 @@ public class Player extends Entity {
 		super(position);
 		abilities = new ArrayList<Ability>(2);
 		abilities.add(new FireballAbility());
+		abilities.add(new ShieldAbility());
+		abilities.get(1).active = true;
 		items = new ArrayList<Item>(1);
 		swordDmg = 1;
 		setAnimations();
@@ -101,7 +103,7 @@ public class Player extends Entity {
 		fdef.shape = bottomShape;
 		fdef.friction = 2f;
 		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
-		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.OTHERS_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		EdgeShape leftShape = new EdgeShape();
@@ -109,7 +111,7 @@ public class Player extends Entity {
 		fdef.shape = leftShape;
 		fdef.friction = 0;
 		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
-		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.OTHERS_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		EdgeShape rightShape = new EdgeShape();
@@ -117,7 +119,7 @@ public class Player extends Entity {
 		fdef.shape = rightShape;
 		fdef.friction = 0;
 		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
-		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.OTHERS_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		EdgeShape topShape = new EdgeShape();
@@ -125,14 +127,13 @@ public class Player extends Entity {
 		fdef.shape = topShape;
 		fdef.friction = 0;
 		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
-		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.LIGHT_BIT & ~CollisionListener.OTHERS_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		bottomShape.dispose();
 		topShape.dispose();
 		leftShape.dispose();
 		rightShape.dispose();
-		
 	}
 	
 	@Override
@@ -143,31 +144,6 @@ public class Player extends Entity {
 			return;
 		}
 		Vector2 playerVelocity = body.getLinearVelocity();
-		
-		
-		if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-			abilities.get(0).cast(scene, this);
-		}
-		
-		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-			abilities.get(1).cast(scene, this);
-		}
-		
-		currentRegion = getFrame(deltaTime);
-		
-	     if(previousState == State.FALLING && currentState == State.STANDING) 
-				land.play();
-			
-		if(currentState == State.RUNNING && !isFootstepPlaying) {
-			footstep.loop(0.4f);
-			isFootstepPlaying = true;
-		}
-		
-		for (Ability ability : abilities) {
-			if (ability.active) {
-				ability.update(deltaTime);
-			}
-		}
 		
 		if(playerVelocity.y == ON_GROUND){
         	jumpCount = 0;
@@ -186,6 +162,7 @@ public class Player extends Entity {
 					jump();
 				}
 			}
+			
 			if(Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT)) {
 				dash();
 			}
@@ -208,11 +185,35 @@ public class Player extends Entity {
 	        		attackCooldown = 0.25f;
 	        	}
 	        }
+	        
 	        attackCooldown -= deltaTime;
 	        if(attackCooldown < 0) attackCooldown = 0;
 	        
-	        
+	        if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
+				abilities.get(0).cast(scene, this);
+			}
+			
+			if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+				abilities.get(1).cast(scene, this);
+			}
 		}
+		
+		currentRegion = getFrame(deltaTime);
+		
+		for (Ability ability : abilities) {
+			if (ability.active) {
+				ability.update(deltaTime);
+			}
+		}
+		
+	     if(previousState == State.FALLING && currentState == State.STANDING) 
+				land.play();
+			
+		if(currentState == State.RUNNING && !isFootstepPlaying) {
+			footstep.loop(0.4f);
+			isFootstepPlaying = true;
+		}
+		
 
         if(playerVelocity.x == 0 || playerVelocity.y != ON_GROUND) {
 			isFootstepPlaying = false;
@@ -361,11 +362,12 @@ public class Player extends Entity {
 		this.hp -= dmg;
 		if(this.hp<=0)
 			active = false;
-		if(x==0) return;
-		if(this.body.getPosition().x < x) {
+		if (x == 0)
+			return;
+		
+		if (body.getPosition().x < x) {
 	    	body.applyLinearImpulse(new Vector2(-5f, 1f), body.getWorldCenter(), true);
-		}
-		else {
+		} else {
 			body.applyLinearImpulse(new Vector2(5f, 1f), body.getWorldCenter(), true);
 		}		
 	}
@@ -379,11 +381,9 @@ public class Player extends Entity {
 	}
 	
 	private void needsFlip() {
-		 if((!facingRight)){
+		if ((!facingRight)) {
             facingRight = false;
-        }
-
-        else if((facingRight)){
+        } else if ((facingRight)) {
             facingRight = true;
         }	
 	}
@@ -432,6 +432,9 @@ public class Player extends Entity {
 		items.clear();
 		abilities.clear();
 		abilities.add(new FireballAbility());
+		Ability shieldAbility = new ShieldAbility();
+		shieldAbility.active = true;
+		abilities.add(shieldAbility);
 		coinCount = 0;
 	}
 	

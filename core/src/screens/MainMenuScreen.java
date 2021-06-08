@@ -25,65 +25,68 @@ public class MainMenuScreen implements Screen {
 	private TextButton newGameButton;
 	private TextButton resumeGameButton;
 	private TextButton optionsButton;
-	private Table table;
+	private Table mainMenuTable;
+	private Table optionsTable;
 
 	public MainMenuScreen(final Platformer game) {
 		// Initialization
 		this.game = game;
+		optionsTable = game.options.getTable();
 		userInterface = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), game.batch);
 		
 		// Setup input
 		Gdx.input.setInputProcessor(userInterface);
 
 		// Setup
-		table = new Table();
-		table.setBackground(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Forest/forest24000.jpeg")))));
-		userInterface.addActor(table);
-		table.setFillParent(true);
+		mainMenuTable = new Table();
+		TextureRegionDrawable backgroundImage = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Forest/forest24000.jpeg"))));
+		mainMenuTable.setBackground(backgroundImage);
+		game.options.setBackground(backgroundImage.tint(new Color(0.3f, 0.3f, 0.3f, 1.f)));
+		userInterface.addActor(mainMenuTable);
+		mainMenuTable.setFillParent(true);
 
-		table.align(Align.center);
+		mainMenuTable.align(Align.center);
 		float buttonHeight = userInterface.getHeight() / 8;
 		
 		Pixmap pixmap = new Pixmap(1, 1, Format.RGB888);
 		pixmap.setColor(Color.BROWN);
 		pixmap.fill();
-		TextureRegionDrawable texture = new TextureRegionDrawable(new Texture(pixmap));
-		pixmap.dispose();
+		TextureRegionDrawable buttonBackground = new TextureRegionDrawable(new Texture(pixmap));
 		
-		TextButtonStyle style = new TextButtonStyle();
-		style.font = game.font;
-		style.fontColor = Color.WHITE;
-		style.overFontColor = new Color(0.415f, 0.14f, 0.087f, 1f);
-		style.up = texture;
+		TextButtonStyle textButtonStyle = new TextButtonStyle();
+		textButtonStyle.font = game.font;
+		textButtonStyle.fontColor = Color.WHITE;
+		textButtonStyle.overFontColor = new Color(0.415f, 0.14f, 0.087f, 1f);
+		textButtonStyle.up = buttonBackground;
 		
-		newGameButton = new TextButton("New game", style);
-		resumeGameButton = new TextButton("Resume game", style);
-		optionsButton = new TextButton("Options", style);
+		newGameButton = new TextButton("New game", textButtonStyle);
+		resumeGameButton = new TextButton("Resume game", textButtonStyle);
+		optionsButton = new TextButton("Options", textButtonStyle);
 		
 		Image title = new Image(new TextureRegion(new Texture(Gdx.files.internal("AerosAdventureLogo.png"))));
 		
-		table.row();
-		Cell<Image> imageCell = table.add(title);
+		mainMenuTable.row();
+		Cell<Image> imageCell = mainMenuTable.add(title);
 		imageCell.spaceBottom(buttonHeight / 3.f);
 		imageCell.width(userInterface.getWidth() / 2);
 		imageCell.height(buttonHeight * 2f);
 		
 		Cell<TextButton> cell;
-		table.row();
-		cell = table.add(newGameButton);
+		mainMenuTable.row();
+		cell = mainMenuTable.add(newGameButton);
 		cell.spaceBottom(buttonHeight / 3.f);
 		cell.width(userInterface.getWidth() / 2);
 		cell.height(buttonHeight);
 
-		table.row();
-		cell = table.add(resumeGameButton);
+		mainMenuTable.row();
+		cell = mainMenuTable.add(resumeGameButton);
 		cell.spaceBottom(buttonHeight / 3.f);
 		cell.width(userInterface.getWidth() / 2);
 		cell.height(buttonHeight);
 		cell.fill();
 		
-		table.row();
-		cell = table.add(optionsButton);
+		mainMenuTable.row();
+		cell = mainMenuTable.add(optionsButton);
 		cell.spaceBottom(buttonHeight / 3.f);
 		cell.width(userInterface.getWidth() / 2);
 		cell.height(buttonHeight);
@@ -91,6 +94,11 @@ public class MainMenuScreen implements Screen {
 		newGameButton.getLabel().setFontScale(buttonHeight / 25.f);
 		resumeGameButton.getLabel().setFontScale(buttonHeight / 25.f);
 		optionsButton.getLabel().setFontScale(buttonHeight / 25.f);
+		
+		
+		// Options table
+		userInterface.addActor(optionsTable);
+		pixmap.dispose();
 	}
 	
 	@Override
@@ -102,12 +110,23 @@ public class MainMenuScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(Color.BLACK);
+			
 		userInterface.act();
 		userInterface.draw();
 		
 		if (newGameButton.getClickListener().isPressed()) {
-			game.setScreen(new GameScreen(game));
 			dispose();
+			game.setScreen(new GameScreen(game));
+		}
+		
+		if (optionsButton.getClickListener().isPressed()) {
+			optionsTable.setVisible(true);
+			mainMenuTable.setVisible(false);
+		}
+		
+		if (game.options.backButton.getClickListener().isPressed()) {
+			optionsTable.setVisible(false);
+			mainMenuTable.setVisible(true);
 		}
 	}
 

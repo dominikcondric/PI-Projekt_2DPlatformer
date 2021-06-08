@@ -25,8 +25,6 @@ import utility.Hud;
 import utility.SceneManager;
 
 public class GameScreen implements Screen {
-	
-	
 	private final Platformer game;
 	private final TmxMapLoader tiledMapLoader;
 	private Box2DDebugRenderer physicsDebugRenderer;
@@ -47,7 +45,7 @@ public class GameScreen implements Screen {
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
 		player = new Player(new Vector2(2.f, 39.f));
-		inGameHud = new Hud(player, game.batch, game.font);
+		inGameHud = new Hud(player, game.batch, game.font, game.options);
 		Light.setGlobalContactFilter((short)CollisionListener.LIGHT_BIT, (short)0, (short)(CollisionListener.PLATFORM_BIT | CollisionListener.SOLID_WALL_BIT | CollisionListener.OTHERS_BIT));
 		
 		Scene castleScene = new CastleScene(tiledMapLoader, game.batch);
@@ -108,6 +106,7 @@ public class GameScreen implements Screen {
 			}
 		} else if (!player.isActive()) {
 			sceneManager.getActiveScene().resetEntities();
+			sceneManager.getActiveScene().stopMusic(false);
 			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
 		}
 	}

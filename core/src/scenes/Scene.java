@@ -13,6 +13,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
+import com.platformer.Platformer;
 
 import box2dLight.RayHandler;
 import entities.Entity;
@@ -139,6 +140,9 @@ public abstract class Scene {
 	
 	public void update(float deltaTime) {
 		box2DWorld.step(deltaTime, 10, 10);
+		if (!music.isPlaying()) {
+			music.play();
+		}
 		
 		if (runningAnimation != null) {
 			player.controllable = false;
@@ -164,6 +168,7 @@ public abstract class Scene {
 		
 		toDestroy.clear();
 		
+		music.setVolume(Platformer.musicVolume);
 	}
 	
 	public void dispose() {
@@ -174,7 +179,7 @@ public abstract class Scene {
 	}
 	
 	public void playMusic() {
-		music.setVolume(0.02f);
+		music.setVolume(Platformer.musicVolume);
 		music.play();
 		music.setLooping(true);
 	}
