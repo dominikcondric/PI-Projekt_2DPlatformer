@@ -17,6 +17,7 @@ import box2dLight.PointLight;
 import entities.Player;
 import scenes.CastleInDistanceScene;
 import scenes.CastleScene;
+import scenes.ForestScene;
 import scenes.OutOfMapTrigger;
 import scenes.Scene;
 import screens.GameOverScreen.ScreenType;
@@ -52,7 +53,10 @@ public class GameScreen implements Screen {
 		sceneManager.addScene(castleScene, "Castle", true);
 		Scene introScene = new CastleInDistanceScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(introScene, "Intro", true);
+		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
+		sceneManager.addScene(forestScene, "Forest", false);
 		introScene.addTrigger(new OutOfMapTrigger(castleScene, player, new Vector2(19.f, 19.f), true));
+		castleScene.addTrigger(new OutOfMapTrigger(forestScene, player, new Vector2(220.f, 15.f), true));
 		introScene.addEntity(player);
 	}
 

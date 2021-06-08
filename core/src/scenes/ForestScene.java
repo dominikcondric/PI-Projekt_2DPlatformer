@@ -93,7 +93,7 @@ public class ForestScene extends Scene {
 
 	@Override
 	protected void placePlayerOnScene(Player player) {
-		player.setPosition(new Vector2(3.f, 39.f));
+		player.setPosition(new Vector2(3.f, 40.f));
 	}
 
 	@Override

@@ -11,7 +11,8 @@ import scenes.Scene;
 
 public class Key extends Item {
 	private String keyID;
-
+	public boolean used = false; 
+			
 	public Key(Vector2 position, String keyID) {
 		super(position);
 		this.keyID = keyID;

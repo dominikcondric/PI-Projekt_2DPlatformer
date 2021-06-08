@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.5.0" orientation="orthogonal" renderorder="right-down" width="220" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="24" nextobjectid="688">
+<map version="1.5" tiledversion="2021.03.23" orientation="orthogonal" renderorder="right-down" width="220" height="80" tilewidth="32" tileheight="32" infinite="0" nextlayerid="24" nextobjectid="689">
  <tileset firstgid="1" name="Background" tilewidth="32" tileheight="32" tilecount="70" columns="7">
   <image source="Castle_Tilesets/Tileset 1/Background.png" width="224" height="336"/>
  </tileset>
@@ -576,17 +576,20 @@
   <object id="683" x="2816" y="1376" width="32" height="32"/>
   <object id="684" x="2848" y="1440" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="21" name="Gate Hall">
-  <properties>
-   <property name="Key" value="Hall"/>
-  </properties>
-  <object id="685" x="4320" y="1856" width="32" height="320"/>
- </objectgroup>
- <objectgroup id="22" name="Gate End">
+ <objectgroup id="22" name="Gate Object">
   <properties>
    <property name="Key" value="End"/>
   </properties>
-  <object id="687" x="6560" y="1984" width="32" height="192"/>
+  <object id="687" x="6560" y="1984" width="32" height="192">
+   <properties>
+    <property name="Key" value="End"/>
+   </properties>
+  </object>
+  <object id="688" x="4320" y="1856" width="32" height="320">
+   <properties>
+    <property name="Key" value="Main"/>
+   </properties>
+  </object>
  </objectgroup>
  <layer id="1" name="Main Background " width="220" height="80">
   <data encoding="csv">

@@ -21,7 +21,10 @@ import entities.Chest;
 import entities.Coin;
 import entities.FireballItem;
 import entities.FirstBoss;
+import entities.Gate;
+import entities.Key;
 import entities.MeleeGuard;
+import entities.Orb;
 import entities.Player;
 import entities.RangedGuard;
 import entities.Slime;
@@ -91,7 +94,7 @@ public class CastleScene extends Scene {
         addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
         addEntity(new MeleeGuard(new Vector2(110.f, 13.f)));
-        addEntity(new RangedGuard(new Vector2(135.f, 13.f)));
+        addEntity(new RangedGuard(new Vector2(145.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(160f, 13.f)));
         addEntity(new RangedGuard(new Vector2(192f, 13.f)));
         FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 8.1f));
@@ -109,6 +112,20 @@ public class CastleScene extends Scene {
 	    addEntity(new MeleeGuard(new Vector2(154.f, 36.f)));
 	    addEntity(new RangedGuard(new Vector2(199.f, 47.f)));
 	    addEntity(new FirstBoss(new Vector2(174f, 20.f)));
+
+       addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
+       addEntity(new MeleeGuard(new Vector2(68.f, 13.f)));
+       Key mainGateKey = new Key(new Vector2(130.f, 12.f), "Main");
+       addEntity(mainGateKey);
+       addEntity(new Chest(new Vector2(130f, 12f), mainGateKey));
+       
+       Key endGateKey = new Key(new Vector2(200.f, 12.f), "End");
+       addEntity(endGateKey);
+       addEntity(new Chest(new Vector2(200f, 12f), endGateKey));
+       
+       TiledMapTileLayer orbLayer = (TiledMapTileLayer)map.getLayers().get("Main Infront 2");
+       addEntity(new Orb(new Vector2(208.f, 13f), "Fire", orbLayer.getCell(208, 13)));
+       
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
 		for(MapObject object : map.getLayers().get("Lights Torch").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
@@ -190,12 +207,19 @@ public class CastleScene extends Scene {
 			Coin coin = new Coin(rect.getPosition(new Vector2()), coinLayer.getCell((int)rect.getX(), (int)rect.getY()));
 			addEntity(coin);
 		}
+		
+		// GATES
+		TiledMapTileLayer gateLayer = (TiledMapTileLayer)map.getLayers().get("Gate");
+		for (RectangleMapObject object : map.getLayers().get("Gate Object").getObjects().getByType(RectangleMapObject.class)) {
+			Rectangle rect = object.getRectangle();
+			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
+			Gate gate = new Gate(rect.getPosition(new Vector2()), rect.getSize(new Vector2()), gateLayer.getCell((int)rect.getX(), (int)rect.getY()), (String)object.getProperties().get("Key"));
+			addEntity(gate);
+		}
 	}
 
 	@Override
 	protected void placePlayerOnScene(Player player) {
-		//player.setPosition(new Vector2(2.f, 9.f));
-		//player.setPosition(new Vector2(2.f, 9.f));
-		player.setPosition(new Vector2(195.f, 13.f));
+		player.setPosition(new Vector2(2.f, 9.f));
 	}
 }

@@ -174,6 +174,10 @@ public class Player extends Entity {
 	        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 	        	moveLeft();
 	        }
+	        
+	        if (Gdx.input.isKeyJustPressed(Input.Keys.H))
+	        	hp = maxHp;
+	        
 	        if(hasAttacked) {
 	        	body.destroyFixture(melee);
 	        	hasAttacked = false;
@@ -238,6 +242,10 @@ public class Player extends Entity {
 		melee.setUserData(this);
 		hasAttacked = true;
 		attackRange.dispose();
+	}
+	
+	public ArrayList<Item> getItems() {
+		return items;
 	}
 
 	public TextureRegion getFrame(float deltaTime){

@@ -50,8 +50,8 @@ public class Arrow extends Entity{
 		body.setGravityScale(0);
 		fdef = new FixtureDef();
 		fdef.shape = polShape;
-		fdef.filter.categoryBits = CollisionListener.PROJECTILE_BIT;
-		fdef.filter.maskBits = 0xFF;
+		fdef.filter.categoryBits = CollisionListener.PROJECTILE_BIT | CollisionListener.ENEMY_BIT;
+		fdef.filter.maskBits = CollisionListener.PLAYER_BIT | CollisionListener.SOLID_WALL_BIT;
 		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 	
 		arrowBody = this.body.createFixture(fdef);
