@@ -78,7 +78,7 @@ public class FirstBoss extends Enemy {
 		body.setGravityScale(0);
 		
 		PolygonShape vision = new PolygonShape();
-		vision.setAsBox(visionLength, visionHeight, new Vector2(0,visionHeight-0.2f), 0);
+		vision.setAsBox(visionLength * 2, visionHeight * 2, new Vector2(0,visionHeight-1f), 0);
 		
 		fdef.shape = vision;
 		fdef.isSensor = true;
@@ -109,34 +109,51 @@ public class FirstBoss extends Enemy {
 	}
 	private void setAnimations() {
 
-		atlas = new TextureAtlas(Gdx.files.internal("slimesprites\\slime_sprites.atlas"));
-		currentRegion = new TextureRegion(atlas.findRegion("slime_idle"), 0, 0, 28, 14);
-		for(int i = 0; i < 5; i++) {
+		atlas = new TextureAtlas(Gdx.files.internal("sorcerersprites\\first_boss_sprites.atlas"));
+		currentRegion = new TextureRegion(atlas.findRegion("idle_wizard"), 0, 0, 28, 14);
+		for(int i = 0; i < 8; i++) {
 			switch (i) {
 				case 0:
-					idleFrames.add(new TextureRegion(atlas.findRegion("slime_idle"), i * 30 , 0, 28, 14 ));
-					moveFrames.add(new TextureRegion(atlas.findRegion("slime_move"), i * 28 , 0, 26, 12 ));
-					attackFrames.add(new TextureRegion(atlas.findRegion("slime_attack"), i * 31 , 0, 28, 11 ));
+					idleFrames.add(new TextureRegion(atlas.findRegion("idle_wizard"), i * 37 , 0, 32, 55 ));
+					moveFrames.add(new TextureRegion(atlas.findRegion("move_wizard"), i * 54 , 0, 48, 65 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
 					break;
 				case 1:
-					idleFrames.add(new TextureRegion(atlas.findRegion("slime_idle"), i * 30 , 0, 28, 14 ));
-					moveFrames.add(new TextureRegion(atlas.findRegion("slime_move"), i * 28 , 0, 26, 12 ));
-					attackFrames.add(new TextureRegion(atlas.findRegion("slime_attack"), i * 31 , 0, 29, 11 ));
+					idleFrames.add(new TextureRegion(atlas.findRegion("idle_wizard"), i * 37 , 0, 34, 54 ));
+					moveFrames.add(new TextureRegion(atlas.findRegion("move_wizard"), i * 54 , 0, 48, 66 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
 					break;
 				case 2:
-					idleFrames.add(new TextureRegion(atlas.findRegion("slime_idle"), i * 30 , 0, 28, 14 ));
-					moveFrames.add(new TextureRegion(atlas.findRegion("slime_move"), i * 28 , 0, 24, 12 ));
-					attackFrames.add(new TextureRegion(atlas.findRegion("slime_attack"), i * 31 , 0, 28, 20 ));
+					idleFrames.add(new TextureRegion(atlas.findRegion("idle_wizard"), i * 37 , 0, 35, 54 ));
+					moveFrames.add(new TextureRegion(atlas.findRegion("move_wizard"), i * 54 , 0, 49, 67 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
 					break;
 				case 3:
-					idleFrames.add(new TextureRegion(atlas.findRegion("slime_idle"), i * 30 , 0, 28, 13 ));
-					moveFrames.add(new TextureRegion(atlas.findRegion("slime_move"), i * 28 , 0, 26, 11 ));
-					attackFrames.add(new TextureRegion(atlas.findRegion("slime_attack"), i * 31 , 0, 28, 15 ));
+					idleFrames.add(new TextureRegion(atlas.findRegion("idle_wizard"), i * 37 , 0, 32, 53 ));
+					moveFrames.add(new TextureRegion(atlas.findRegion("move_wizard"), i * 54 , 0, 48, 67 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
 					break;
 				case 4:
-					attackFrames.add(new TextureRegion(atlas.findRegion("slime_attack"), i * 31 , 0, 28, 12 ));
-					attackFrames.add(new TextureRegion(atlas.findRegion("slime_attack"), i * 31 , 0, 28, 12 ));
-					break;			
+					idleFrames.add(new TextureRegion(atlas.findRegion("idle_wizard"), i * 37 , 0, 32, 55));
+					moveFrames.add(new TextureRegion(atlas.findRegion("move_wizard"), i * 54 , 0, 48, 66 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
+					break;		
+				case 5:
+					idleFrames.add(new TextureRegion(atlas.findRegion("idle_wizard"), i * 37 , 0, 35, 53 ));
+					moveFrames.add(new TextureRegion(atlas.findRegion("move_wizard"), i * 54 , 0, 52, 66 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
+					break;
+				case 6:
+					idleFrames.add(new TextureRegion(atlas.findRegion("idle_wizard"), i * 37 , 0, 35, 56 ));
+					moveFrames.add(new TextureRegion(atlas.findRegion("move_wizard"), i * 54 , 0, 52, 68 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
+					break;
+				case 7:
+					idleFrames.add(new TextureRegion(atlas.findRegion("idle_wizard"), i * 37 , 0, 34, 57 ));
+					moveFrames.add(new TextureRegion(atlas.findRegion("move_wizard"), i * 54 , 0, 52, 67 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
+					attackFrames.add(new TextureRegion(atlas.findRegion("attack_wizard"), i * 83 , 0, 48, 65 ));
+					break;
 			}
 			
 		}
@@ -150,12 +167,8 @@ public class FirstBoss extends Enemy {
 		super.update(scene, deltaTime);
 		currentRegion = getFrame(deltaTime);
 		
-		System.out.println(body.getPosition().x + " " + body.getPosition().y);
-		//System.out.println(currentPos);
+
 		if(hasAttacked) {
-			attackAnimDelay -= deltaTime;
-		}
-		if(attackAnimDelay <= 0) {
 			scene.addEntity(new EnemyFireball(new Vector2(body.getPosition().x, body.getPosition().y), true, 1, 1, 10f, 0f));
 			scene.addEntity(new EnemyFireball(new Vector2(body.getPosition().x, body.getPosition().y + bodyHeight/2), true, 1, 1, 10f, 10f));
 			scene.addEntity(new EnemyFireball(new Vector2(body.getPosition().x, body.getPosition().y - bodyHeight/2), true, 1, 1, 10f, -10f));
@@ -170,10 +183,14 @@ public class FirstBoss extends Enemy {
 		}
 		
 		if(activeAI) { 
-			shoot();
-			//System.out.println(body.getPosition().x + " " + body.getPosition().y);
-			//System.out.println((positionsx[currentPos] + 1f) + " " + (positionsx[currentPos] + 1f));
-			System.out.println(currentPos);
+			
+			attackAnimDelay -= deltaTime;
+			
+			if(attackAnimDelay <= 0) {
+				shoot();
+				attackAnimDelay = 5f;
+			}
+				
 			move(getHeading(positionsx[currentPos], positionsy[currentPos]));
 			if((body.getPosition().x<=positionsx[currentPos] + 0.1f && body.getPosition().x>=positionsx[currentPos] - 0.1f) &&
 			   (body.getPosition().y<=positionsy[currentPos] + 0.1f && body.getPosition().y>=positionsy[currentPos] - 0.1f)) currentPos++;
@@ -207,7 +224,7 @@ public class FirstBoss extends Enemy {
 		previousState = currentState;
 		TextureRegion region;		
 
-		if(currentState == State.ATTACKING && attackAnim.getKeyFrameIndex(stateTimer) != 4) {
+		if(currentState == State.ATTACKING && attackAnim.getKeyFrameIndex(stateTimer) != 8) {
 			region = (TextureRegion) attackAnim.getKeyFrame(stateTimer, true);
 			needsFlip(region);
 			stateTimer = currentState == previousState ? stateTimer + deltaTime : 0;

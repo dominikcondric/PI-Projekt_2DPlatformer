@@ -1,0 +1,41 @@
+
+first_boss_sprites.png
+size: 2048, 256
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+attack_wizard
+  rotate: false
+  xy: 2, 4
+  size: 657, 50
+  orig: 1024, 64
+  offset: 2, 10
+  index: -1
+die_wizard
+  rotate: false
+  xy: 661, 4
+  size: 259, 56
+  orig: 512, 64
+  offset: 2, 4
+  index: -1
+hurt_wizard
+  rotate: false
+  xy: 1320, 4
+  size: 112, 55
+  orig: 128, 64
+  offset: 2, 5
+  index: -1
+idle_wizard
+  rotate: false
+  xy: 2, 74
+  size: 293, 57
+  orig: 512, 64
+  offset: 2, 3
+  index: -1
+move_wizard
+  rotate: false
+  xy: 661, 74
+  size: 430, 68
+  orig: 512, 128
+  offset: 2, 56
+  index: -1

@@ -72,7 +72,7 @@ public class RangedGuard extends Enemy {
 		body.createFixture(fdef).setUserData(this);
 		
 		PolygonShape vision = new PolygonShape();
-		vision.setAsBox(visionLength, visionHeight, new Vector2(0,visionHeight-(0.8f)), 0);
+		vision.setAsBox(visionLength * 5, visionHeight, new Vector2(0,visionHeight-(0.8f)), 0);
 		
 		fdef.shape = vision;
 		fdef.isSensor=true;
