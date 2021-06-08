@@ -37,11 +37,11 @@ public class FirstBoss extends Enemy {
 	private State currentState;
 	private State previousState;
 	private int currentPos = 0;
-	private int[] positionsx = {80, 75, 80};
-	private int[] positionsy = {15, 16, 15};
+	private int[] positionsx = {174,180,190,203,203,203,194,194,190,187,183,177};
+	private int[] positionsy = {20,23,24,22,17,14,14,16,16,16,18,16};
 	private float attackAnimDelay;
 	private float bodyHeight=2f;
-	private float bodyWidth=2f;
+	private float bodyWidth=1f;
 
 	
 	public FirstBoss(Vector2 position) {
@@ -173,12 +173,11 @@ public class FirstBoss extends Enemy {
 			shoot();
 			//System.out.println(body.getPosition().x + " " + body.getPosition().y);
 			//System.out.println((positionsx[currentPos] + 1f) + " " + (positionsx[currentPos] + 1f));
-			System.out.println(currentPos);
 			move(getHeading(positionsx[currentPos], positionsy[currentPos]));
 			if((body.getPosition().x<=positionsx[currentPos] + 0.1f && body.getPosition().x>=positionsx[currentPos] - 0.1f) &&
 			   (body.getPosition().y<=positionsy[currentPos] + 0.1f && body.getPosition().y>=positionsy[currentPos] - 0.1f)) currentPos++;
 			}
-		if(currentPos>=2) currentPos=0;
+		if(currentPos>=11) currentPos=0;
 
 	
 	}

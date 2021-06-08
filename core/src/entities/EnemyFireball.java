@@ -36,8 +36,9 @@ public class EnemyFireball extends Entity {
 	Sound explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/fireball.wav"));
 	private float xSpeed;
 	private float ySpeed;
+	private float imageDirection=0;
 	
-	public EnemyFireball(Vector2 entityPosition, boolean firedRight, float hitDmg, float explosionDmg, float xSpeed, float ySpeed) {
+	public EnemyFireball(Vector2 entityPosition, boolean firedRight, float hitDmg, float explosionDmg, float xSpeed, float ySpeed ) {
 		super(entityPosition);
 		
 		setAnimations();
@@ -46,6 +47,8 @@ public class EnemyFireball extends Entity {
 		this.explosionDmg = explosionDmg;
 		this.xSpeed=xSpeed;
 		this.ySpeed=ySpeed;
+		
+		//image direction N=1, NE=2, E=3, SE=4, S=5, SW=6, W=7, NW= 8
 		
 		if (firedRight) {
 			sprite.setX(entityPosition.x + 1f);
@@ -56,6 +59,17 @@ public class EnemyFireball extends Entity {
 		
 		sprite.setY(entityPosition.y + 0.07f);
 		sprite.setSize(0.8f, 0.4f);
+		sprite.setOriginCenter();
+		
+		if (firedRight) {
+			if(imageDirection == 2)sprite.setRotation(45);
+			else if(imageDirection == 4)sprite.setRotation(-45);
+		} else {
+			if(imageDirection == 1)sprite.setRotation(90);
+			else if(imageDirection == 5)sprite.setRotation(-90);
+			else if(imageDirection == 6)sprite.setRotation(-45);
+			else if(imageDirection == 8)sprite.setRotation(45);
+		}
 	}
 
 	public void addToWorld(World world) {
@@ -70,7 +84,7 @@ public class EnemyFireball extends Entity {
 		
 		fdef = new FixtureDef();
 		fdef.shape = polShape;
-		fdef.filter.categoryBits = CollisionListener.PROJECTILE_BIT;
+		fdef.filter.categoryBits = CollisionListener.PROJECTILE_BIT | CollisionListener.ENEMY_BIT;
 		fdef.filter.maskBits = 0xFF & ~CollisionListener.PLATFORM_BIT;
 		fdef.isSensor=true;
 	

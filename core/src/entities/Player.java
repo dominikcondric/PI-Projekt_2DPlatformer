@@ -144,7 +144,7 @@ public class Player extends Entity {
 			return;
 		}
 		Vector2 playerVelocity = body.getLinearVelocity();
-		
+		//System.out.println("x "+ body.getPosition().x + " y: " + body.getPosition().y);
 		if(playerVelocity.y == ON_GROUND){
         	jumpCount = 0;
         	moveThresholdLeft = -6;
@@ -411,10 +411,11 @@ public class Player extends Entity {
 				onHit(((Enemy) other.getUserData()).getPosition().x, 2f);
 			else if(!other.isSensor()) 
 				onHit(((Enemy) other.getUserData()).getPosition().x, 1f);
-			
+			if((other.getFilterData().categoryBits & CollisionListener.PROJECTILE_BIT) != 0) this.onHit(0, 5);
 		} else if ((other.getFilterData().categoryBits & CollisionListener.COIN_BIT) != 0 && ((Coin)other.getUserData()).isActive()) {
 			++coinCount;
 		}
+		
 	}
 
 	public float getSwordDmg() {

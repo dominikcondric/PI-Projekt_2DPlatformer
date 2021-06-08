@@ -87,7 +87,7 @@ public class CastleScene extends Scene {
 	public void constructEntities() {
 		lights = new ArrayList<PointLight>(4);
 
-		addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
+	/*	addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
         addEntity(new MeleeGuard(new Vector2(110.f, 13.f)));
@@ -100,8 +100,9 @@ public class CastleScene extends Scene {
 
 
        addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
-       addEntity(new MeleeGuard(new Vector2(68.f, 13.f)));
+       addEntity(new MeleeGuard(new Vector2(68.f, 13.f)));*/
 		
+        addEntity(new FirstBoss(new Vector2(174f, 20.f)));
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
 		for(MapObject object : map.getLayers().get("Lights Torch").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
@@ -187,6 +188,7 @@ public class CastleScene extends Scene {
 
 	@Override
 	protected void placePlayerOnScene(Player player) {
-		player.setPosition(new Vector2(2.f, 9.f));
+		//player.setPosition(new Vector2(2.f, 9.f));
+		player.setPosition(new Vector2(160.f, 20.f));
 	}
 }
