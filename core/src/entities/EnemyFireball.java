@@ -58,7 +58,7 @@ public class EnemyFireball extends Entity {
 		}
 		
 		sprite.setY(entityPosition.y + 0.07f);
-		sprite.setSize(0.8f, 0.4f);
+		sprite.setSize(1f, 1f);
 		sprite.setOriginCenter();
 		
 		if (firedRight) {
@@ -145,7 +145,7 @@ public class EnemyFireball extends Entity {
     	currentState = getState();
     	switch(currentState) {
     		case FLYING:
-    			sprite.setSize(0.8f, 0.4f);
+    			sprite.setSize(1, 1);
     	        region = (TextureRegion) flying.getKeyFrame(stateTimer, true);
     	        if((body.getLinearVelocity().x < 0 || !firedRight) && !region.isFlipX()){
     	            region.flip(true, false);
@@ -194,12 +194,12 @@ public class EnemyFireball extends Entity {
 	}
 	
 	private void setAnimations() {
-		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\fireball.atlas"));
-		TextureRegion projectileImage = new TextureRegion(atlas.findRegion("FB001"),0 , 0, 35, 17);
+		atlas = new TextureAtlas(Gdx.files.internal("projectiles\\enemy_fireball.atlas"));
+		TextureRegion projectileImage = new TextureRegion(atlas.findRegion("FB500-1"),0 , 0, 304, 304);
 		
 		Array<TextureRegion> frames = new Array<TextureRegion>();
 		for(int i = 0; i < 5; i++) {
-			frames.add(new TextureRegion(atlas.findRegion("FB001"),i * 37 , 0, 35, 17));
+			frames.add(new TextureRegion(atlas.findRegion("FB500-1"),i * 306 , 0, 304, 304));
 		}
 		
 		flying = new Animation<TextureRegion>(0.1f, frames);

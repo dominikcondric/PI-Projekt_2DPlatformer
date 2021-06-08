@@ -1,0 +1,41 @@
+
+enemy_fireball.png
+size: 2048, 512
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+FB500-1
+  rotate: false
+  xy: 2, 4
+  size: 304, 304
+  orig: 512, 512
+  offset: 96, 112
+  index: -1
+FB500-2
+  rotate: false
+  xy: 308, 4
+  size: 304, 304
+  orig: 512, 512
+  offset: 96, 112
+  index: -1
+FB500-3
+  rotate: false
+  xy: 614, 4
+  size: 304, 288
+  orig: 512, 512
+  offset: 96, 112
+  index: -1
+FB500-4
+  rotate: false
+  xy: 920, 4
+  size: 304, 288
+  orig: 512, 512
+  offset: 96, 112
+  index: -1
+FB500-5
+  rotate: false
+  xy: 1226, 4
+  size: 304, 288
+  orig: 512, 512
+  offset: 96, 112
+  index: -1
