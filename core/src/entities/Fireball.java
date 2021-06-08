@@ -33,6 +33,7 @@ public class Fireball extends Entity {
 	private enum State { FLYING, EXPLODING};
 	private State currentState;
 	private State previousState;
+	private 
 	Sound explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/fireball.wav"));
 	public Fireball(Vector2 entityPosition, boolean firedRight, float hitDmg, float explosionDmg) {
 		super(entityPosition);
@@ -88,30 +89,37 @@ public class Fireball extends Entity {
 		if(body.getLinearVelocity().y < 0) {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
+		if(exploded) {
+			animLenght -= deltaTime;
+			if(explosionSensor != null) {
+				body.destroyFixture(explosionSensor);
+				explosionSensor = null;
+			}		
+			if(animLenght <= 0) {
+				setToDestroy = true;
+			}
+		}
 		
 		if(setToExplode) {
 			body.setLinearVelocity(0, 0);
 			body.destroyFixture(fireballBody);
 			PolygonShape polShape = new PolygonShape();
-			polShape.setAsBox(5, 2.5f);
+			polShape.setAsBox(5f, 2.5f);
 			fdef.shape = polShape;
 			fdef.isSensor = true;
+			fdef.filter.categoryBits = CollisionListener.FIREBALL_BIT;
+			fdef.filter.maskBits = CollisionListener.ENEMY_BIT;
 			explosionSensor = this.body.createFixture(fdef);
 			explosionSensor.setUserData(this);
 			exploded = true;
 			setToExplode = false;
-			explosionSound.play(0.5f);
-			body.destroyFixture(explosionSensor);
+			explosionSound.play(0.5f);			
 		}
-		if(exploded) {
-			animLenght -= deltaTime;
-			if(animLenght <= 0) {
-				setToDestroy = true;
-			}
-		}
+		
 	}
     
     private void onHit() {	
+    	if(!exploded)
     	setToExplode = true;
     }
     

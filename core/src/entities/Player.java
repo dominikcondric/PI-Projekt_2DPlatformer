@@ -177,12 +177,7 @@ public class Player extends Entity {
         	moveThresholdLeft = -4.5f;
         	moveThresholdRight = 4.5f;
         }
-		
-		if(hasAttacked) {
-        	body.destroyFixture(melee);
-        	hasAttacked = false;
-        }
-		
+
 		if (controllable) {
 			if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
 				if(((currentState == State.FALLING || currentState == State.JUMPING) && jumpCount == 1) || (playerVelocity.y == ON_GROUND && jumpCount < 2)) {
@@ -202,7 +197,10 @@ public class Player extends Entity {
 	        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 	        	moveLeft();
 	        }
-	        
+	        if(hasAttacked) {
+	        	body.destroyFixture(melee);
+	        	hasAttacked = false;
+	        }
 	        if(attackCooldown == 0) {
 	        	if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
 	        		swordSlash.play();
@@ -212,6 +210,8 @@ public class Player extends Entity {
 	        }
 	        attackCooldown -= deltaTime;
 	        if(attackCooldown < 0) attackCooldown = 0;
+	        
+	        
 		}
 
         if(playerVelocity.x == 0 || playerVelocity.y != ON_GROUND) {
@@ -231,7 +231,8 @@ public class Player extends Entity {
 		fdef.shape = attackRange;
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
-		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT ;
+		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.maskBits = CollisionListener.ENEMY_BIT & ~CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT & ~CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT;
 		melee = this.body.createFixture(fdef);
 		melee.setUserData(this);
 		hasAttacked = true;
@@ -355,9 +356,9 @@ public class Player extends Entity {
 		items.add(item);
 	}
 	
-	public void onHit(float x) {
+	public void onHit(float x, float dmg) {
 		gettingHit.play(0.25f);
-		this.hp--;
+		this.hp -= dmg;
 		if(this.hp<=0)
 			active = false;
 		if(x==0) return;
@@ -405,8 +406,12 @@ public class Player extends Entity {
 
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
-		if((other.getFilterData().categoryBits & CollisionListener.ENEMY_BIT) != 0 && !other.isSensor() && !hasAttacked) {
-			onHit(((Enemy) other.getUserData()).getPosition().x);
+		if((other.getFilterData().categoryBits & CollisionListener.ENEMY_BIT) != 0 && !hasAttacked) {
+			if(other.isSensor() && other.getUserData() instanceof MeleeGuard && ((MeleeGuard)other.getUserData()).hasAttacked()) 
+				onHit(((Enemy) other.getUserData()).getPosition().x, 2f);
+			else if(!other.isSensor()) 
+				onHit(((Enemy) other.getUserData()).getPosition().x, 1f);
+			
 		} else if ((other.getFilterData().categoryBits & CollisionListener.COIN_BIT) != 0 && ((Coin)other.getUserData()).isActive()) {
 			++coinCount;
 		}
