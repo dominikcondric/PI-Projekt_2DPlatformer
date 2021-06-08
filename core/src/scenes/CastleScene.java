@@ -20,11 +20,8 @@ import box2dLight.PointLight;
 import entities.Chest;
 import entities.Coin;
 import entities.FireballItem;
-<<<<<<< HEAD
 import entities.FirstBoss;
-=======
 import entities.MeleeGuard;
->>>>>>> 553d734deaaa6af46faef2036e93011b6c064d81
 import entities.Player;
 import entities.RangedGuard;
 import entities.Slime;
