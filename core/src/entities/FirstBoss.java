@@ -37,7 +37,7 @@ public class FirstBoss extends Enemy {
 	private State currentState;
 	private State previousState;
 	private int currentPos = 0;
-	private int[] positionsx = {174,180,190,203,203,203,194,194,190,187,183,177};
+	private int[] positionsx = {174,180,190,203,203,204,194,194,190,187,183,177};
 	private int[] positionsy = {20,23,24,22,17,14,14,16,16,16,18,16};
 	private float attackAnimDelay;
 	private float bodyHeight=2f;
@@ -49,8 +49,8 @@ public class FirstBoss extends Enemy {
 		setAnimations();
 
 		facingRight=false;
-		moveSpeed=0.1f;
-		jumpHeight=0.1f;
+		moveSpeed=0.3f;
+		jumpHeight=0.3f;
 		attackAnimDelay=1f;
 		activeAI=false;
 		
@@ -78,7 +78,7 @@ public class FirstBoss extends Enemy {
 		body.setGravityScale(0);
 		
 		PolygonShape vision = new PolygonShape();
-		vision.setAsBox(visionLength * 2, visionHeight * 2, new Vector2(0,visionHeight-1f), 0);
+		vision.setAsBox(visionLength * 4, visionHeight * 4, new Vector2(0,visionHeight-4f), 0);
 		
 		fdef.shape = vision;
 		fdef.isSensor = true;
@@ -189,7 +189,7 @@ public class FirstBoss extends Enemy {
 			
 			if(attackAnimDelay <= 0) {
 				shoot();
-				attackAnimDelay = 5f;
+				attackAnimDelay = 3f;
 			}
 				
 			move(getHeading(positionsx[currentPos], positionsy[currentPos]));
@@ -204,9 +204,9 @@ public class FirstBoss extends Enemy {
 		//enemy manji x dakle true onda se mice enemy u desno
 		//inace se mice u lijevo
 		int dir = 0;
-		if (body.getPosition().x < x) {
+		if (body.getPosition().x < x - 0.1f) {
 			dir++;
-		} else if (body.getPosition().x > x){
+		} else if (body.getPosition().x > x + 0.1f){
 			dir--;
 		}
 		
