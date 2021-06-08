@@ -10,4 +10,8 @@ public abstract class Item extends Entity {
 	}
 	
 	public abstract void appear();
+	
+	public void disappear() {
+		active = false;
+	}
 }

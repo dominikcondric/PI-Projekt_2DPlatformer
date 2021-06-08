@@ -1,5 +1,6 @@
 package utility;
 
+import java.awt.Menu;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
@@ -28,7 +29,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider.SliderStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 
@@ -38,7 +41,6 @@ import scenes.Scene;
 public class Hud implements Disposable {
 	private Stage hud;
 	private ArrayList<Stack> abilityIcons;
-	private int maxHp;
 	private ProgressBar progressBar;
 	private ShapeRenderer shapeRenderer;
 	private Table pauseTable;
@@ -46,14 +48,17 @@ public class Hud implements Disposable {
 	public TextButton resumeButton;
 	public TextButton optionsButton;
 	private Label dialogueBox;
+	private Label coinCount;
+	private OptionsUI options;
 	
-	public Hud(Player player, SpriteBatch batch, BitmapFont font) {
+	public Hud(Player player, SpriteBatch batch, BitmapFont font, OptionsUI options) {
 		shapeRenderer = new ShapeRenderer();
 		shapeRenderer.setColor(0.f, 0.f, 0.f, 0.9f);
 		hud = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), batch);
 		Gdx.input.setInputProcessor(hud);
-		
-		maxHp = player.getHp();
+		this.options = options;
+		hud.addActor(options.getTable());
+		options.setBackground(null);
 		
 		Group hp = new Group();
 		Label hpLabel = new Label("HP:", new LabelStyle(font, Color.BLACK));
@@ -69,7 +74,7 @@ public class Hud implements Disposable {
 		barRegion.setRegionHeight(20);
 		ProgressBarStyle barStyle = new ProgressBarStyle(null, new TextureRegionDrawable(barRegion));
 		barStyle.knobBefore = barStyle.knob;
-		progressBar = new ProgressBar(0f, maxHp, 1.0f, false, barStyle);
+		progressBar = new ProgressBar(0f, player.getMaxHp(), 1.0f, false, barStyle);
 		progressBar.setHeight(20.f);
 		progressBar.setWidth(200.f);
 		progressBar.setAnimateDuration(0.4f);
@@ -81,20 +86,22 @@ public class Hud implements Disposable {
 		progressBarColor.dispose();
 		
 		abilityIcons = new ArrayList<Stack>(4);
+		float offset = 60.f;
 		for (Ability ability : player.getAbilityList()) {
-			Image fireballImage = new Image(new TextureRegion(ability.getHudTextureRegion()));
+			Image abilityImage = new Image(new TextureRegion(ability.getHudTextureRegion()));
 			Label cooldownTimer = new Label(Integer.toString((int)ability.getCooldownTime()), new LabelStyle(font, Color.BLACK));
 			cooldownTimer.setAlignment(Align.center);
 			cooldownTimer.setFontScale(2f);
-			fireballImage.setSize(40f, 40f);
-			Stack abilityFireball = new Stack();
-			abilityFireball.addActor(fireballImage);
-			abilityFireball.addActor(cooldownTimer);
-			abilityFireball.setPosition(hud.getWidth() - 60.f, hud.getHeight() - 60f);
-			abilityFireball.setSize(40.f, 40.f);
-			abilityFireball.setVisible(ability.active);
-			abilityIcons.add(abilityFireball);
-			hud.addActor(abilityFireball);
+			abilityImage.setSize(40f, 40f);
+			Stack abilityStack = new Stack();
+			abilityStack.addActor(abilityImage);
+			abilityStack.addActor(cooldownTimer);
+			abilityStack.setPosition(hud.getWidth() - offset, hud.getHeight() - 60.f);
+			offset *= 2.f;
+			abilityStack.setSize(40.f, 40.f);
+			abilityStack.setVisible(ability.active);
+			abilityIcons.add(abilityStack);
+			hud.addActor(abilityStack);
 		}
 		
 		// Pause game gui
@@ -136,12 +143,11 @@ public class Hud implements Disposable {
 		
 		hud.addActor(pauseTable);
 
-		Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
-		p.setColor(0.f, 0.f, 0.f, 0.7f);
-		p.fill();
+		Pixmap pixmap = new Pixmap(1, 1, Format.RGBA8888);
+		pixmap.setColor(0.f, 0.f, 0.f, 0.7f);
+		pixmap.fill();
 		LabelStyle dialogueBoxStyle = new LabelStyle(font, Color.WHITE);
-		dialogueBoxStyle.background =  new TextureRegionDrawable(new TextureRegion(new Texture(p)));
-		p.dispose();
+		dialogueBoxStyle.background =  new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
 		dialogueBox = new Label("", dialogueBoxStyle);
 		dialogueBox.setPosition(10.f, 10.f);
 		dialogueBox.setSize(hud.getWidth() - 20.f, hud.getHeight() / 4.f);
@@ -151,6 +157,20 @@ public class Hud implements Disposable {
 		dialogueBox.setFontScale(2.f);
 		
 		hud.addActor(dialogueBox);
+		
+		coinCount = new Label("", new LabelStyle(font, Color.BROWN));
+		coinCount.setFontScale(2.5f);
+		coinCount.setSize(40f, 40f);
+		coinCount.setPosition(hud.getWidth() / 2.f, hud.getHeight() - 50.f);
+		coinCount.setAlignment(Align.center);
+		hud.addActor(coinCount);
+		
+		Image coinImage = new Image(new TextureRegion(new Texture(Gdx.files.internal("Castle/Castle_Tilesets/Coin/Coin.png")), 0, 0, 32, 32));
+		coinImage.setPosition(hud.getWidth() / 2.f - 40f, hud.getHeight() - 50.f);
+		coinImage.setSize(40f, 40f);
+		hud.addActor(coinImage);
+		
+		pixmap.dispose();
 	}
 	
 	public void onResize(int width, int height) {
@@ -160,13 +180,14 @@ public class Hud implements Disposable {
 	private void update(final Scene scene, boolean gamePaused) {
 		Player player = scene.getPlayer();
 		progressBar.setValue(player.getHp());
+		coinCount.setText(Integer.toString(player.getCoinCount()));
 		
 		ArrayList<Ability> abilities = player.getAbilityList();
 		for (int i = 0; i < abilities.size(); ++i) {
 			Ability ability = abilities.get(i);
 			if (ability.active) {
-				abilityIcons.get(i).setVisible(true);
 				Label cooldownTimer = null;
+				abilityIcons.get(i).setVisible(true);
 				
 				if (abilityIcons.get(i).getChild(1) instanceof Label) {
 					cooldownTimer = (Label)abilityIcons.get(i).getChild(1);
@@ -185,7 +206,15 @@ public class Hud implements Disposable {
 			}
 		}
 		
-		pauseTable.setVisible(gamePaused);
+		options.update();
+		
+		if (gamePaused) {
+			if (!options.getTable().isVisible())
+				pauseTable.setVisible(true);
+		} else {
+			pauseTable.setVisible(false);
+		}
+		
 		if (scene.getSceneAnimation() != null) {
 			dialogueBox.setText(scene.getSceneAnimation().getDialogueText());
 			dialogueBox.setVisible(true);
@@ -204,11 +233,21 @@ public class Hud implements Disposable {
 		shapeRenderer.end();
 	}
 	
-	public void render(final Scene scene, boolean gamePaused) {
+	public void render(final Scene scene, boolean gamePaused, boolean sceneInTransition) {
 		update(scene, gamePaused);
 		
 		if (gamePaused)
 			dimBackground();
+		
+		if (optionsButton.getClickListener().isPressed()) {
+			options.getTable().setVisible(true);
+			pauseTable.setVisible(false);
+		}
+		
+		if (options.backButton.getClickListener().isPressed()) {
+			options.getTable().setVisible(false);
+			pauseTable.setVisible(true);
+		}
 		
 		hud.act();
 		hud.draw();

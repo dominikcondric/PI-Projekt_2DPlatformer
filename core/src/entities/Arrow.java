@@ -2,28 +2,22 @@ package entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
 
 import scenes.Scene;
+import tools.CollisionListener;
 
 
 public class Arrow extends Entity{
 	private boolean firedRight;
-	private TextureAtlas atlas;
-	private Fixture fireballBody;
+	private Fixture arrowBody;
 	private FixtureDef fdef;
 	private float hitDmg;
-
-
 	
 	protected Arrow(Vector2 entityPosition, boolean firedRight, float hitDmg) {
 		super(entityPosition);
@@ -56,11 +50,12 @@ public class Arrow extends Entity{
 		body.setGravityScale(0);
 		fdef = new FixtureDef();
 		fdef.shape = polShape;
+		fdef.filter.categoryBits = CollisionListener.PROJECTILE_BIT | CollisionListener.ENEMY_BIT;
+		fdef.filter.maskBits = CollisionListener.PLAYER_BIT | CollisionListener.SOLID_WALL_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 	
-		fireballBody = this.body.createFixture(fdef);
-		fireballBody.setUserData(this);
-		
-		
+		arrowBody = this.body.createFixture(fdef);
+		arrowBody.setUserData(this);
 		
 		if (firedRight)
 			body.setLinearVelocity(new Vector2(10f, 0f));
@@ -73,40 +68,27 @@ public class Arrow extends Entity{
 	
 	public void update(final Scene scene, float deltaTime) {
 		super.update(scene, deltaTime);
-		
 		if(body.getLinearVelocity().y < 0) {
 			body.setLinearVelocity(new Vector2(body.getLinearVelocity().x,0));
 		}
-		
 	}
 
 	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
 		if (!other.isSensor()) {
-			
 			onHit();
 		}
-		
 	}
 	
 	private void onHit() {	
     	setToDestroy = true;
     }
 
-	@Override
-	public void resolveCollisionEnd(Fixture A, Fixture B) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resolvePreSolve(Fixture A, Fixture B) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public float getHitDmg() {
 		return hitDmg;
 	}
-
+	
+	public void reset(World world) {
+		setToDestroy = true;
+	}
 }

@@ -13,19 +13,22 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import entities.Entity;
 import entities.Player;
+import tools.CollisionListener;
+import entities.Chest;
+import entities.FireballItem;
+import entities.Key;
+import entities.RangedGuard;
+import entities.Slime;
 
 public class SnowScene extends Scene {
 
 	public SnowScene(TmxMapLoader mapLoader, SpriteBatch batch) {
 		super(mapLoader, "Snow/snow.tmx", batch);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void constructTileMap() {
-		// TODO Auto-generated method stub
 		BodyDef bodyDef = null;
 		PolygonShape shape = null;
 		FixtureDef fixtureDef = null;
@@ -44,6 +47,8 @@ public class SnowScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 0.f;
+			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
+			fixtureDef.filter.maskBits = 0xFF;
 			
 			body.createFixture(fixtureDef);
 			shape.dispose();
@@ -77,15 +82,22 @@ public class SnowScene extends Scene {
 
 	@Override
 	public void constructEntities() {
-		// TODO Auto-generated method stub
+		addEntity(new Slime(new Vector2(13.f, 8.f)));
+		addEntity(new Slime(new Vector2(68.f, 12.f)));
+		addEntity(new Slime(new Vector2(112.f, 21.f)));
+		addEntity(new RangedGuard(new Vector2(89.f, 33.f)));
+		Key key = new Key(new Vector2(115.1f, 21.f), "first");
+		FireballItem fireballItem = new FireballItem(new Vector2(75.1f, 32.1f));
+		addEntity(fireballItem);
+		addEntity(key);
+		addEntity(new Chest(new Vector2(115.f, 21.f), key));
+		addEntity(new Chest(new Vector2(75f, 32f), fireballItem));
 
 	}
 
 	@Override
 	protected void placePlayerOnScene(Player player) {
-		// TODO Auto-generated method stub
 		player.setPosition(new Vector2(2, 40));
-		
 	}
 
 }

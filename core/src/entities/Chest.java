@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import scenes.Scene;
+import tools.CollisionListener;
 
 public class Chest extends Entity {
 	private Item item;
@@ -42,6 +43,9 @@ public class Chest extends Entity {
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 		fdef.isSensor = true;
+		fdef.filter.categoryBits = CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
+		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		this.body.createFixture(fdef).setUserData(this);
 		
 		polShape.dispose();
@@ -56,23 +60,31 @@ public class Chest extends Entity {
 			opened = true;
 			item.appear();
 		}
-	}
-
-	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
-		openable = false;
-		if (!opened && other.getUserData() instanceof Player) {
-			openable = true;
+		
+		if (opened) {
+			body.setActive(false);
 		}
 	}
 
 	@Override
-	public void resolveCollisionEnd(Fixture A, Fixture B) {
+	public void resolveCollisionBegin(Fixture self, Fixture other) {
+		if (!opened) {
+			openable = true;
+		}
 	}
-
+	
 	@Override
-	public void resolvePreSolve(Fixture A, Fixture B) {
-		// TODO Auto-generated method stub
-		
+	public void resolveCollisionEnd(Fixture A, Fixture B) {
+		if (!opened) {
+			openable = false;
+		}
+	}
+	
+	@Override
+	public void reset(World world) {
+		super.reset(world);
+		opened = false;
+		openable = false;
+		sprite.setRegion(0, 0, 20, 20);
 	}
 }

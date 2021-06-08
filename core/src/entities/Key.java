@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 
 import sceneAnimations.PickupAnimation;
@@ -12,7 +11,8 @@ import scenes.Scene;
 
 public class Key extends Item {
 	private String keyID;
-
+	public boolean used = false; 
+			
 	public Key(Vector2 position, String keyID) {
 		super(position);
 		this.keyID = keyID;
@@ -43,15 +43,6 @@ public class Key extends Item {
 
 	@Override
 	public void addToWorld(World world) {
-	}
-
-	@Override
-	public void resolveCollision(Fixture self, Fixture other) {
-	}
-	@Override
-	public void resolveCollisionEnd(Fixture A, Fixture B) {
-	}
-	@Override
-	public void resolvePreSolve(Fixture A, Fixture B) {		
+		
 	}
 }

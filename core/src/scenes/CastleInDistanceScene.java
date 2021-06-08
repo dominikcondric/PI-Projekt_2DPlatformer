@@ -1,6 +1,5 @@
 package scenes;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
@@ -15,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import entities.Player;
 import sceneAnimations.IntroAnimation;
+import tools.CollisionListener;
 
 public class CastleInDistanceScene extends Scene {
 
@@ -22,7 +22,7 @@ public class CastleInDistanceScene extends Scene {
 		super(mapLoader, "CastleInDistance/CastleInDistance.tmx", batch);
 		music = Gdx.audio.newMusic(Gdx.files.internal("sounds/intro_music.mp3"));
 		visibleMapScale = 1.8f;
-		ambientLight = new Color(0.1f, 0.1f, 0.1f, 0.8f);
+		batchTintColor.set(0.5f, 0.5f, 0.5f, 1.f);
 	}
 
 	@Override
@@ -45,6 +45,8 @@ public class CastleInDistanceScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1f;
+			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
+			fixtureDef.filter.maskBits = 0xFF;
 			
 			body.createFixture(fixtureDef);
 			shape.dispose();

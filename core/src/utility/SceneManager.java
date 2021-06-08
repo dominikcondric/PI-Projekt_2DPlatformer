@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.function.BiConsumer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Disposable;
 
 import entities.Player;
@@ -11,12 +15,17 @@ import scenes.Scene;
 import scenes.SceneTrigger;
 
 public class SceneManager implements Disposable {
-	
 	private Scene activeScene = null;
-	protected HashMap<String, Scene> sceneMap;
+	private HashMap<String, Scene> sceneMap;
+	private boolean transitionTriggered;
+	private float timer = 2.3f;
+	private Scene nextScene = null;
+	private ShapeRenderer transitionRenderer;
 	
 	public SceneManager() {
 		sceneMap = new HashMap<String, Scene>(2);
+		transitionRenderer = new ShapeRenderer();
+		transitionRenderer.setColor(new Color(0.f, 0.f, 0.f, 0.f));
 	}
 	
 	/**
@@ -35,8 +44,16 @@ public class SceneManager implements Disposable {
 		sceneMap.put(sceneName, scene);
 		
 		if (setActive || sceneMap.isEmpty()) {
+			if (activeScene != null) 
+				activeScene.stopMusic(false);
+			
 			activeScene = scene;
+			activeScene.playMusic();
 		}
+	}
+	
+	public boolean isTransitionTriggered() {
+		return transitionTriggered;
 	}
 	
 	public Scene getActiveScene() {
@@ -46,27 +63,51 @@ public class SceneManager implements Disposable {
 	public void setActiveScene(String sceneName) {
 		if (sceneName != null && sceneMap.containsKey(sceneName)) {
 			activeScene = sceneMap.get(sceneName);
-			activeScene.getMusic().setVolume(0.1f);
-			activeScene.getMusic().play();
-			activeScene.getMusic().setLooping(true);
-			
+			activeScene.playMusic();
 		} else {
 			System.out.println("Scene doesn't exist!");
 		}
 	}
 	
-	public void update() {
-		for (SceneTrigger trigger : activeScene.getTriggers()) {
-			if (trigger.isTriggered()) {
-				activeScene.stopMusic();
-				Player p = activeScene.getPlayer();
-				activeScene = trigger.sceneToFollow;
-				activeScene.resetPlayer();
-				activeScene.addEntity(p);			
-				
-			}	
+	private void fadeInTransition() {
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		transitionRenderer.updateMatrices();
+		transitionRenderer.begin(ShapeType.Filled);
+		transitionRenderer.rect(0.f, 0.f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		transitionRenderer.end();
+	}
+	
+	public void update(float deltaTime) {
+		if (transitionTriggered) {
+			if (timer <= 0.f) {
+				transitionTriggered = false;
+			} else if (timer <= 2.f) {
+				transitionRenderer.getColor().a = timer / 2.f;
+				if (nextScene != null) {
+					activeScene.stopMusic(false);
+					Player p = activeScene.getPlayer();
+					activeScene = nextScene;
+					activeScene.addEntity(p);
+					activeScene.playMusic();
+					nextScene = null;
+				}
+			} else {
+				transitionRenderer.getColor().a = 1.f - (timer / 4.f);
+			}
+			
+			timer -= deltaTime;
+			fadeInTransition();
+		} else {
+			for (SceneTrigger trigger : activeScene.getTriggers()) {
+				if (trigger.isTriggered()) {
+					nextScene = trigger.sceneToFollow;
+					transitionTriggered = true;
+					timer = 3.f;
+					transitionRenderer.getColor().a = 0.f;
+				}
+			}
 		}
-		activeScene.playMusic();
 	}
 	
 	@Override

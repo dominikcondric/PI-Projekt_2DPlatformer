@@ -1,11 +1,10 @@
 package scenes;
 
-
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -24,6 +23,7 @@ import entities.Key;
 import entities.Player;
 import entities.RangedGuard;
 import entities.Slime;
+import tools.CollisionListener;
 
 public class ForestScene extends Scene {
 	private ArrayList<PointLight> lights;
@@ -53,7 +53,8 @@ public class ForestScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1f;
-			fixtureDef.filter.categoryBits=3;
+			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
+			fixtureDef.filter.maskBits = 0xFF;
 
 			body.createFixture(fixtureDef);
 			shape.dispose();
@@ -63,29 +64,40 @@ public class ForestScene extends Scene {
 	@Override
 	public void constructEntities() {
 		
-		addEntity(new Slime(new Vector2(15.f, 37.f)));
+		addEntity(new Slime(new Vector2(25.f, 31.f)));
 		addEntity(new Slime(new Vector2(17.f, 37.f)));
-		addEntity(new Slime(new Vector2(39.f, 50.f)));
-		addEntity(new RangedGuard(new Vector2(15.f, 37.f)));
+		addEntity(new Slime(new Vector2(37.f, 31.f)));
+		addEntity(new RangedGuard(new Vector2(53.f, 45.f)));
 		Key key = new Key(new Vector2(85.1f, 32.f), "first");
 		FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 39.1f));
 		addEntity(fireballItem);
 		addEntity(key);
 		addEntity(new Chest(new Vector2(85.f, 32.f), key));
 		addEntity(new Chest(new Vector2(5f, 39f), fireballItem));
+		
+
+		lights = new ArrayList<PointLight>(4);
+		addEntity(new Slime(new Vector2(34.f, 23.f)));
+		//addEntity(new Enemy(new Vector2(39.f, 50.f)));
+		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
+		for(MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
+			Rectangle rect = ((RectangleMapObject)object).getRectangle();
+			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
+			Color c = new Color(Color.GOLD);
+			c.a *= 0.78;
+			PointLight light = new PointLight(rayHandler, 150, c, 20, rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f);
+			
+			lights.add(light);
+		}
 	}
 
 	@Override
 	protected void placePlayerOnScene(Player player) {
-		player.setPosition(new Vector2(3.f, 39.f));
+		player.setPosition(new Vector2(3.f, 40.f));
 	}
 
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		
-		
 	}
-	
-
 }

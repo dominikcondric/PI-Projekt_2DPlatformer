@@ -13,9 +13,9 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
+import com.platformer.Platformer;
 
 import box2dLight.RayHandler;
-import entities.Coin;
 import entities.Entity;
 import entities.Player;
 import sceneAnimations.SceneAnimation;
@@ -33,8 +33,8 @@ public abstract class Scene {
 	protected Player player = null;
 	protected float visibleMapScale = 4.f;
 	protected Color ambientLight = Color.BLACK;
-	protected ArrayList<Coin> coins;
 	protected Music music;
+	protected Color batchTintColor;
 	
 	public Scene(final TmxMapLoader mapLoader, String mapFilePath, final SpriteBatch batch) {
 		this.map = mapLoader.load(mapFilePath);
@@ -43,7 +43,7 @@ public abstract class Scene {
 		box2DWorld = new World(new Vector2(0.f, -18.81f), true);
 		box2DWorld.setContactListener(new CollisionListener());
 		rayHandler = new RayHandler(box2DWorld);
-		coins = new ArrayList<Coin>(10);
+		batchTintColor = new Color(0.5f, 0.5f, 0.5f, 1.f);
 		
 		entities = new ArrayList<Entity>(5);
 		triggers = new ArrayList<SceneTrigger>(2);
@@ -70,16 +70,31 @@ public abstract class Scene {
 		return triggers;
 	}
 	
+	public RayHandler getRayHandler() {
+		return rayHandler;
+	}
+	
 	public void resetPlayer() {
 		player = null;
 	}
 	
 	public void resetEntities() {
-		for (Entity e : entities)
-			e.destroyBody(box2DWorld);
+		toDestroy.clear();
 		
-		entities.clear();
-		constructEntities();
+		for (int i = entities.size() - 1; i >= 0; --i) {
+			Entity e = entities.get(i);
+			e.reset(box2DWorld);
+			if (e.isSetToDestroy())
+				toDestroy.add(i);
+		}
+		
+		for (Integer i : toDestroy) {
+			entities.get(i).destroyBody(box2DWorld);
+			entities.remove(i.intValue());
+		}
+		
+		toDestroy.clear();
+		placePlayerOnScene(player);
 	}
 	
 	public Vector3 getTiledMapSize() {
@@ -110,7 +125,9 @@ public abstract class Scene {
 	
 	public void render(SpriteBatch batch, OrthographicCamera camera) {
 		mapRenderer.setView(camera);
+		mapRenderer.getBatch().setColor(batchTintColor);
 		mapRenderer.render();
+		batch.setColor(batchTintColor);
 		rayHandler.setCombinedMatrix(camera);
 		rayHandler.setAmbientLight(ambientLight);
 		batch.begin();
@@ -123,6 +140,9 @@ public abstract class Scene {
 	
 	public void update(float deltaTime) {
 		box2DWorld.step(deltaTime, 10, 10);
+		if (!music.isPlaying()) {
+			music.play();
+		}
 		
 		if (runningAnimation != null) {
 			player.controllable = false;
@@ -148,30 +168,29 @@ public abstract class Scene {
 		
 		toDestroy.clear();
 		
-		for (Coin coin : coins) {
-			coin.update();
-		}
+		music.setVolume(Platformer.musicVolume);
 	}
 	
 	public void dispose() {
 		box2DWorld.dispose();
 		map.dispose();
+		music.stop();
+		rayHandler.dispose();
 	}
 	
-
-	public Music getMusic() {
-		return music;
-	}
-	
-	public void playMusic(){
-		music.setVolume(0.1f);
+	public void playMusic() {
+		music.setVolume(Platformer.musicVolume);
 		music.play();
 		music.setLooping(true);
 	}
 	
-	public void stopMusic() {
-		music.stop();
+	public void stopMusic(boolean pause) {
+		if (pause) {
+			music.pause();
+		} else {
+			music.stop();
+		}
 	}
-
+	
 	protected abstract void placePlayerOnScene(Player player);
 }

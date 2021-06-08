@@ -3,7 +3,6 @@ package screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -13,21 +12,20 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.platformer.Platformer;
 
+import box2dLight.Light;
+import box2dLight.PointLight;
 import entities.Player;
 import scenes.CastleInDistanceScene;
 import scenes.CastleScene;
-import scenes.CaveScene;
 import scenes.ForestScene;
 import scenes.OutOfMapTrigger;
 import scenes.Scene;
-import scenes.SnowScene;
 import screens.GameOverScreen.ScreenType;
+import tools.CollisionListener;
 import utility.Hud;
 import utility.SceneManager;
 
 public class GameScreen implements Screen {
-	
-	
 	private final Platformer game;
 	private final TmxMapLoader tiledMapLoader;
 	private Box2DDebugRenderer physicsDebugRenderer;
@@ -48,16 +46,17 @@ public class GameScreen implements Screen {
 		tiledMapLoader = new TmxMapLoader();
 		sceneManager = new SceneManager();
 		player = new Player(new Vector2(2.f, 39.f));
-		inGameHud = new Hud(player, game.batch, game.font);
-		
+		inGameHud = new Hud(player, game.batch, game.font, game.options);
+		Light.setGlobalContactFilter((short)CollisionListener.LIGHT_BIT, (short)0, (short)(CollisionListener.PLATFORM_BIT | CollisionListener.SOLID_WALL_BIT | CollisionListener.OTHERS_BIT));
 		
 		Scene castleScene = new CastleScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(castleScene, "Castle", true);
-		
 		Scene introScene = new CastleInDistanceScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(introScene, "Intro", true);
-		
+		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
+		sceneManager.addScene(forestScene, "Forest", false);
 		introScene.addTrigger(new OutOfMapTrigger(castleScene, player, new Vector2(19.f, 19.f), true));
+		castleScene.addTrigger(new OutOfMapTrigger(forestScene, player, new Vector2(220.f, 15.f), true));
 		introScene.addEntity(player);
 	}
 
@@ -90,10 +89,14 @@ public class GameScreen implements Screen {
 		}
 		
 		camera.update();
-		sceneManager.update();
+		sceneManager.update(deltaTime);
 		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 			paused = !paused;
+			if (paused)
+				sceneManager.getActiveScene().stopMusic(true);
+			else 
+				sceneManager.getActiveScene().playMusic();
 		} 
 		
 		if (paused == true) {
@@ -105,29 +108,29 @@ public class GameScreen implements Screen {
 				dispose();
 				game.setScreen(new MainMenuScreen(game));
 			}
-		} else if (player.isSetToDestroy()) {
-			player.update(sceneManager.getActiveScene(), deltaTime);
+		} else if (!player.isActive()) {
 			sceneManager.getActiveScene().resetEntities();
-			sceneManager.getActiveScene().addEntity(player);
+			sceneManager.getActiveScene().stopMusic(false);
 			game.setScreen(new GameOverScreen(game, this, ScreenType.GAME_OVER));
 		}
 	}
 	
 	@Override
 	public void render (float delta) {
-		ScreenUtils.clear(Color.SKY);
+		ScreenUtils.clear(Color.BLACK);
 		Scene activeScene = sceneManager.getActiveScene();
 		game.batch.setProjectionMatrix(camera.combined);
 		
-		if (!paused) {
+		if (!paused && !sceneManager.isTransitionTriggered()) {
 			activeScene.update(delta);
-		} 
+		}
 		
 		activeScene.render(game.batch, camera);
 		if (debug) {
 			physicsDebugRenderer.render(activeScene.getWorld(), camera.combined);
 		}
-		inGameHud.render(activeScene, paused);
+			
+		inGameHud.render(activeScene, paused, sceneManager.isTransitionTriggered());
 		update(delta);
 	}
 	
