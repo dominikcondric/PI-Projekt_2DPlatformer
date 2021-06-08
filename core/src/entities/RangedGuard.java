@@ -304,7 +304,13 @@ public class RangedGuard extends Enemy {
 			} else {
 				onHit(fireball.facingRight, fireball.getHitDmg());
 			}
-		}		
+		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.OTHERS_BIT) != 0 && other.getUserData() instanceof Shield) {
+			if (facingRight) {
+				body.applyLinearImpulse(new Vector2(-10.f, 0.f), body.getWorldCenter(), false);
+			} else {
+				body.applyLinearImpulse(new Vector2(10.f, 0.f), body.getWorldCenter(), false);
+			}
+		}
 	}		
 
 	@Override

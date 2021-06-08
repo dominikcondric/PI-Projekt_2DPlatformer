@@ -56,7 +56,7 @@ public class CastleScene extends Scene {
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1.f;
 			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
-			fixtureDef.filter.maskBits = 0xFF;
+			fixtureDef.filter.maskBits = 0xFF & ~CollisionListener.PROJECTILE_BIT;
 
 			body.createFixture(fixtureDef);
 			shape.dispose();
@@ -74,7 +74,8 @@ public class CastleScene extends Scene {
 			fixtureDef = new FixtureDef();
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1.f;
-			fixtureDef.filter.categoryBits=3;
+			fixtureDef.filter.categoryBits = CollisionListener.PLATFORM_BIT;
+			fixtureDef.filter.maskBits = 0xFF & ~CollisionListener.PROJECTILE_BIT;
 
 			body.createFixture(fixtureDef);
 			shape.dispose();
@@ -86,7 +87,6 @@ public class CastleScene extends Scene {
 	public void constructEntities() {
 		lights = new ArrayList<PointLight>(4);
 
-
 		addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
         addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
@@ -95,20 +95,13 @@ public class CastleScene extends Scene {
         addEntity(new RangedGuard(new Vector2(160f, 13.f)));
         addEntity(new RangedGuard(new Vector2(192f, 13.f)));
         FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 8.1f));
-        //addEntity(fireballItem);
-       //addEntity(new Slime(new Vector2(15.f, 8.f)));
+        addEntity(fireballItem);
         addEntity(new FirstBoss(new Vector2(80f, 15.f)));
 
 
-       //addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
-       //addEntity(new Sorcerer(new Vector2(4f, 8f)));
        addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
        addEntity(new MeleeGuard(new Vector2(68.f, 13.f)));
 		
-		//TORCH
-		//addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
-		//addEntity(new RangedGuard(new Vector2(50.f, 12.f)));
-
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
 		for(MapObject object : map.getLayers().get("Lights Torch").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
@@ -194,12 +187,6 @@ public class CastleScene extends Scene {
 
 	@Override
 	protected void placePlayerOnScene(Player player) {
-		player.setPosition(new Vector2(70.f, 15.f));
+		player.setPosition(new Vector2(2.f, 9.f));
 	}
-	
-	@Override
-	public void update(float deltaTime) {
-		super.update(deltaTime);
-	}
-
 }

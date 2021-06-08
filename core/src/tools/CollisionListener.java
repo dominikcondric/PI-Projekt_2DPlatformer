@@ -26,7 +26,6 @@ public class CollisionListener implements ContactListener {
 	public static final int ENEMY_VISION_SENSOR_BIT = (1 << 12);
 	public static final int LEFT_BOTTOM_ENEMY_SENSOR_BIT = (1 << 13);
 	public static final int RIGHT_BOTTOM_ENEMY_SENSOR_BIT = (1 << 14);
-
 	
 	@Override
 	public void beginContact(Contact contact) {

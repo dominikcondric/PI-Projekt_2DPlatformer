@@ -150,7 +150,7 @@ public class FirstBoss extends Enemy {
 		super.update(scene, deltaTime);
 		currentRegion = getFrame(deltaTime);
 		
-		System.out.println(body.getPosition().x + " " + body.getPosition().y);
+//		System.out.println(body.getPosition().x + " " + body.getPosition().y);
 		//System.out.println(currentPos);
 		if(hasAttacked) {
 			attackAnimDelay -= deltaTime;

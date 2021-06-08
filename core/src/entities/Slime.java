@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.platformer.Platformer;
 
 import scenes.Scene;
 import tools.CollisionListener;
@@ -160,7 +161,7 @@ public class Slime extends Enemy {
 		}
 		
 		if(direction >= 2 && body.getLinearVelocity().y == 0 && jumpTimer < 0) {
-			slimeMove.play(0.5f);
+			slimeMove.play(Platformer.effectsVolume);
 			jump();
 			jumpTimer = 2;
 		}		
@@ -218,9 +219,14 @@ public class Slime extends Enemy {
 			} else {
 				onHit(fireball.facingRight, fireball.getHitDmg());
 			}
-		}
-		else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0) {
+		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.PLAYER_BIT) != 0) {
 			hasAttacked = true;
+		} else if (!self.isSensor() && (other.getFilterData().categoryBits & CollisionListener.OTHERS_BIT) != 0 && other.getUserData() instanceof Shield) {
+			if (facingRight) {
+				body.applyLinearImpulse(new Vector2(-10.f, 0.f), body.getWorldCenter(), false);
+			} else {
+				body.applyLinearImpulse(new Vector2(10.f, 0.f), body.getWorldCenter(), false);
+			}
 		}
 	}
 	

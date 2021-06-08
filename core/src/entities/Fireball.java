@@ -67,7 +67,7 @@ public class Fireball extends Entity {
 		fdef = new FixtureDef();
 		fdef.shape = polShape;
 		fdef.filter.categoryBits = CollisionListener.PROJECTILE_BIT | CollisionListener.FIREBALL_BIT;
-		fdef.filter.maskBits = 0xFF & ~CollisionListener.PLATFORM_BIT;
+		fdef.filter.maskBits = 0xFF & ~CollisionListener.PLATFORM_BIT & ~CollisionListener.OTHERS_BIT & ~CollisionListener.INTERACTABLE_BIT;
 	
 		fireballBody = this.body.createFixture(fdef);
 		fireballBody.setUserData(this);

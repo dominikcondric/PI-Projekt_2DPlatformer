@@ -43,7 +43,7 @@ public class Chest extends Entity {
 		FixtureDef fdef = new FixtureDef();
 		fdef.shape = polShape;
 		fdef.isSensor = true;
-		fdef.filter.categoryBits = CollisionListener.OTHERS_BIT | CollisionListener.INTERACTABLE_BIT;
+		fdef.filter.categoryBits = CollisionListener.INTERACTABLE_BIT;
 		fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
 		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		this.body.createFixture(fdef).setUserData(this);
@@ -68,7 +68,6 @@ public class Chest extends Entity {
 
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
-		openable = false;
 		if (!opened) {
 			openable = true;
 		}
@@ -76,7 +75,9 @@ public class Chest extends Entity {
 	
 	@Override
 	public void resolveCollisionEnd(Fixture A, Fixture B) {
-		resolveCollisionBegin(A, B);
+		if (!opened) {
+			openable = false;
+		}
 	}
 	
 	@Override
