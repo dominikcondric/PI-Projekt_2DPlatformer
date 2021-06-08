@@ -20,6 +20,7 @@ import box2dLight.PointLight;
 import entities.Chest;
 import entities.Coin;
 import entities.FireballItem;
+import entities.FirstBoss;
 import entities.Player;
 import entities.RangedGuard;
 import entities.Slime;
@@ -65,24 +66,26 @@ public class CastleScene extends Scene {
 	public void constructEntities() {
 		lights = new ArrayList<PointLight>(4);
 
-		addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
-        addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
-        addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
-        addEntity(new RangedGuard(new Vector2(135.f, 13.f)));
-        addEntity(new RangedGuard(new Vector2(160f, 13.f)));
-        addEntity(new RangedGuard(new Vector2(192f, 13.f)));
+		//addEntity(new RangedGuard(new Vector2(82.f, 13.f)));
+       // addEntity(new RangedGuard(new Vector2(68.f, 13.f)));
+        //addEntity(new RangedGuard(new Vector2(110.f, 13.f)));
+        //addEntity(new RangedGuard(new Vector2(135.f, 13.f)));
+        //addEntity(new RangedGuard(new Vector2(160f, 13.f)));
+        //addEntity(new RangedGuard(new Vector2(192f, 13.f)));
         FireballItem fireballItem = new FireballItem(new Vector2(5.1f, 8.1f));
-        addEntity(fireballItem);
+        //addEntity(fireballItem);
        //addEntity(new Slime(new Vector2(15.f, 8.f)));
-       addEntity(new RangedGuard(new Vector2(13.f, 8.f)));
-       addEntity(new Slime(new Vector2(53.f, 12.f)));
-       addEntity(new Slime(new Vector2(22.f, 11.f)));
-       addEntity(new Slime(new Vector2(5.f, 8.f)));
-       addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
-       addEntity(new Sorcerer(new Vector2(4f, 8f)));
+
+        addEntity(new FirstBoss(new Vector2(80f, 15.f)));
+       //addEntity(new RangedGuard(new Vector2(13.f, 8.f)));
+       //addEntity(new Slime(new Vector2(53.f, 12.f)));
+       //addEntity(new Slime(new Vector2(22.f, 11.f)));
+       //addEntity(new Slime(new Vector2(5.f, 8.f)));
+       //addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
+       //addEntity(new Sorcerer(new Vector2(4f, 8f)));
 		
 		//TORCH
-		addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
+		//addEntity(new RangedGuard(new Vector2(53.f, 12.f)));
 		//addEntity(new RangedGuard(new Vector2(50.f, 12.f)));
 
 		float scalingFactor = 1f / map.getProperties().get("tilewidth", Integer.class);
@@ -170,8 +173,9 @@ public class CastleScene extends Scene {
 
 	@Override
 	protected void placePlayerOnScene(Player player) {
-		player.setPosition(new Vector2(2.f, 9.f));
-		
+		//player.setPosition(new Vector2(2.f, 9.f));
+		player.setPosition(new Vector2(70.f, 15.f));
+
 	}
 	
 	@Override

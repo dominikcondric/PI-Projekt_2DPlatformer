@@ -108,7 +108,18 @@ public abstract class Enemy extends Entity {
 		body.applyLinearImpulse(new Vector2(moveSpeed, 0), body.getWorldCenter(), true);
     	
 	}
+	
+	public void moveDown() {
+		body.setLinearDamping(10);
+		body.applyLinearImpulse(new Vector2(0, -jumpHeight), body.getWorldCenter(), true);
 
+	}
+	
+	public void moveUp() {
+		body.setLinearDamping(10);
+		body.applyLinearImpulse(new Vector2(0, jumpHeight), body.getWorldCenter(), true);
+		
+	}
 
 	protected void onHit(boolean pushRight, float dmg) {
 		float xPush = 15f;

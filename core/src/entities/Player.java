@@ -144,6 +144,7 @@ public class Player extends Entity {
 		}
 		Vector2 playerVelocity = body.getLinearVelocity();
 		
+		
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
 			abilities.get(0).cast(scene, this);
 		}
