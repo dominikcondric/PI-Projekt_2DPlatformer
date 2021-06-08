@@ -44,7 +44,7 @@ public class FirstBoss extends Enemy {
 	public FirstBoss(Vector2 position) {
 		super(position);
 		setAnimations();
-		hp = 1;
+		hp = 15;
 		facingRight=false;
 		moveSpeed=0.3f;
 		jumpHeight=0.3f;
@@ -176,11 +176,15 @@ public class FirstBoss extends Enemy {
 		}
 		
 		if(deathAnimDelay <= 0) {
+			if (active) {
+				Key endGateKey = new Key(new Vector2(200.f, 12.f), "End");
+				scene.addEntity(endGateKey);
+				scene.addEntity(new Chest(new Vector2(200f, 12f), endGateKey));
+			}
 			active = false;
 			activeAI = false;
 		}
 			
-
 		if(hasAttacked) {
 			scene.addEntity(new EnemyFireball(new Vector2(body.getPosition().x, body.getPosition().y), true, 1, 1, 10f, 0f));
 			scene.addEntity(new EnemyFireball(new Vector2(body.getPosition().x, body.getPosition().y + bodyHeight/2), true, 1, 1, 10f, 10f));

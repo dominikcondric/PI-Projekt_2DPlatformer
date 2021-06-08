@@ -28,7 +28,6 @@ import entities.Orb;
 import entities.Player;
 import entities.RangedGuard;
 import entities.Slime;
-import entities.Sorcerer;
 import tools.CollisionListener;
 
 public class CastleScene extends Scene {
@@ -59,11 +58,11 @@ public class CastleScene extends Scene {
 			fixtureDef.shape = shape;
 			fixtureDef.friction = 1.f;
 			fixtureDef.filter.categoryBits = CollisionListener.SOLID_WALL_BIT;
-			fixtureDef.filter.maskBits = 0xFF & ~CollisionListener.PROJECTILE_BIT;
-
+			fixtureDef.filter.maskBits = 0xFF;
 			body.createFixture(fixtureDef);
 			shape.dispose();
 		}
+		
 		for (MapObject object : map.getLayers().get("Platform Object").getObjects().getByType(RectangleMapObject.class)) {
 			Rectangle rect = ((RectangleMapObject)object).getRectangle();
 			rect.set(rect.getX() * scalingFactor, rect.getY() * scalingFactor, rect.getWidth() * scalingFactor, rect.getHeight() * scalingFactor);
@@ -83,7 +82,6 @@ public class CastleScene extends Scene {
 			body.createFixture(fixtureDef);
 			shape.dispose();
 		}
-		
 	}
 
 	@Override
@@ -115,13 +113,9 @@ public class CastleScene extends Scene {
 
        addEntity(new Chest(new Vector2(5f, 8f), fireballItem));
        addEntity(new MeleeGuard(new Vector2(68.f, 13.f)));
-       Key mainGateKey = new Key(new Vector2(130.f, 12.f), "Main");
+       Key mainGateKey = new Key(new Vector2(178.f, 45.f), "Main");
        addEntity(mainGateKey);
-       addEntity(new Chest(new Vector2(130f, 12f), mainGateKey));
-       
-       Key endGateKey = new Key(new Vector2(200.f, 12.f), "End");
-       addEntity(endGateKey);
-       addEntity(new Chest(new Vector2(200f, 12f), endGateKey));
+       addEntity(new Chest(new Vector2(178f, 45f), mainGateKey));
        
        TiledMapTileLayer orbLayer = (TiledMapTileLayer)map.getLayers().get("Main Infront 2");
        addEntity(new Orb(new Vector2(208.f, 13f), "Fire", orbLayer.getCell(208, 13)));

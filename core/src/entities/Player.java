@@ -237,7 +237,7 @@ public class Player extends Entity {
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
 		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
-		fdef.filter.maskBits = CollisionListener.ENEMY_BIT & ~CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT & ~CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT;
+		fdef.filter.maskBits = CollisionListener.ENEMY_BIT & ~CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT;
 		melee = this.body.createFixture(fdef);
 		melee.setUserData(this);
 		hasAttacked = true;
@@ -415,7 +415,7 @@ public class Player extends Entity {
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
 		if((other.getFilterData().categoryBits & CollisionListener.ENEMY_BIT) != 0 && !hasAttacked) {
-			if(other.isSensor() && other.getUserData() instanceof MeleeGuard && ((MeleeGuard)other.getUserData()).hasAttacked()) 
+			if(other.isSensor() && other.getUserData() instanceof MeleeGuard && ((MeleeGuard)other.getUserData()).hasAttacked() && (other.getFilterData().categoryBits & CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT) == 0) 
 				onHit(((Enemy) other.getUserData()).getPosition().x, 2f);
 			else if(!other.isSensor()) 
 				onHit(((Enemy) other.getUserData()).getPosition().x, 1f);

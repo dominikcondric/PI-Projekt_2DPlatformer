@@ -56,7 +56,7 @@ public class GameScreen implements Screen {
 		Scene forestScene = new ForestScene(tiledMapLoader, game.batch);
 		sceneManager.addScene(forestScene, "Forest", false);
 		introScene.addTrigger(new OutOfMapTrigger(castleScene, player, new Vector2(19.f, 19.f), true));
-		castleScene.addTrigger(new OutOfMapTrigger(forestScene, player, new Vector2(220.f, 15.f), true));
+		castleScene.addTrigger(new OutOfMapTrigger(forestScene, player, new Vector2(220.f, 200.f), true));
 		introScene.addEntity(player);
 	}
 
