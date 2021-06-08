@@ -332,7 +332,8 @@ public class Player extends Entity {
 
 
 	private void jump() {
-		body.setLinearVelocity(new Vector2(0, 8f));
+		body.setLinearVelocity(new Vector2(0, 10f));
+
 	}
 	
 	public void moveRight() {
@@ -417,7 +418,7 @@ public class Player extends Entity {
 		if((other.getFilterData().categoryBits & CollisionListener.ENEMY_BIT) != 0 && !hasAttacked) {
 			if(other.isSensor() && other.getUserData() instanceof MeleeGuard && ((MeleeGuard)other.getUserData()).hasAttacked() && (other.getFilterData().categoryBits & CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT) == 0) 
 				onHit(((Enemy) other.getUserData()).getPosition().x, 2f);
-			else if(!other.isSensor()) 
+			else if(!other.isSensor() && (other.getFilterData().categoryBits & CollisionListener.PROJECTILE_BIT)==0 ) 
 				onHit(((Enemy) other.getUserData()).getPosition().x, 1f);
 			if((other.getFilterData().categoryBits & CollisionListener.PROJECTILE_BIT) != 0) this.onHit(0, 5);
 		} else if ((other.getFilterData().categoryBits & CollisionListener.COIN_BIT) != 0 && ((Coin)other.getUserData()).isActive()) {
