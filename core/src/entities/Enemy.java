@@ -36,7 +36,7 @@ public abstract class Enemy extends Entity {
 	protected TextureAtlas atlas;
 	protected TextureRegion currentRegion;
 	
-	protected Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/sword_hit3.wav"));
+	protected Sound hit = Gdx.audio.newSound(Gdx.files.internal("sounds/sword_hit.wav"));
 
 	public Enemy(Vector2 position) {
 		super(position);

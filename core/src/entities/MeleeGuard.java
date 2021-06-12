@@ -40,6 +40,7 @@ public class MeleeGuard extends Enemy {
 	FixtureDef fdef;
 	Fixture melee;
 	private Sound shieldBlock = Gdx.audio.newSound(Gdx.files.internal("sounds/shield_block.wav"));
+	private Sound swordSlash = Gdx.audio.newSound(Gdx.files.internal("sounds/melee_guard_slash.wav"));
 	private float moveDelay = 1f;
 	private boolean usingShield = false;
 	private float jumpTimer = 0;
@@ -113,6 +114,7 @@ public class MeleeGuard extends Enemy {
 			destroyAttackFix = false;
 		}
 		if(hasAttacked && attackDelay <= 0) {
+			swordSlash.play();
 			meleeAttack();
 			destroyAttackFix = true;
 			hasAttacked = false;       	  
@@ -214,7 +216,7 @@ public class MeleeGuard extends Enemy {
 		fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
 		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		melee = this.body.createFixture(fdef);
-		melee.setUserData(this); 
+		melee.setUserData(this); 	
 		attackRange.dispose(); 	
 	}
 
