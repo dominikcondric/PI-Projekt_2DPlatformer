@@ -143,8 +143,7 @@ public class Player extends Entity {
 			hp = maxHp;
 			return;
 		}
-		Vector2 playerVelocity = body.getLinearVelocity();
-		//System.out.println("x "+ body.getPosition().x + " y: " + body.getPosition().y);
+		Vector2 playerVelocity = body.getLinearVelocity();		
 		if(playerVelocity.y == ON_GROUND){
         	jumpCount = 0;
         	moveThresholdLeft = -6;
@@ -237,7 +236,7 @@ public class Player extends Entity {
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
 		fdef.filter.categoryBits = CollisionListener.PLAYER_BIT;
-		fdef.filter.maskBits = CollisionListener.ENEMY_BIT & ~CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT;
+		fdef.filter.maskBits = CollisionListener.ENEMY_BIT & ~CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT & ~CollisionListener.RIGHT_UPPER_ENEMY_SENSOR_BIT;
 		melee = this.body.createFixture(fdef);
 		melee.setUserData(this);
 		hasAttacked = true;
@@ -332,7 +331,7 @@ public class Player extends Entity {
 
 
 	private void jump() {
-		body.setLinearVelocity(new Vector2(0, 10f));
+		body.setLinearVelocity(new Vector2(0, 8f));
 
 	}
 	
@@ -416,8 +415,10 @@ public class Player extends Entity {
 	@Override
 	public void resolveCollisionBegin(Fixture self, Fixture other) {
 		if((other.getFilterData().categoryBits & CollisionListener.ENEMY_BIT) != 0 && !hasAttacked) {
-			if(other.isSensor() && other.getUserData() instanceof MeleeGuard && ((MeleeGuard)other.getUserData()).hasAttacked() && (other.getFilterData().categoryBits & CollisionListener.LEFT_UPPER_ENEMY_SENSOR_BIT) == 0) 
+			if(other.isSensor() && other.getUserData() instanceof MeleeGuard && (other.getFilterData().categoryBits & CollisionListener.RIGHT_UPPER_ENEMY_SENSOR_BIT) != 0) {
 				onHit(((Enemy) other.getUserData()).getPosition().x, 2f);
+			}
+				
 			else if(!other.isSensor() && (other.getFilterData().categoryBits & CollisionListener.PROJECTILE_BIT)==0 ) 
 				onHit(((Enemy) other.getUserData()).getPosition().x, 1f);
 			if((other.getFilterData().categoryBits & CollisionListener.PROJECTILE_BIT) != 0) this.onHit(0, 5);

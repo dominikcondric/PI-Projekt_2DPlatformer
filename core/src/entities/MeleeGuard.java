@@ -108,6 +108,10 @@ public class MeleeGuard extends Enemy {
 		moveDelay -= deltaTime;
 		attackDelay -= deltaTime;
 		startAttackAnim = false;
+		if(destroyAttackFix) {
+			body.destroyFixture(melee);
+			destroyAttackFix = false;
+		}
 		if(hasAttacked && attackDelay <= 0) {
 			meleeAttack();
 			destroyAttackFix = true;
@@ -116,10 +120,7 @@ public class MeleeGuard extends Enemy {
 			attackDelay = 1f;
         }
 		currentRegion = getFrame(deltaTime);
-		if(destroyAttackFix) {
-			body.destroyFixture(melee);
-			destroyAttackFix = false;
-		}	
+			
 		
 		usingShield = false;
 		if (activeAI) {
@@ -209,7 +210,7 @@ public class MeleeGuard extends Enemy {
 		fdef.shape = attackRange;
 		fdef.isSensor = true;
 		//fdef.filter.categoryBits = 2;
-		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT;
+		fdef.filter.categoryBits = CollisionListener.ENEMY_BIT | CollisionListener.RIGHT_UPPER_ENEMY_SENSOR_BIT; 
 		fdef.filter.maskBits = CollisionListener.PLAYER_BIT;
 		fdef.filter.groupIndex = -CollisionListener.ENEMY_BIT;
 		melee = this.body.createFixture(fdef);
